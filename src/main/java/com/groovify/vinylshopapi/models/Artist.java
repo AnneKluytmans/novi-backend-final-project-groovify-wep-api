@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 
 @Entity
 @Table(name = "artists")
@@ -22,9 +24,17 @@ public class Artist {
     private String name;
 
     @NotNull(message = "Birth year cannot be null")
-    @Min(value = 1900, message = "Year must be after 1900")
-    @Max(value = 2025, message = "Year cannot be in the future")
-    private Integer birthYear;
+    @Past(message = "Birth date must be in the past")
+    private LocalDate birthDate;
+
+    @AssertTrue(message = "Birth date must be after 1886")
+    public boolean birthDateIsValid() {
+        if (birthDate == null) {
+            return false;
+        }
+        LocalDate minValidBirthDate = LocalDate.of(1886, 1, 1);
+        return birthDate.isAfter(minValidBirthDate);
+    }
 
     @NotBlank(message = "Country of origin cannot be blank")
     @Size(max = 100, message = "Country of origin must not exceed 100 characters")
