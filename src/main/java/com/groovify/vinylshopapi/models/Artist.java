@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.models;
 
+import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -23,24 +24,16 @@ public class Artist {
     @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;
 
-    @NotNull(message = "Birth year cannot be null")
-    @Past(message = "Birth date must be in the past")
+    @NotNull(message = "Birth date is required")
+    @ValidDate(min = "1886-01-01", mustBePast = true, message = "Birth date must be between 1886 and now")
     private LocalDate birthDate;
-
-    @AssertTrue(message = "Birth date must be after 1886")
-    public boolean birthDateIsValid() {
-        if (birthDate == null) {
-            return false;
-        }
-        LocalDate minValidBirthDate = LocalDate.of(1886, 1, 1);
-        return birthDate.isAfter(minValidBirthDate);
-    }
 
     @NotBlank(message = "Country of origin cannot be blank")
     @Size(max = 100, message = "Country of origin must not exceed 100 characters")
     private String countryOfOrigin;
 
-    @PositiveOrZero(message = "Popularity score must be ")
-    private float popularity;
+    @NotNull(message = "Popularity score is required")
+    @PositiveOrZero(message = "Popularity score cannot be negative")
+    private Integer popularity = 0;
 
 }
