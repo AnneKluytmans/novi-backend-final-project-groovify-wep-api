@@ -8,8 +8,9 @@ import java.time.LocalDate;
 public class ArtistResponseDTO {
     private Long id;
     private String name;
-    private LocalDate birthDate;
-    private Integer age;
+    private Boolean isGroup;
+    private LocalDate firstReleaseDate;
+    private Integer yearsSinceFirstRelease;
     private String countryOfOrigin;
     private Integer popularity;
 }
