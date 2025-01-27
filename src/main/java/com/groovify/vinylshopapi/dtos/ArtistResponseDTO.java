@@ -10,7 +10,6 @@ public class ArtistResponseDTO {
     private String name;
     private Boolean isGroup;
     private LocalDate debutDate;
-    private Integer yearsSinceDebut;
     private String countryOfOrigin;
     private Integer popularity;
 }

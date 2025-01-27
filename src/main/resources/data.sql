@@ -1,4 +1,4 @@
-INSERT INTO artists (name, is_group, first_release_date, country_of_origin, popularity)
+INSERT INTO artists (name, is_group, debut_date, country_of_origin, popularity)
 VALUES
     ('Queen', true, '1973-07-13', 'United Kingdom', 85),
     ('The Beatles', true, '1963-03-22', 'United Kingdom', 90),
