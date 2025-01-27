@@ -15,15 +15,16 @@ public class ArtistRequestDTO {
     @NotNull(message = "Type is required")
     private Boolean isGroup = false;
 
-    @NotNull(message = "Birth date is required")
-    @ValidDate(min = "1886-01-01", mustBePast = true, message = "Birth date must be between 1886 and now")
-    private LocalDate firstReleaseDate;
+    @NotNull(message = "Debut date is required")
+    @ValidDate(min = "1500-01-01", mustBePast = true, message = "Debut date must be between 1500 and now")
+    private LocalDate debutDate;
 
     @NotBlank(message = "Country of origin cannot be blank")
     @Size(max = 100, message = "Country of origin must not exceed 100 characters")
     private String countryOfOrigin;
 
     @NotNull(message = "Popularity score is required")
-    @PositiveOrZero(message = "Popularity score cannot be negative")
+    @Min(value = 0, message = "Popularity score must be between 0 and 100")
+    @Max(value = 100, message = "Popularity score must be between 0 and 100")
     private Integer popularity = 0;
 }

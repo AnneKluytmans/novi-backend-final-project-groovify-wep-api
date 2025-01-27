@@ -13,9 +13,9 @@ public interface ArtistMapper {
     @Mapping(target = "id", ignore=true)
     Artist toEntity(ArtistRequestDTO artistRequestDTO);
 
-    @Mapping(target = "yearsSinceFirstRelease", ignore = true)
+    @Mapping(target = "yearsSinceDebut", ignore = true)
     ArtistResponseDTO toResponseDTO(Artist artist);
 
-    @Mapping(target = "yearsSinceFirstRelease", ignore = true)
+    @Mapping(target = "yearsSinceDebut", ignore = true)
     List<ArtistResponseDTO> toResponseDTOs(List<Artist> artists);
 }

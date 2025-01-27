@@ -9,8 +9,8 @@ public class ArtistResponseDTO {
     private Long id;
     private String name;
     private Boolean isGroup;
-    private LocalDate firstReleaseDate;
-    private Integer yearsSinceFirstRelease;
+    private LocalDate debutDate;
+    private Integer yearsSinceDebut;
     private String countryOfOrigin;
     private Integer popularity;
 }
