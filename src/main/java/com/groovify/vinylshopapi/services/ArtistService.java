@@ -73,5 +73,12 @@ public class ArtistService {
         return artistMapper.toResponseDTO(artist);
     }
 
+    public ArtistResponseDTO getArtistByName(String name) {
+        Artist artist = artistRepository.findByNameContainingIgnoreCase(name)
+                .orElseThrow(() -> new RecordNotFoundException("Artist with name " + name + " not found"));
+
+        return artistMapper.toResponseDTO(artist);
+    }
+
 }
 
