@@ -20,4 +20,6 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     List<Artist> findByPopularityLessThanEqual(Integer maxPopularity, Sort sort);
 
     Optional<Artist> findByNameContainingIgnoreCase(String name);
+
+    Boolean existsByName(String name);
 }

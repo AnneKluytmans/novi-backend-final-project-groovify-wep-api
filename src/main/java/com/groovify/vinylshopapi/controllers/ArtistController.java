@@ -1,11 +1,16 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
 import com.groovify.vinylshopapi.services.ArtistService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -41,5 +46,19 @@ public class ArtistController {
     public ResponseEntity<ArtistResponseDTO> getArtistByName(@PathVariable String name) {
         ArtistResponseDTO artist = artistService.getArtistByName(name);
         return ResponseEntity.ok(artist);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createArtist(@Valid @RequestBody ArtistRequestDTO artistRequestDTO,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        ArtistResponseDTO newArtist = artistService.createArtist(artistRequestDTO);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newArtist.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(newArtist);
     }
 }

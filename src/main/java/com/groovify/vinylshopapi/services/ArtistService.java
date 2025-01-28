@@ -1,7 +1,9 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
 import com.groovify.vinylshopapi.enums.SortOrder;
+import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.ArtistMapper;
 import com.groovify.vinylshopapi.models.Artist;
@@ -78,6 +80,17 @@ public class ArtistService {
                 .orElseThrow(() -> new RecordNotFoundException("Artist with name " + name + " not found"));
 
         return artistMapper.toResponseDTO(artist);
+    }
+
+    public ArtistResponseDTO createArtist(ArtistRequestDTO artistRequestDTO) {
+        Artist artist = artistMapper.toEntity(artistRequestDTO);
+
+        if (artistRepository.existsByName(artist.getName())) {
+            throw new ConflictException("Artist with name " + artist.getName() + " already exists");
+        }
+
+        Artist savedArtist = artistRepository.save(artist);
+        return artistMapper.toResponseDTO(savedArtist);
     }
 
 }
