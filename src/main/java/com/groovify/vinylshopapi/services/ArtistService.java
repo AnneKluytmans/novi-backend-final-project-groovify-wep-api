@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.ArtistPatchDTO;
 import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
 import com.groovify.vinylshopapi.enums.SortOrder;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ArtistService {
@@ -93,5 +95,58 @@ public class ArtistService {
         return artistMapper.toResponseDTO(savedArtist);
     }
 
+    public ArtistResponseDTO updateArtist(Long id, ArtistRequestDTO artistRequestDTO) {
+        Artist artist = artistRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
+
+        checkForDuplicateName(artistRequestDTO.getName(), id);
+
+        artist.setName(artistRequestDTO.getName());
+        artist.setIsGroup(artistRequestDTO.getIsGroup());
+        artist.setDebutDate(artistRequestDTO.getDebutDate());
+        artist.setCountryOfOrigin(artistRequestDTO.getCountryOfOrigin());
+        artist.setPopularity(artistRequestDTO.getPopularity());
+
+        Artist savedArtist = artistRepository.save(artist);
+        return artistMapper.toResponseDTO(savedArtist);
+    }
+
+    public ArtistResponseDTO partialUpdateArtist(Long id, ArtistPatchDTO artistPatchDTO) {
+        Artist artist = artistRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
+
+
+        if (artistPatchDTO.getName() != null && !artistPatchDTO.getName().trim().isEmpty()) {
+            checkForDuplicateName(artistPatchDTO.getName(), id);
+            artist.setName(artistPatchDTO.getName());
+        }
+
+        if (artistPatchDTO.getIsGroup() != null) {
+            artist.setIsGroup(artistPatchDTO.getIsGroup());
+        }
+
+        if (artistPatchDTO.getDebutDate() != null) {
+            artist.setDebutDate(artistPatchDTO.getDebutDate());
+        }
+
+        if (artistPatchDTO.getCountryOfOrigin() != null && !artistPatchDTO.getCountryOfOrigin().trim().isEmpty()) {
+            artist.setCountryOfOrigin(artistPatchDTO.getCountryOfOrigin());
+        }
+
+        if (artistPatchDTO.getPopularity() != null) {
+            artist.setPopularity(artistPatchDTO.getPopularity());
+        }
+
+        Artist savedArtist = artistRepository.save(artist);
+        return artistMapper.toResponseDTO(savedArtist);
+    }
+
+    private void checkForDuplicateName(String name, Long currentArtistId) {
+        Optional<Artist> existingArtist = artistRepository.findByNameContainingIgnoreCase(name);
+
+        if (existingArtist.isPresent() && !existingArtist.get().getId().equals(currentArtistId)) {
+            throw new ConflictException("Artist with name " + name + " already exists");
+        }
+    }
 }
 

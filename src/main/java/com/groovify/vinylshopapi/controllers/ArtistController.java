@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.ArtistPatchDTO;
 import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
 import com.groovify.vinylshopapi.services.ArtistService;
@@ -60,5 +61,29 @@ public class ArtistController {
                 .buildAndExpand(newArtist.getId())
                 .toUri();
         return ResponseEntity.created(location).body(newArtist);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateArtist(@PathVariable Long id,
+                                          @Valid @RequestBody ArtistRequestDTO artistRequestDTO,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        ArtistResponseDTO updatedArtist = artistService.updateArtist(id, artistRequestDTO);
+        return ResponseEntity.ok(updatedArtist);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> partialUpdateArtist(@PathVariable Long id,
+                                                 @Valid @RequestBody ArtistPatchDTO artistPatchDTO,
+                                                 BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        ArtistResponseDTO updatedArtist = artistService.partialUpdateArtist(id, artistPatchDTO);
+        return ResponseEntity.ok(updatedArtist);
     }
 }
