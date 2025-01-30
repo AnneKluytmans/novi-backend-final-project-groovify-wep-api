@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.models;
 
-import com.groovify.vinylshopapi.converters.DurationConverter;
 import com.groovify.vinylshopapi.enums.Genre;
 
 import com.groovify.vinylshopapi.validation.ValidDate;
@@ -11,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Entity
@@ -50,8 +48,7 @@ public class VinylRecord {
 
     @NotNull(message = "Play time is required")
     @Positive(message = "Play time must be greater than 0 seconds")
-    @Convert(converter = DurationConverter.class)
-    private Duration playTime;
+    private Long playTimeSeconds;
 
     @NotNull(message = "Limited edition status is required")
     private Boolean isLimitedEdition;

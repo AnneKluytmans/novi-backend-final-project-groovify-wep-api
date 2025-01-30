@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.dtos;
 
-import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -34,7 +33,7 @@ public class VinylRecordRequestDTO {
 
     @NotNull(message = "Play time is required")
     @Positive(message = "Play time must be greater than 0 seconds")
-    private Long playTime;
+    private Long playTimeSeconds;
 
     @NotNull(message = "Limited edition status is required")
     private Boolean isLimitedEdition;
