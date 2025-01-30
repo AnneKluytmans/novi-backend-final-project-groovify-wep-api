@@ -23,10 +23,14 @@ public class DateValidator implements ConstraintValidator<ValidDate, LocalDate> 
         }
 
         if (!constraintAnnotation.max().isEmpty()) {
-            try {
-                maxDate = LocalDate.parse(constraintAnnotation.max());
-            } catch (DateTimeParseException ex) {
-                throw new IllegalArgumentException("Invalid max date format in @ValidDate");
+            if (constraintAnnotation.max().equals("now+1Y")) {
+                maxDate = LocalDate.now().plusYears(1);
+            } else {
+                try {
+                    maxDate = LocalDate.parse(constraintAnnotation.max());
+                } catch (DateTimeParseException ex) {
+                    throw new IllegalArgumentException("Invalid max date format in @ValidDate");
+                }
             }
         }
 
