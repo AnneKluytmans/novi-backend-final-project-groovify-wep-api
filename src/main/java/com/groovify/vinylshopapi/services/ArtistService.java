@@ -141,6 +141,13 @@ public class ArtistService {
         return artistMapper.toResponseDTO(savedArtist);
     }
 
+    public void deleteArtist(Long id) {
+        if (!artistRepository.existsById(id)) {
+            throw new RecordNotFoundException("Artist with id " + id + " not found");
+        }
+        artistRepository.deleteById(id);
+    }
+
     private void checkForDuplicateName(String name, Long currentArtistId) {
         Optional<Artist> existingArtist = artistRepository.findByNameContainingIgnoreCase(name);
 
