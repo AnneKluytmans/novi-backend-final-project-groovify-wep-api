@@ -10,7 +10,9 @@ import com.groovify.vinylshopapi.mappers.ArtistMapper;
 import com.groovify.vinylshopapi.models.Artist;
 import com.groovify.vinylshopapi.repositories.ArtistRepository;
 
+import com.groovify.vinylshopapi.specifications.ArtistSpecification;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,42 +31,17 @@ public class ArtistService {
 
     public List<ArtistResponseDTO> getArtists(String country, Integer minPopularity, Integer maxPopularity,
                                               String orderBy, String sortOrder, Integer limit) {
-        Sort sort;
-        if ("popularity".equalsIgnoreCase(orderBy)) {
-            sort = SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ?
-                    Sort.by("popularity").descending() : Sort.by("popularity").ascending();
-        } else if ("id".equalsIgnoreCase(orderBy)) {
-            sort = SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ?
-                    Sort.by("id").descending() : Sort.by("id").ascending();
-        } else {
-            sort = SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ?
-                    Sort.by("name").descending() : Sort.by("name").ascending();
-        }
+        Sort sort = switch (orderBy.toLowerCase()) {
+          case "popularity" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("popularity") : Sort.Order.asc("popularity"));
+          case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
+          default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("name") : Sort.Order.asc("name"));
+        };
 
-        List<Artist> artists;
+        Specification<Artist> specification = ArtistSpecification.withFilters(country, minPopularity, maxPopularity);
+        List<Artist> artists = artistRepository.findAll(specification, sort);
 
-        if (country != null && !country.trim().isEmpty()) {
-            if (minPopularity != null && maxPopularity != null) {
-                artists = artistRepository.findByCountryOfOriginContainingIgnoreCaseAndPopularityBetween(country, minPopularity, maxPopularity, sort);
-            } else if (minPopularity != null) {
-                artists = artistRepository.findByCountryOfOriginContainingIgnoreCaseAndPopularityGreaterThanEqual(country, minPopularity, sort);
-            } else if (maxPopularity != null) {
-                artists = artistRepository.findByCountryOfOriginContainingIgnoreCaseAndPopularityLessThanEqual(country, maxPopularity, sort);
-            } else {
-                artists = artistRepository.findByCountryOfOriginContainingIgnoreCase(country, sort);
-            }
-        } else if (minPopularity != null && maxPopularity != null) {
-            artists = artistRepository.findByPopularityBetween(minPopularity, maxPopularity, sort);
-        } else if (minPopularity != null) {
-            artists = artistRepository.findByPopularityGreaterThanEqual(minPopularity, sort);
-        } else if (maxPopularity != null) {
-            artists = artistRepository.findByPopularityLessThanEqual(maxPopularity, sort);
-        } else {
-            artists = artistRepository.findAll(sort);
-        }
-
-        if (limit != null && limit > 0) {
-            artists = artists.subList(0, Math.min(limit, artists.size()));
+        if (limit != null && limit > 0 && limit < artists.size()) {
+            artists = artists.subList(0, limit);
         }
 
         return artistMapper.toResponseDTOs(artists);
