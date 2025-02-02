@@ -18,7 +18,7 @@ public class VinylRecordSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (genre != null && !genre.isBlank()) {
-                predicates.add(cb.equal(root.get("genre"), genre));
+                predicates.add(cb.equal(cb.lower(root.get("genre")), genre.toLowerCase()));
             }
             if (minPrice != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
