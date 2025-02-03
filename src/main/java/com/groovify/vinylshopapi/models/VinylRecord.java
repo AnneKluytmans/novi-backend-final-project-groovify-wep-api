@@ -55,6 +55,6 @@ public class VinylRecord {
 
     @NotNull(message = "EAN is required")
     @Pattern(regexp = "\\d{13}", message = "EAN must be a valid 13-digit number")
-    private String EAN;
+    private String ean;
 
 }

@@ -1,11 +1,16 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
 import com.groovify.vinylshopapi.services.VinylRecordService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -44,4 +49,20 @@ public class VinylRecordController {
         VinylRecordResponseDTO vinylRecord = vinylRecordService.getVinylRecordByTitle(title);
         return ResponseEntity.ok(vinylRecord);
     }
+
+    @PostMapping
+    public ResponseEntity<?> createVinylRecord(@Valid @RequestBody VinylRecordRequestDTO vinylRecordRequestDTO,
+                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        VinylRecordResponseDTO newVinylRecord = vinylRecordService.createVinylRecord(vinylRecordRequestDTO);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newVinylRecord.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(newVinylRecord);
+    }
+
+
 }

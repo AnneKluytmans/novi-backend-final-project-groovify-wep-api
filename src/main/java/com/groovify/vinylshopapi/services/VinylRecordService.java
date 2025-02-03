@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
 import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
@@ -7,6 +8,7 @@ import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
 import com.groovify.vinylshopapi.models.VinylRecord;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.specifications.VinylRecordSpecification;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -56,5 +58,12 @@ public class VinylRecordService {
                 .orElseThrow(() -> new RecordNotFoundException("Vinyl record with title " + title + " not found"));
 
         return vinylRecordMapper.toResponseDTO(vinylRecord);
+    }
+
+    public VinylRecordResponseDTO createVinylRecord(VinylRecordRequestDTO vinylRecordRequestDTO) {
+        VinylRecord vinylRecord = vinylRecordMapper.toEntity(vinylRecordRequestDTO);
+
+        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
+        return vinylRecordMapper.toResponseDTO(savedRecord);
     }
 }

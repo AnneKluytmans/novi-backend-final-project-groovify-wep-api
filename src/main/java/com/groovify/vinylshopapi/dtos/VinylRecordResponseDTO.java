@@ -16,5 +16,5 @@ public class VinylRecordResponseDTO {
     private LocalDate releaseDate;
     private Long playTimeSeconds;
     private Boolean isLimitedEdition;
-    private String EAN;
+    private String ean;
 }
