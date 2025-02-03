@@ -130,4 +130,11 @@ public class VinylRecordService {
         VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
         return vinylRecordMapper.toResponseDTO(savedRecord);
     }
+
+    public void deleteVinylRecord(Long id) {
+        if (!vinylRecordRepository.existsById(id)) {
+            throw new RecordNotFoundException("Vinyl record with id " + id + " not found");
+        }
+        vinylRecordRepository.deleteById(id);
+    }
 }

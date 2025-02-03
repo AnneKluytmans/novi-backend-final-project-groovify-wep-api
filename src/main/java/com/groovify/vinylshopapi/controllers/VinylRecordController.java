@@ -89,6 +89,10 @@ public class VinylRecordController {
         return ResponseEntity.ok(updatedVinylRecord);
     }
 
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVinylRecord(@PathVariable Long id) {
+        vinylRecordService.deleteVinylRecord(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }
