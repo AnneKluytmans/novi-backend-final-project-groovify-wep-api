@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.VinylRecordPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
 import com.groovify.vinylshopapi.services.VinylRecordService;
@@ -63,6 +64,31 @@ public class VinylRecordController {
                 .toUri();
         return ResponseEntity.created(location).body(newVinylRecord);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateVinylRecord(@PathVariable Long id,
+                                               @Valid @RequestBody VinylRecordRequestDTO vinylRecordRequestDTO,
+                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        VinylRecordResponseDTO updatedVinylRecord = vinylRecordService.updateVinylRecord(id, vinylRecordRequestDTO);
+        return ResponseEntity.ok(updatedVinylRecord);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> partialUpdateVinylRecord(@PathVariable Long id,
+                                                      @Valid @RequestBody VinylRecordPatchDTO vinylRecordPatchDTO,
+                                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        VinylRecordResponseDTO updatedVinylRecord = vinylRecordService.partialUpdateVinylRecord(id, vinylRecordPatchDTO);
+        return ResponseEntity.ok(updatedVinylRecord);
+    }
+
 
 
 }

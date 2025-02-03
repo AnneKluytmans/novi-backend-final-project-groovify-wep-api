@@ -1,7 +1,9 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.VinylRecordPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
+import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
@@ -62,6 +64,68 @@ public class VinylRecordService {
 
     public VinylRecordResponseDTO createVinylRecord(VinylRecordRequestDTO vinylRecordRequestDTO) {
         VinylRecord vinylRecord = vinylRecordMapper.toEntity(vinylRecordRequestDTO);
+
+        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
+        return vinylRecordMapper.toResponseDTO(savedRecord);
+    }
+
+    public VinylRecordResponseDTO updateVinylRecord(Long id, VinylRecordRequestDTO vinylRecordRequestDTO) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + id + " not found"));
+
+        vinylRecord.setTitle(vinylRecordRequestDTO.getTitle());
+        vinylRecord.setDescription(vinylRecordRequestDTO.getDescription());
+        vinylRecord.setGenre(Genre.stringToGenre(vinylRecordRequestDTO.getGenre()));
+        vinylRecord.setLabel(vinylRecordRequestDTO.getLabel());
+        vinylRecord.setPrice(vinylRecordRequestDTO.getPrice());
+        vinylRecord.setReleaseDate(vinylRecordRequestDTO.getReleaseDate());
+        vinylRecord.setPlayTimeSeconds(vinylRecordRequestDTO.getPlayTimeSeconds());
+        vinylRecord.setIsLimitedEdition(vinylRecordRequestDTO.getIsLimitedEdition());
+        vinylRecord.setEan(vinylRecordRequestDTO.getEan());
+
+        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
+        return vinylRecordMapper.toResponseDTO(savedRecord);
+    }
+
+    public VinylRecordResponseDTO partialUpdateVinylRecord(Long id, VinylRecordPatchDTO vinylRecordPatchDTO) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + id + " not found"));
+
+        if (vinylRecordPatchDTO.getTitle() != null && !vinylRecordPatchDTO.getTitle().trim().isEmpty()) {
+            vinylRecord.setTitle(vinylRecordPatchDTO.getTitle());
+        }
+
+        if (vinylRecordPatchDTO.getDescription() != null) {
+            vinylRecord.setDescription(vinylRecordPatchDTO.getDescription());
+        }
+
+        if (vinylRecordPatchDTO.getGenre() != null && !vinylRecordPatchDTO.getGenre().trim().isEmpty()) {
+            vinylRecord.setGenre(Genre.stringToGenre(vinylRecordPatchDTO.getGenre()));
+        }
+
+        if (vinylRecordPatchDTO.getLabel() != null && !vinylRecordPatchDTO.getLabel().trim().isEmpty()) {
+            vinylRecord.setLabel(vinylRecordPatchDTO.getLabel());
+        }
+
+        if (vinylRecordPatchDTO.getPrice() != null) {
+            vinylRecord.setPrice(vinylRecordPatchDTO.getPrice());
+        }
+
+        if (vinylRecordPatchDTO.getReleaseDate() != null) {
+            vinylRecord.setReleaseDate(vinylRecordPatchDTO.getReleaseDate());
+        }
+
+        if (vinylRecordPatchDTO.getPlayTimeSeconds() != null) {
+            vinylRecord.setPlayTimeSeconds(vinylRecordPatchDTO.getPlayTimeSeconds());
+        }
+
+        if (vinylRecordPatchDTO.getIsLimitedEdition() != null) {
+            vinylRecord.setIsLimitedEdition(vinylRecordPatchDTO.getIsLimitedEdition());
+        }
+
+        if (vinylRecordPatchDTO.getEan() != null) {
+            vinylRecord.setEan(vinylRecordPatchDTO.getEan());
+        }
 
         VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
         return vinylRecordMapper.toResponseDTO(savedRecord);
