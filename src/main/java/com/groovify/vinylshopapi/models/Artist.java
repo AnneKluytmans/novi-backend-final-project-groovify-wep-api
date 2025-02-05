@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -40,5 +42,8 @@ public class Artist {
     @Min(value = 0, message = "Popularity score must be between 0 and 100")
     @Max(value = 100, message = "Popularity score must be between 0 and 100")
     private Integer popularity = 0;
+
+    @OneToMany(mappedBy = "artist")
+    private List<VinylRecord> vinylRecords = new ArrayList<>();
 
 }

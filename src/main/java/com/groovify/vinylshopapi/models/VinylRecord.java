@@ -57,4 +57,7 @@ public class VinylRecord {
     @Pattern(regexp = "\\d{13}", message = "EAN must be a valid 13-digit number")
     private String ean;
 
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "artist_id", referencedColumnName = "id")
+    private Artist artist;
 }

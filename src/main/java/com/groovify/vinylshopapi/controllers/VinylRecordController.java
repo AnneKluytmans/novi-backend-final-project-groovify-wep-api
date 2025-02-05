@@ -95,4 +95,17 @@ public class VinylRecordController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @PutMapping("/{vinylId}/artist/{artistId}")
+    public ResponseEntity<VinylRecordResponseDTO> linkArtistToVinyl(@PathVariable Long vinylId, @PathVariable Long artistId) {
+        VinylRecordResponseDTO linkedVinylRecord = vinylRecordService.linkArtistToVinyl(vinylId, artistId);
+        return ResponseEntity.ok(linkedVinylRecord);
+    }
+
+    @PutMapping("/{vinylId}/artist/unlink")
+    public ResponseEntity<VinylRecordResponseDTO> unlinkArtistFromVinyl(@PathVariable Long vinylId) {
+        VinylRecordResponseDTO unlinkedVinylRecord = vinylRecordService.unlinkArtistFromVinyl(vinylId);
+        return ResponseEntity.ok(unlinkedVinylRecord);
+    }
+
 }

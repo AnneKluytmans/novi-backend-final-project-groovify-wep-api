@@ -7,7 +7,9 @@ import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
+import com.groovify.vinylshopapi.models.Artist;
 import com.groovify.vinylshopapi.models.VinylRecord;
+import com.groovify.vinylshopapi.repositories.ArtistRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.specifications.VinylRecordSpecification;
 
@@ -21,10 +23,12 @@ import java.util.List;
 @Service
 public class VinylRecordService {
 
+    private final ArtistRepository artistRepository;
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordMapper vinylRecordMapper;
 
-    public VinylRecordService(VinylRecordRepository vinylRecordRepository, VinylRecordMapper vinylRecordMapper) {
+    public VinylRecordService(ArtistRepository artistRepository, VinylRecordRepository vinylRecordRepository, VinylRecordMapper vinylRecordMapper) {
+        this.artistRepository = artistRepository;
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordMapper = vinylRecordMapper;
     }
@@ -136,5 +140,29 @@ public class VinylRecordService {
             throw new RecordNotFoundException("Vinyl record with id " + id + " not found");
         }
         vinylRecordRepository.deleteById(id);
+    }
+
+
+    public VinylRecordResponseDTO linkArtistToVinyl(Long vinylId, Long artistId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylId + " not found"));
+
+        Artist artist = artistRepository.findById(artistId)
+                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + artistId + " not found"));
+
+        vinylRecord.setArtist(artist);
+        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
+
+        return vinylRecordMapper.toResponseDTO(savedRecord);
+    }
+
+    public VinylRecordResponseDTO unlinkArtistFromVinyl(Long vinylId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylId + " not found"));
+
+        vinylRecord.setArtist(null);
+        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
+
+        return vinylRecordMapper.toResponseDTO(savedRecord);
     }
 }

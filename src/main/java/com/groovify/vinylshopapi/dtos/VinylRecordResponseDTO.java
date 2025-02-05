@@ -17,4 +17,5 @@ public class VinylRecordResponseDTO {
     private Long playTimeSeconds;
     private Boolean isLimitedEdition;
     private String ean;
+    private ArtistResponseDTO artist;
 }

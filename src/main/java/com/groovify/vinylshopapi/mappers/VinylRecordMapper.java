@@ -9,19 +9,20 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.time.Duration;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ArtistMapper.class)
 public interface VinylRecordMapper {
     @Mapping(target = "id", ignore=true)
     @Mapping(target = "genre", source = "genre", qualifiedByName = "stringToGenre")
     VinylRecord toEntity(VinylRecordRequestDTO vinylRecordRequestDTO);
 
     @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
+    @Mapping(target = "artist", source = "artist")
     VinylRecordResponseDTO toResponseDTO(VinylRecord vinylRecord);
 
     @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
+    @Mapping(target = "artist", source = "artist")
     List<VinylRecordResponseDTO> toResponseDTOs(List<VinylRecord> vinylRecords);
 
 
