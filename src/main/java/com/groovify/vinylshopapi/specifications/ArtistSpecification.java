@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArtistSpecification {
-    public static Specification<Artist> withFilters(String country, Integer minPopularity, Integer maxPopularity) {
+    public static Specification<Artist> filterArtists(String country, Integer minPopularity, Integer maxPopularity) {
         return (Root<Artist> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

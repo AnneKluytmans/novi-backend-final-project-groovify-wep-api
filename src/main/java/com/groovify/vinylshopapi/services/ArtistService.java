@@ -38,7 +38,7 @@ public class ArtistService {
           default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("name") : Sort.Order.asc("name"));
         };
 
-        Specification<Artist> specification = ArtistSpecification.withFilters(country, minPopularity, maxPopularity);
+        Specification<Artist> specification = ArtistSpecification.filterArtists(country, minPopularity, maxPopularity);
         List<Artist> artists = artistRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < artists.size()) {

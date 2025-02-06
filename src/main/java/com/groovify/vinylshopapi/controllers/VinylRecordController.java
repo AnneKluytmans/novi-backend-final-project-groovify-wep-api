@@ -27,6 +27,7 @@ public class VinylRecordController {
     @GetMapping
     public ResponseEntity<List<VinylRecordResponseDTO>> getVinylRecords(
             @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String artist,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean isLimitedEdition,
@@ -34,7 +35,7 @@ public class VinylRecordController {
             @RequestParam(defaultValue = "ASC") String sortOrder,
             @RequestParam(required = false) Integer limit)
     {
-        List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(genre, minPrice, maxPrice, isLimitedEdition,
+        List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition,
                 orderBy, sortOrder, limit);
         return ResponseEntity.ok(vinylRecords);
     }

@@ -33,7 +33,7 @@ public class VinylRecordService {
         this.vinylRecordMapper = vinylRecordMapper;
     }
 
-    public List<VinylRecordResponseDTO> getVinylRecords(String genre, BigDecimal minPrice, BigDecimal maxPrice,
+    public List<VinylRecordResponseDTO> getVinylRecords(String genre, String artist, BigDecimal minPrice, BigDecimal maxPrice,
                                                         Boolean isLimitedEdition, String orderBy, String sortOrder, Integer limit) {
         Sort sort = switch (orderBy.toLowerCase()) {
             case "price" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("price") : Sort.Order.asc("price"));
@@ -42,7 +42,7 @@ public class VinylRecordService {
             default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("title") : Sort.Order.asc("title"));
         };
 
-        Specification<VinylRecord> specification = VinylRecordSpecification.withFilters(genre, minPrice, maxPrice, isLimitedEdition);
+        Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition);
         List<VinylRecord> vinylRecords = vinylRecordRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < vinylRecords.size()) {
