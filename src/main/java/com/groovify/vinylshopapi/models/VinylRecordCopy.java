@@ -17,9 +17,9 @@ public class VinylRecordCopy {
     private Long id;
 
     @Column(unique = true)
-    @NotNull(message = "Product number is required")
-    @Pattern(regexp = "VN-\\d{4}-\\d{4}", message = "Product number must follow the pattern VN-YYYY-XXXX")
-    private String productNumber;
+    @NotNull(message = "Serial number is required")
+    @Pattern(regexp = "VYN-\\d{4}-\\d{4}", message = "Serial number must follow the pattern VYN-XXXX-YYYY")
+    private String serialNumber;
 
     @NotNull(message = "Sold status is required")
     Boolean isSold = false;
