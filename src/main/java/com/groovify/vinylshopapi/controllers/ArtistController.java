@@ -92,5 +92,4 @@ public class ArtistController {
         artistService.deleteArtist(id);
         return ResponseEntity.noContent().build();
     }
-
 }
