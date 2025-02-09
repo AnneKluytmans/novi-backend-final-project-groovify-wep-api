@@ -18,4 +18,5 @@ public class VinylRecordResponseDTO {
     private Boolean isLimitedEdition;
     private String ean;
     private ArtistResponseDTO artist;
+    private VinylRecordStockResponseDTO stock;
 }

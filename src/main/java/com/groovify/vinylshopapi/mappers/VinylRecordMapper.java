@@ -11,7 +11,7 @@ import org.mapstruct.Named;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = ArtistMapper.class)
+@Mapper(componentModel = "spring", uses = {ArtistMapper.class, VinylRecordStockMapper.class})
 public interface VinylRecordMapper {
     @Mapping(target = "id", ignore=true)
     @Mapping(target = "genre", source = "genre", qualifiedByName = "stringToGenre")
@@ -19,10 +19,12 @@ public interface VinylRecordMapper {
 
     @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
     @Mapping(target = "artist", source = "artist")
+    @Mapping(target = "stock", source = "stock")
     VinylRecordResponseDTO toResponseDTO(VinylRecord vinylRecord);
 
     @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
     @Mapping(target = "artist", source = "artist")
+    @Mapping(target = "stock", source = "stock")
     List<VinylRecordResponseDTO> toResponseDTOs(List<VinylRecord> vinylRecords);
 
 
