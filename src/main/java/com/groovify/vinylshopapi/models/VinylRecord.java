@@ -61,7 +61,6 @@ public class VinylRecord {
     @JoinColumn(name = "artist_id", referencedColumnName = "id")
     private Artist artist;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "stock_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "vinylRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private VinylRecordStock stock;
 }

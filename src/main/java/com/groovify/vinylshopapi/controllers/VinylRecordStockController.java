@@ -12,7 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/stocks")
+@RequestMapping("/api/vinyl-records/stock")
 public class VinylRecordStockController {
 
     private final VinylRecordStockService vinylRecordStockService;

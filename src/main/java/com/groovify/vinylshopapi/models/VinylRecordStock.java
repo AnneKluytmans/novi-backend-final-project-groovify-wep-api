@@ -25,6 +25,7 @@ public class VinylRecordStock {
     @Min(value = 0)
     private Integer amountSold;
 
-    @OneToOne(mappedBy = "stock", optional = false)
+    @OneToOne
+    @JoinColumn(name = "vinyl_record_id", referencedColumnName = "id", nullable = false, unique = true)
     private VinylRecord vinylRecord;
 }
