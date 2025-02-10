@@ -31,12 +31,13 @@ public class VinylRecordController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean isLimitedEdition,
+            @RequestParam(required = false) Boolean isAvailable,
             @RequestParam(defaultValue = "title") String orderBy,
             @RequestParam(defaultValue = "ASC") String sortOrder,
             @RequestParam(required = false) Integer limit)
     {
         List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition,
-                orderBy, sortOrder, limit);
+                isAvailable, orderBy, sortOrder, limit);
         return ResponseEntity.ok(vinylRecords);
     }
 

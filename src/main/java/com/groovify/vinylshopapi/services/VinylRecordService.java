@@ -34,15 +34,16 @@ public class VinylRecordService {
     }
 
     public List<VinylRecordResponseDTO> getVinylRecords(String genre, String artist, BigDecimal minPrice, BigDecimal maxPrice,
-                                                        Boolean isLimitedEdition, String orderBy, String sortOrder, Integer limit) {
+                                                        Boolean isLimitedEdition, Boolean isAvailable, String orderBy, String sortOrder, Integer limit) {
         Sort sort = switch (orderBy.toLowerCase()) {
             case "price" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("price") : Sort.Order.asc("price"));
             case "releasedate" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("releaseDate") : Sort.Order.asc("releaseDate"));
+            case "bestselling" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("stock.amountSold") : Sort.Order.asc("stock.amountSold"));
             case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
             default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("title") : Sort.Order.asc("title"));
         };
 
-        Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition);
+        Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable);
         List<VinylRecord> vinylRecords = vinylRecordRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < vinylRecords.size()) {
