@@ -1,9 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.exceptions.BadRequestException;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
-import com.groovify.vinylshopapi.exceptions.TeapotException;
+import com.groovify.vinylshopapi.exceptions.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +64,18 @@ public class ExceptionController {
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(value = DeleteOperationException.class)
+    public ResponseEntity<Object> handleArtistDeleteException(DeleteOperationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Conflict");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
 
     @ExceptionHandler(value = TeapotException.class)
     public ResponseEntity<Object> handleTeapotException(TeapotException ex) {
