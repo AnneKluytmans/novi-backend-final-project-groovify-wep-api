@@ -4,7 +4,7 @@ import com.groovify.vinylshopapi.dtos.ArtistPatchDTO;
 import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
 import com.groovify.vinylshopapi.enums.SortOrder;
-import com.groovify.vinylshopapi.exceptions.ArtistDeleteException;
+import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.ArtistMapper;
@@ -124,7 +124,7 @@ public class ArtistService {
                 .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
 
         if (!artist.getVinylRecords().isEmpty()) {
-            throw new ArtistDeleteException("Artist " + artist.getName() + " cannot be deleted while linked to vinyl records");
+            throw new DeleteOperationException("Artist " + artist.getName() + " cannot be deleted while linked to vinyl records");
         }
 
         artistRepository.deleteById(id);

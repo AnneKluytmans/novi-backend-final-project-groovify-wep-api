@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.VinylRecordStockPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
@@ -24,6 +25,17 @@ public class VinylRecordStockService {
         this.vinylRecordStockMapper = vinylRecordStockMapper;
     }
 
+
+    public VinylRecordStockResponseDTO getStockByVinylRecord(Long vinylRecordId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+
+        VinylRecordStock stock = vinylRecordStockRepository.findByVinylRecord(vinylRecord)
+                .orElseThrow(() -> new RecordNotFoundException("Stock from vinyl record " + vinylRecord.getTitle() + " not found"));
+
+        return vinylRecordStockMapper.toResponseDTO(stock);
+    }
+
     public VinylRecordStockResponseDTO createStock(VinylRecordStockRequestDTO stockRequestDTO) {
         VinylRecord vinylRecord = vinylRecordRepository.findById(stockRequestDTO.getVinylRecordId())
                 .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + stockRequestDTO.getVinylRecordId() + " not found"));
@@ -40,12 +52,12 @@ public class VinylRecordStockService {
         return vinylRecordStockMapper.toResponseDTO(savedStock);
     }
 
-    public VinylRecordStockResponseDTO updateStock(Long id, VinylRecordStockRequestDTO stockRequestDTO) {
+    public VinylRecordStockResponseDTO updateStock(Long id, VinylRecordStockPatchDTO stockPatchDTO) {
         VinylRecordStock stock = vinylRecordStockRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Stock with id " + id + " not found"));
 
-        stock.setAmountInStock(stockRequestDTO.getAmountInStock());
-        stock.setAmountSold(stockRequestDTO.getAmountSold());
+        stock.setAmountInStock(stockPatchDTO.getAmountInStock());
+        stock.setAmountSold(stockPatchDTO.getAmountSold());
 
         VinylRecordStock savedStock = vinylRecordStockRepository.save(stock);
         return vinylRecordStockMapper.toResponseDTO(savedStock);

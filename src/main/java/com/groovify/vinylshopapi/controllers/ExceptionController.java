@@ -65,8 +65,8 @@ public class ExceptionController {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(value = ArtistDeleteException.class)
-    public ResponseEntity<Object> handleArtistDeleteException(ArtistDeleteException ex) {
+    @ExceptionHandler(value = DeleteOperationException.class)
+    public ResponseEntity<Object> handleArtistDeleteException(DeleteOperationException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());
