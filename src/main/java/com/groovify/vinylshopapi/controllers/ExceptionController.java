@@ -4,6 +4,7 @@ import com.groovify.vinylshopapi.exceptions.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(value = DeleteOperationException.class)
-    public ResponseEntity<Object> handleArtistDeleteException(DeleteOperationException ex) {
+    public ResponseEntity<Object> handleDeleteOperationException(DeleteOperationException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());
@@ -76,6 +77,27 @@ public class ExceptionController {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(value = IOException.class)
+    public ResponseEntity<Object> handleIOException(IOException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "File Processing Error");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = InvalidFileTypeException.class)
+    public ResponseEntity<Object> handleInvalidFileTypeException(InvalidFileTypeException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
+        body.put("error", "Invalid File Type");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
 
     @ExceptionHandler(value = TeapotException.class)
     public ResponseEntity<Object> handleTeapotException(TeapotException ex) {
