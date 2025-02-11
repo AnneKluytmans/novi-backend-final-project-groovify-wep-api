@@ -13,7 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/vinyl-records/stock")
+@RequestMapping("/api/vinyl-records/{id}/stock")
 public class VinylRecordStockController {
 
     private final VinylRecordStockService vinylRecordStockService;
@@ -22,19 +22,20 @@ public class VinylRecordStockController {
         this.vinylRecordStockService = vinylRecordStockService;
     }
 
-    @GetMapping("/{vinylRecordId}")
-    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(@PathVariable Long vinylRecordId) {
-        VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(vinylRecordId);
+    @GetMapping()
+    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(@PathVariable Long id) {
+        VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(id);
         return ResponseEntity.ok(stock);
     }
 
     @PostMapping
-    public ResponseEntity<?> createStock(@Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
+    public ResponseEntity<?> createStock(@PathVariable Long id,
+                                         @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        VinylRecordStockResponseDTO newStock = vinylRecordStockService.createStock(stockRequestDTO);
+        VinylRecordStockResponseDTO newStock = vinylRecordStockService.createStock(id, stockRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(newStock.getId())
@@ -42,7 +43,7 @@ public class VinylRecordStockController {
         return ResponseEntity.created(location).body(newStock);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping()
     public ResponseEntity<?> updateStock(@PathVariable Long id,
                                          @Valid @RequestBody VinylRecordStockPatchDTO stockPatchDTO,
                                          BindingResult bindingResult) {
@@ -53,7 +54,7 @@ public class VinylRecordStockController {
         return ResponseEntity.ok(updatedStock);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping()
     public ResponseEntity<Void> deleteStock(@PathVariable Long id) {
         vinylRecordStockService.deleteStock(id);
         return ResponseEntity.noContent().build();

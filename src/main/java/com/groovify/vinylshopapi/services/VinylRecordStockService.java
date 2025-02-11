@@ -36,12 +36,12 @@ public class VinylRecordStockService {
         return vinylRecordStockMapper.toResponseDTO(stock);
     }
 
-    public VinylRecordStockResponseDTO createStock(VinylRecordStockRequestDTO stockRequestDTO) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(stockRequestDTO.getVinylRecordId())
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + stockRequestDTO.getVinylRecordId() + " not found"));
+    public VinylRecordStockResponseDTO createStock(Long vinylRecordId, VinylRecordStockRequestDTO stockRequestDTO) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
 
         if (vinylRecord.getStock() != null) {
-            throw new ConflictException("Stock already exists for vinyl record with id " + stockRequestDTO.getVinylRecordId());
+            throw new ConflictException("Stock already exists for vinyl record with id " + vinylRecordId);
         }
 
         VinylRecordStock stock = vinylRecordStockMapper.toEntity(stockRequestDTO);
@@ -52,9 +52,12 @@ public class VinylRecordStockService {
         return vinylRecordStockMapper.toResponseDTO(savedStock);
     }
 
-    public VinylRecordStockResponseDTO updateStock(Long id, VinylRecordStockPatchDTO stockPatchDTO) {
-        VinylRecordStock stock = vinylRecordStockRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Stock with id " + id + " not found"));
+    public VinylRecordStockResponseDTO updateStock(Long vinylRecordId, VinylRecordStockPatchDTO stockPatchDTO) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+
+        VinylRecordStock stock = vinylRecordStockRepository.findByVinylRecord(vinylRecord)
+                .orElseThrow(() -> new RecordNotFoundException("Stock of record " + vinylRecord.getTitle() + " not found"));
 
         stock.setAmountInStock(stockPatchDTO.getAmountInStock());
         stock.setAmountSold(stockPatchDTO.getAmountSold());
@@ -63,11 +66,13 @@ public class VinylRecordStockService {
         return vinylRecordStockMapper.toResponseDTO(savedStock);
     }
 
-    public void deleteStock(Long id) {
-        VinylRecordStock stock = vinylRecordStockRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Stock with id " + id + " not found"));
+    public void deleteStock(Long vinylRecordId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
 
-        VinylRecord vinylRecord = stock.getVinylRecord();
+        VinylRecordStock stock = vinylRecordStockRepository.findByVinylRecord(vinylRecord)
+                .orElseThrow(() -> new RecordNotFoundException("Stock of record " + vinylRecord.getTitle() + " not found"));
+
         vinylRecord.setStock(null);
 
         vinylRecordStockRepository.delete(stock);

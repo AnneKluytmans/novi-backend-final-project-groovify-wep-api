@@ -13,7 +13,4 @@ public class VinylRecordStockRequestDTO {
     @NotNull(message = "Amount sold is required")
     @Min(value = 0)
     private Integer amountSold;
-
-    @NotNull(message = "Vinyl Record id is required")
-    private Long vinylRecordId;
 }
