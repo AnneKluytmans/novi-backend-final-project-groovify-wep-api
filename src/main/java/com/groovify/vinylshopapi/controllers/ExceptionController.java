@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.controllers;
 import com.groovify.vinylshopapi.exceptions.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -97,6 +98,17 @@ public class ExceptionController {
         body.put("message", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Max Upload Size Exceeded");
+        body.put("message", "File size exceeded max upload size. Max upload size is " + ex.getMaxUploadSize());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = TeapotException.class)
