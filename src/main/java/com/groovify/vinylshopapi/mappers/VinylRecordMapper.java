@@ -5,9 +5,7 @@ import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
 import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.models.VinylRecord;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -29,6 +27,15 @@ public interface VinylRecordMapper {
     @Mapping(target = "cover", source = "cover")
     List<VinylRecordResponseDTO> toResponseDTOs(List<VinylRecord> vinylRecords);
 
+    @AfterMapping
+    default void addDownloadUrl(@MappingTarget VinylRecordResponseDTO vinylRecordResponseDTO, VinylRecord vinylRecord) {
+        String downloadUrl = generateCoverDownloadUrl(vinylRecord.getId());
+        vinylRecordResponseDTO.getCover().setDownloadUrl(downloadUrl);
+    }
+
+    default String generateCoverDownloadUrl(Long vinylRecordId) {
+        return "/api/vinyl-records/" + vinylRecordId + "/cover/download";
+    }
 
     @Named("stringToGenre")
     static Genre stringToGenre(String genre) {

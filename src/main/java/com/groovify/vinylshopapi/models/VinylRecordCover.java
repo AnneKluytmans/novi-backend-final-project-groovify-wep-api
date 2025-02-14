@@ -19,8 +19,6 @@ public class VinylRecordCover {
 
     private String fileType;
 
-    private String downloadUrl;
-
     @Lob
     private byte[] data;
 }
