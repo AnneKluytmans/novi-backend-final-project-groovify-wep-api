@@ -27,16 +27,6 @@ public interface VinylRecordMapper {
     @Mapping(target = "cover", source = "cover")
     List<VinylRecordResponseDTO> toResponseDTOs(List<VinylRecord> vinylRecords);
 
-    @AfterMapping
-    default void addDownloadUrl(@MappingTarget VinylRecordResponseDTO vinylRecordResponseDTO, VinylRecord vinylRecord) {
-        String downloadUrl = generateCoverDownloadUrl(vinylRecord.getId());
-        vinylRecordResponseDTO.getCover().setDownloadUrl(downloadUrl);
-    }
-
-    default String generateCoverDownloadUrl(Long vinylRecordId) {
-        return "/api/vinyl-records/" + vinylRecordId + "/cover/download";
-    }
-
     @Named("stringToGenre")
     static Genre stringToGenre(String genre) {
         return Genre.stringToGenre(genre);

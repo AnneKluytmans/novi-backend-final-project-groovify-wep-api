@@ -64,7 +64,7 @@ public class VinylRecord {
     @OneToOne(mappedBy = "vinylRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private VinylRecordStock stock;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cover_id", referencedColumnName = "id")
     private VinylRecordCover cover;
 }

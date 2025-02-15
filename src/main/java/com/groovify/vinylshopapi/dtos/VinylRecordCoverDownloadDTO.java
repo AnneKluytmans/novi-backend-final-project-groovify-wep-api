@@ -3,8 +3,8 @@ package com.groovify.vinylshopapi.dtos;
 import lombok.Data;
 
 @Data
-public class VinylRecordCoverMetadataResponseDTO {
+public class VinylRecordCoverDownloadDTO {
     private String filename;
     private String fileType;
-    private String downloadUrl;
+    private byte[] data;
 }
