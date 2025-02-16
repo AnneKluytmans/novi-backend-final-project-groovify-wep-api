@@ -32,7 +32,7 @@ public class VinylRecordCoverService {
         this.vinylRecordCoverMapper = vinylRecordCoverMapper;
     }
 
-    public VinylRecordCoverResponseDTO uploadCover(Long vinylRecordId, MultipartFile file) throws IOException {
+    public VinylRecordCoverResponseDTO uploadCover(Long vinylRecordId, MultipartFile file, String downloadUrl) throws IOException {
         if (file.isEmpty()) {
             throw new InvalidFileTypeException("Uploaded file is empty");
         }
@@ -52,7 +52,7 @@ public class VinylRecordCoverService {
         VinylRecordCover cover = new VinylRecordCover();
         cover.setFilename(file.getOriginalFilename());
         cover.setFileType(file.getContentType());
-        cover.setDownloadUrl("/vinyl-records/" + vinylRecordId + "/cover/download");
+        cover.setDownloadUrl(downloadUrl);
         cover.setData(file.getBytes());
 
         VinylRecordCover savedCover = vinylRecordCoverRepository.save(cover);

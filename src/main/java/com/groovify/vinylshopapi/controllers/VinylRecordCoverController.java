@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,9 +27,16 @@ public class VinylRecordCoverController {
     @PostMapping("/upload")
     public ResponseEntity<VinylRecordCoverResponseDTO> uploadCover(@PathVariable("id") Long vinylRecordId,
                                                                    @RequestParam("file") MultipartFile file) throws IOException {
-        VinylRecordCoverResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file);
 
-        URI location = URI.create(newCover.getDownloadUrl());
+        String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/vinyl-records/")
+                .path(vinylRecordId.toString())
+                .path("/cover/download")
+                .toUriString();
+
+        VinylRecordCoverResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file, downloadUrl);
+
+        URI location = URI.create(downloadUrl);
 
         return ResponseEntity.created(location).body(newCover);
     }
