@@ -19,4 +19,5 @@ public class VinylRecordResponseDTO {
     private String ean;
     private ArtistResponseDTO artist;
     private VinylRecordStockResponseDTO stock;
+    private VinylRecordCoverResponseDTO cover;
 }
