@@ -24,14 +24,11 @@ public class VinylRecordCoverController {
         this.vinylRecordCoverService = vinylRecordCoverService;
     }
 
-    @PostMapping("/upload")
+    @PostMapping()
     public ResponseEntity<VinylRecordCoverResponseDTO> uploadCover(@PathVariable("id") Long vinylRecordId,
                                                                    @RequestParam("file") MultipartFile file) throws IOException {
 
-        String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/vinyl-records/")
-                .path(vinylRecordId.toString())
-                .path("/cover/download")
+        String downloadUrl = ServletUriComponentsBuilder.fromCurrentRequest()
                 .toUriString();
 
         VinylRecordCoverResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file, downloadUrl);
@@ -41,7 +38,7 @@ public class VinylRecordCoverController {
         return ResponseEntity.created(location).body(newCover);
     }
 
-    @GetMapping("/download")
+    @GetMapping()
     public ResponseEntity<byte[]> downloadCover(@PathVariable("id") Long vinylRecordId) {
         VinylRecordCoverDownloadDTO cover = vinylRecordCoverService.downloadCover(vinylRecordId);
 
@@ -58,6 +55,12 @@ public class VinylRecordCoverController {
                 .contentType(mediaType)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + cover.getFilename() + "\"")
                 .body(cover.getData());
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteCover(@PathVariable("id") Long vinylRecordId) {
+        vinylRecordCoverService.deleteCover(vinylRecordId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -76,5 +76,19 @@ public class VinylRecordCoverService {
         return vinylRecordCoverMapper.toDownloadDTO(cover);
     }
 
+    public void deleteCover(Long vinylRecordId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+
+        VinylRecordCover cover = vinylRecord.getCover();
+
+        if (cover == null) {
+            throw new RecordNotFoundException("Cover of vinyl record with id " + vinylRecordId + " not found");
+        }
+
+        vinylRecord.setCover(null);
+
+        vinylRecordCoverRepository.delete(cover);
+    }
 }
 
