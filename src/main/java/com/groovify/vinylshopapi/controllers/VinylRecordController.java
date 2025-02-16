@@ -104,7 +104,7 @@ public class VinylRecordController {
         return ResponseEntity.ok(linkedVinylRecord);
     }
 
-    @PutMapping("/{vinylId}/artist/unlink")
+    @PutMapping("/{vinylId}/artist")
     public ResponseEntity<VinylRecordResponseDTO> unlinkArtistFromVinyl(@PathVariable Long vinylId) {
         VinylRecordResponseDTO unlinkedVinylRecord = vinylRecordService.unlinkArtistFromVinyl(vinylId);
         return ResponseEntity.ok(unlinkedVinylRecord);

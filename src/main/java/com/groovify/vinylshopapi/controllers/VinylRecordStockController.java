@@ -23,40 +23,39 @@ public class VinylRecordStockController {
     }
 
     @GetMapping()
-    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(@PathVariable Long id) {
-        VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(id);
+    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(@PathVariable("id") Long vinylRecordId) {
+        VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(vinylRecordId);
         return ResponseEntity.ok(stock);
     }
 
     @PostMapping
-    public ResponseEntity<?> createStock(@PathVariable Long id,
+    public ResponseEntity<?> createStock(@PathVariable("id") Long vinylRecordId,
                                          @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        VinylRecordStockResponseDTO newStock = vinylRecordStockService.createStock(id, stockRequestDTO);
+        VinylRecordStockResponseDTO newStock = vinylRecordStockService.createStock(vinylRecordId, stockRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(newStock.getId())
+                .build()
                 .toUri();
         return ResponseEntity.created(location).body(newStock);
     }
 
     @PatchMapping()
-    public ResponseEntity<?> updateStock(@PathVariable Long id,
+    public ResponseEntity<?> updateStock(@PathVariable("id") Long vinylRecordId,
                                          @Valid @RequestBody VinylRecordStockPatchDTO stockPatchDTO,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        VinylRecordStockResponseDTO updatedStock = vinylRecordStockService.updateStock(id, stockPatchDTO);
+        VinylRecordStockResponseDTO updatedStock = vinylRecordStockService.updateStock(vinylRecordId, stockPatchDTO);
         return ResponseEntity.ok(updatedStock);
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> deleteStock(@PathVariable Long id) {
-        vinylRecordStockService.deleteStock(id);
+    public ResponseEntity<Void> deleteStock(@PathVariable("id") Long vinylRecordId) {
+        vinylRecordStockService.deleteStock(vinylRecordId);
         return ResponseEntity.noContent().build();
     }
 }

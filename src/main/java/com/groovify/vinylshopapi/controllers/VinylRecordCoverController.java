@@ -30,11 +30,8 @@ public class VinylRecordCoverController {
 
         String downloadUrl = ServletUriComponentsBuilder.fromCurrentRequest()
                 .toUriString();
-
         VinylRecordCoverResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file, downloadUrl);
-
         URI location = URI.create(downloadUrl);
-
         return ResponseEntity.created(location).body(newCover);
     }
 
@@ -43,7 +40,6 @@ public class VinylRecordCoverController {
         VinylRecordCoverDownloadDTO cover = vinylRecordCoverService.downloadCover(vinylRecordId);
 
         MediaType mediaType;
-
         try {
             mediaType = MediaType.parseMediaType(cover.getFileType());
         } catch (InvalidMediaTypeException e) {
