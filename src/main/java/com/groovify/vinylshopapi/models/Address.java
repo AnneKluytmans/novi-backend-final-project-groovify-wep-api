@@ -7,11 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "addresses")
+@Table(
+        name = "addresses",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "isShippingAddress"}),
+                @UniqueConstraint(columnNames = {"user_id", "isBillingAddress"})
+        })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Adress {
+public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,4 +40,14 @@ public class Adress {
     @NotBlank(message = "Country is required")
     @Size(max = 100, message = "Country cannot be longer than 100 characters")
     private String country;
+
+    @NotNull(message = "Shipping address status is required")
+    private Boolean isShippingAddress;
+
+    @NotNull(message = "Billing address status is required")
+    private Boolean isBillingAddress;
+
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private User user;
 }
