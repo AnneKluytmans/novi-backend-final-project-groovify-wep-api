@@ -67,3 +67,11 @@ VALUES
     (20, 25, (SELECT id FROM vinyl_records WHERE title = 'Revolver')),
     (15, 20, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew')),
     (10, 12, (SELECT id FROM vinyl_records WHERE title = 'Satchmo at Symphony Hall'));
+
+
+-- Authority roles
+INSERT INTO roles (role_type)
+VALUES
+    ('ROLE_USER'),
+    ('ROLE_EMPLOYEE'),
+    ('ROLE_ADMIN');
