@@ -1,9 +1,7 @@
 package com.groovify.vinylshopapi.dtos;
 
 import com.groovify.vinylshopapi.validation.ValidDate;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
