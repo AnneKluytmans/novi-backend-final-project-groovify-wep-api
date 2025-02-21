@@ -1,21 +1,13 @@
-package com.groovify.vinylshopapi.models;
+package com.groovify.vinylshopapi.dtos;
 
-
-import jakarta.persistence.*;
+import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
-
-@Entity
-@DiscriminatorValue("EMPLOYEE")
-@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Employee extends User {
+@EqualsAndHashCode(callSuper = true)
+public class EmployeeRegisterDTO extends UserRegisterDTO {
     @NotNull(message = "Job title is required")
     @Size(min = 3, max = 50, message = "Job title must be between 3 and 50 characters")
     private String jobTitle;
