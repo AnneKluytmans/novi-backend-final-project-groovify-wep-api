@@ -72,6 +72,6 @@ VALUES
 -- Authority roles
 INSERT INTO roles (role_type)
 VALUES
-    ('ROLE_USER'),
-    ('ROLE_EMPLOYEE'),
-    ('ROLE_ADMIN');
+    ('USER'),
+    ('EMPLOYEE'),
+    ('ADMIN');

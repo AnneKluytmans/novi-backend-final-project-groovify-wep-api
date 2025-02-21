@@ -3,9 +3,9 @@ package com.groovify.vinylshopapi.enums;
 import java.util.Arrays;
 
 public enum RoleType {
-    ROLE_USER,
-    ROLE_EMPLOYEE,
-    ROLE_ADMIN;
+    USER,
+    EMPLOYEE,
+    ADMIN;
 
     public static RoleType stringToRole(String roleType) {
         try {
