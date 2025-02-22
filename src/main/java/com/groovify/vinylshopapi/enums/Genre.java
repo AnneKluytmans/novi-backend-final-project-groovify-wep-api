@@ -29,7 +29,7 @@ public enum Genre {
         try {
             return Genre.valueOf(genre.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid genre: " + genre + "'. Please use one of the valid genres: " + Arrays.toString(Genre.values()) + " or 'OTHER'.");
+            throw new IllegalArgumentException("Invalid genre: " + genre + ". Valid genres are: " + Arrays.toString(Genre.values()));
         }
     }
 }
