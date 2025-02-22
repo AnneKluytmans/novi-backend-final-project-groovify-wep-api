@@ -25,7 +25,7 @@ public class CustomerController {
     public ResponseEntity<?> registerCustomer(@Valid @RequestBody CustomerRegisterDTO customerRegisterDTO,
                                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult);
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
         CustomerResponseDTO newCustomer = customerService.registerCustomer(customerRegisterDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

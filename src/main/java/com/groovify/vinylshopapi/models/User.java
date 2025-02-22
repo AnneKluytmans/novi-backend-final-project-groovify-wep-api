@@ -15,12 +15,7 @@ import java.util.Set;
 
 
 @Entity
-@Table(
-        name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"username"}),
-                @UniqueConstraint(columnNames = {"email", "user_type"})
-        })
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type")
 @Data
@@ -31,10 +26,12 @@ public abstract class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     @NotNull(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9._&@!]{3,50}$", message = "Username must be between 3 and 50 characters and may not contain spaces.")
     private String username;
 
+    @Column(unique = true)
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
@@ -55,7 +52,7 @@ public abstract class User {
     @ValidDate(min = "1900-01-01", mustBePast = true, message = "Birth data must be in the past")
     private LocalDate dateOfBirth;
 
-    @Pattern(regexp = "^(\\+\\d{1,3})?\\s?\\d{6,15}$", message = "Invalid phone number format")
+    @Pattern(regexp = "^\\+?([0-9]{1,4})?\\s?(\\(?\\d{1,4}\\)?\\s?)?\\d{6,10}$", message = "Invalid phone number format")
     private String phone;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

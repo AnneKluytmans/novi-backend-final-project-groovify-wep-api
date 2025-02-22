@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 public class UserRegisterDTO {
     @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9._&@!]{3,50}$", message = "Username must be between 3 and 50 characters and may not contain spaces.")
     private String username;
 
     @NotBlank(message = "Email is required")
@@ -32,6 +32,6 @@ public class UserRegisterDTO {
     @ValidDate(min = "1900-01-01", mustBePast = true, message = "Birth data must be in the past")
     private LocalDate dateOfBirth;
 
-    @Pattern(regexp = "^(\\+\\d{1,3})?\\s?\\d{6,15}$", message = "Invalid phone number format")
+    @Pattern(regexp = "^\\+?([0-9]{1,4})?\\s?(\\(?\\d{1,4}\\)?\\s?)?\\d{6,10}$", message = "Invalid phone number format")
     private String phone;
 }

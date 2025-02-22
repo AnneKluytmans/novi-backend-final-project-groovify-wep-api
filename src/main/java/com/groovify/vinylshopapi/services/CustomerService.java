@@ -13,9 +13,6 @@ import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-
 @Service
 public class CustomerService {
 
@@ -38,8 +35,8 @@ public class CustomerService {
             throw new ConflictException("Username '" + customer.getUsername() + "' already in use. Choose another username.");
         }
 
-        if (customerRepository.existsByEmail(customer.getEmail().toLowerCase())) {
-            throw new ConflictException("Email '" + customer.getEmail() + "' already in use. Choose another email.");
+        if (userRepository.existsByEmail(customer.getEmail().toLowerCase())) {
+            throw new ConflictException("Email '" + customer.getEmail() + "' already in use. Use another email.");
         }
 
         Role userRole = roleRepository.findByRoleType(RoleType.USER)
