@@ -25,4 +25,6 @@ public class UserPatchDTO {
 
     @Pattern(regexp = "^(\\+\\d{1,3})?\\s?\\d{6,15}$", message = "Invalid phone number format")
     private String phone;
+
+    private Boolean isActive;
 }

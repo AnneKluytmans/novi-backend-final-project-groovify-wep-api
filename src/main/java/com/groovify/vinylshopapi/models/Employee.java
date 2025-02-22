@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.models;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

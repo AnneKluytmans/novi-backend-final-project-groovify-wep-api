@@ -9,9 +9,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
@@ -28,8 +27,8 @@ public interface CustomerMapper {
     List<UserResponseDTO> toUserResponseDTOs(List<Customer> customers);
 
     @Named("mapFavoriteVinylRecords")
-    static Set<Long> mapFavoriteVinylRecords(Set<VinylRecord> vinylRecords) {
-        Set<Long> vinylRecordIds = new HashSet<>();
+    static List<Long> mapFavoriteVinylRecords(List<VinylRecord> vinylRecords) {
+        List<Long> vinylRecordIds = new ArrayList<>();
         for (VinylRecord vinylRecord : vinylRecords) {
             vinylRecordIds.add(vinylRecord.getId());
         }
