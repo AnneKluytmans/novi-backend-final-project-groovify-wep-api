@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.dtos;
 
-import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,4 +18,6 @@ public class EmployeeRegisterDTO extends UserRegisterDTO {
     @NotNull(message = "Work hours are required")
     @Positive(message = "Work hours must be a positive value")
     private Integer workHours;
+
+    private Boolean isAdmin = false;
 }

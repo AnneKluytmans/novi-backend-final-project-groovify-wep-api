@@ -32,7 +32,7 @@ public class CustomerService {
         Customer customer = customerMapper.toEntity(customerRegisterDTO);
 
         if (userRepository.existsByUsername(customer.getUsername().toLowerCase())) {
-            throw new ConflictException("Username '" + customer.getUsername() + "' already in use. Choose another username.");
+            throw new ConflictException("Username '" + customer.getUsername() + "' already in use. Please choose another username.");
         }
 
         if (userRepository.existsByEmail(customer.getEmail().toLowerCase())) {
