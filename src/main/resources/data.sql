@@ -75,3 +75,53 @@ VALUES
     ('USER'),
     ('EMPLOYEE'),
     ('ADMIN');
+
+
+-- Customers
+INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_active, newsletter_subscribed)
+VALUES
+    ('vinylfan_01', 'vinylfan01@example.com', 'password123', 'Alice', 'Johnson', '2001-03-14', '612345678', 'CUSTOMER', true, true),
+    ('groovehunter_02', 'groovehunter02@example.com', 'password123', 'Bob', 'Smith', '1992-07-22', '623456789', 'CUSTOMER', true, false),
+    ('turntableking_03', 'turntableking03@example.com', 'password123', 'Charlie', 'Brown', '1990-11-30', '634567890', 'CUSTOMER', true, true),
+    ('recordlover_04', 'recordlover04@example.com', 'password123', 'David', 'Lee', '1965-05-18', '645678901', 'CUSTOMER', true, true),
+    ('spinningvinyl_05', 'spinningvinyl05@example.com', 'password123', 'Eve', 'Taylor', '2004-09-10', '656789012', 'CUSTOMER', true, true),
+    ('discophile_06', 'discophile06@example.com', 'password123', 'Frank', 'Miller', '1975-01-25', '641769924', 'CUSTOMER', true, false),
+    ('soundsystemfan_07', 'soundsystemfan07@example.com', 'password123', 'Grace', 'Davis', '1983-04-12', '612564574', 'CUSTOMER', true, true),
+    ('thevinylman_08', 'thevinylman08@example.com', 'password123', 'Hank', 'Garcia', '1999-12-05', '65935968', 'CUSTOMER', true, false),
+    ('oldschoolvinyl_09', 'oldschoolvinyl09@example.com', 'password123', 'Irene', 'Martinez', '1991-06-28', '636766940', 'CUSTOMER', true, true),
+    ('newagevinyl_10', 'newagevinyl10@example.com', 'password123', 'Jack', 'Wilson', '1974-02-15', '669067739', 'CUSTOMER', true, true);
+
+-- Employees
+INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_active, job_title, salary, work_hours)
+VALUES
+    ('admin_lyla', 'lyla.gibson@vinylshop.com', 'admin', 'Lyla', 'Gibson', '1983-02-14', '612345678', 'EMPLOYEE', true, 'Store Manager', 6500.00, 40),
+    ('admin_amanda', 'amanda.fowler@vinylshop.com', 'admin', 'Amanda', 'Fowler', '1992-11-12', '656789012', 'EMPLOYEE', true, 'Store Manager', 6000.00, 40),
+    ('employee_marcus', 'marcus.hale@vinylshop.com', 'employee', 'Marcus', 'Hale', '1990-05-09', '623456789', 'EMPLOYEE', true, 'Sales Associate', 3600.00, 32),
+    ('employee_gina', 'gina.parker@vinylshop.com', 'employee', 'Gina', 'Parker', '1992-07-20', '634567890', 'EMPLOYEE', true, 'Sales Associate', 2900.00, 24),
+    ('employee_oliver', 'oliver.grant@vinylshop.com', 'employee', 'Oliver', 'Grant', '1988-03-22', '645678901', 'EMPLOYEE', true, 'Warehouse Coordinator', 5500.00, 32);
+
+
+-- Customer roles
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    (1, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (2, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (3, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (4, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (5, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (6, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (7, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (8, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (9, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (10, (SELECT id FROM roles WHERE role_type = 'USER'));
+
+-- Employee roles
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    (11, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (11, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (12, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (12, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (13, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (14, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (15, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE'));
