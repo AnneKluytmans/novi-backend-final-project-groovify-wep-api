@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.CustomerPatchDTO;
 import com.groovify.vinylshopapi.dtos.CustomerRegisterDTO;
 import com.groovify.vinylshopapi.dtos.CustomerResponseDTO;
 import com.groovify.vinylshopapi.services.CustomerService;
@@ -34,5 +35,16 @@ public class CustomerController {
                 .toUri();
 
         return ResponseEntity.created(location).body(newCustomer);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable Long id,
+                                            @Valid @RequestBody CustomerPatchDTO customerPatchDTO,
+                                            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        CustomerResponseDTO updatedCustomer = customerService.updateCustomer(id, customerPatchDTO);
+        return ResponseEntity.ok(updatedCustomer);
     }
 }

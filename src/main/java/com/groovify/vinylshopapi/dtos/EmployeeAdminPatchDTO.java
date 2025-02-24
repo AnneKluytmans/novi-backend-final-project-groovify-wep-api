@@ -13,5 +13,4 @@ public class EmployeeAdminPatchDTO {
 
     @Positive(message = "Work hours must be a positive value")
     private Integer workHours;
-
 }
