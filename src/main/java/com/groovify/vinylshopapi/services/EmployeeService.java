@@ -5,18 +5,15 @@ import com.groovify.vinylshopapi.dtos.EmployeeRegisterDTO;
 import com.groovify.vinylshopapi.dtos.EmployeeResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserPatchDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
 import com.groovify.vinylshopapi.models.Employee;
 import com.groovify.vinylshopapi.models.Role;
-import com.groovify.vinylshopapi.models.User;
 import com.groovify.vinylshopapi.repositories.EmployeeRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.repositories.UserRepository;
+import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class EmployeeService {
@@ -25,19 +22,22 @@ public class EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ValidationUtils validationUtils;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, UserRepository userRepository, RoleRepository roleRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, UserRepository userRepository,
+                           RoleRepository roleRepository, ValidationUtils validationUtils) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.validationUtils = validationUtils;
     }
 
     public EmployeeResponseDTO registerEmployee(EmployeeRegisterDTO employeeRegisterDTO) {
         Employee employee = employeeMapper.toEntity(employeeRegisterDTO);
 
-        validateUniqueUsername(employeeRegisterDTO.getUsername(), employee.getId());
-        validateUniqueEmail(employeeRegisterDTO.getEmail(), employee.getId());
+        validationUtils.validateUniqueUsername(employeeRegisterDTO.getUsername(), employee.getId());
+        validationUtils.validateUniqueEmail(employeeRegisterDTO.getEmail(), employee.getId());
 
         Role employeeRole = roleRepository.findByRoleType(RoleType.EMPLOYEE)
                 .orElseThrow(() -> new RecordNotFoundException("Role '" + RoleType.EMPLOYEE + "' not found."));
@@ -59,12 +59,12 @@ public class EmployeeService {
                 .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
 
         if (employeePatchDTO.getUsername() != null) {
-            validateUniqueUsername(employeePatchDTO.getUsername(), employee.getId());
+            validationUtils.validateUniqueUsername(employeePatchDTO.getUsername(), employee.getId());
             employee.setUsername(employeePatchDTO.getUsername());
         }
 
         if (employeePatchDTO.getEmail() != null) {
-            validateUniqueEmail(employeePatchDTO.getEmail(), employee.getId());
+            validationUtils.validateUniqueEmail(employeePatchDTO.getEmail(), employee.getId());
             employee.setEmail(employeePatchDTO.getEmail());
         }
 
@@ -108,22 +108,4 @@ public class EmployeeService {
         return employeeMapper.toResponseDTO(savedEmployee);
     }
 
-
-
-
-    private void validateUniqueUsername(String username, Long currentUserId) {
-        Optional<User> existingUser = userRepository.findByUsername(username.toLowerCase());
-
-        if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
-            throw new ConflictException("User with username " + username + " already exists.");
-        }
-    }
-
-    private void validateUniqueEmail(String email, Long currentUserId) {
-        Optional<User> existingUser = userRepository.findByEmail(email.toLowerCase());
-
-        if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
-            throw new ConflictException("User with email " + email + " already exists.");
-        }
-    }
 }

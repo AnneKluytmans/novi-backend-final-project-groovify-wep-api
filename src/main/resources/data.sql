@@ -78,27 +78,27 @@ VALUES
 
 
 -- Customers
-INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_active, newsletter_subscribed)
+INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_deleted, newsletter_subscribed)
 VALUES
-    ('vinylfan_01', 'vinylfan01@example.com', 'password123', 'Alice', 'Johnson', '2001-03-14', '612345678', 'CUSTOMER', true, true),
-    ('groovehunter_02', 'groovehunter02@example.com', 'password123', 'Bob', 'Smith', '1992-07-22', '623456789', 'CUSTOMER', true, false),
-    ('turntableking_03', 'turntableking03@example.com', 'password123', 'Charlie', 'Brown', '1990-11-30', '634567890', 'CUSTOMER', true, true),
-    ('recordlover_04', 'recordlover04@example.com', 'password123', 'David', 'Lee', '1965-05-18', '645678901', 'CUSTOMER', true, true),
-    ('spinningvinyl_05', 'spinningvinyl05@example.com', 'password123', 'Eve', 'Taylor', '2004-09-10', '656789012', 'CUSTOMER', true, true),
-    ('discophile_06', 'discophile06@example.com', 'password123', 'Frank', 'Miller', '1975-01-25', '641769924', 'CUSTOMER', true, false),
-    ('soundsystemfan_07', 'soundsystemfan07@example.com', 'password123', 'Grace', 'Davis', '1983-04-12', '612564574', 'CUSTOMER', true, true),
-    ('thevinylman_08', 'thevinylman08@example.com', 'password123', 'Hank', 'Garcia', '1999-12-05', '65935968', 'CUSTOMER', true, false),
-    ('oldschoolvinyl_09', 'oldschoolvinyl09@example.com', 'password123', 'Irene', 'Martinez', '1991-06-28', '636766940', 'CUSTOMER', true, true),
-    ('newagevinyl_10', 'newagevinyl10@example.com', 'password123', 'Jack', 'Wilson', '1974-02-15', '669067739', 'CUSTOMER', true, true);
+    ('vinylfan_01', 'vinylfan01@example.com', 'password123', 'Alice', 'Johnson', '2001-03-14', '612345678', 'CUSTOMER', false, true),
+    ('groovehunter_02', 'groovehunter02@example.com', 'password123', 'Bob', 'Smith', '1992-07-22', '623456789', 'CUSTOMER', false, false),
+    ('turntableking_03', 'turntableking03@example.com', 'password123', 'Charlie', 'Brown', '1990-11-30', '634567890', 'CUSTOMER', false,true),
+    ('recordlover_04', 'recordlover04@example.com', 'password123', 'David', 'Lee', '1965-05-18', '645678901', 'CUSTOMER', false,true),
+    ('spinningvinyl_05', 'spinningvinyl05@example.com', 'password123', 'Eve', 'Taylor', '2004-09-10', '656789012', 'CUSTOMER', false,true),
+    ('discophile_06', 'discophile06@example.com', 'password123', 'Frank', 'Miller', '1975-01-25', '641769924', 'CUSTOMER', false,false),
+    ('soundsystemfan_07', 'soundsystemfan07@example.com', 'password123', 'Grace', 'Davis', '1983-04-12', '612564574', 'CUSTOMER', false,true),
+    ('thevinylman_08', 'thevinylman08@example.com', 'password123', 'Hank', 'Garcia', '1999-12-05', '65935968', 'CUSTOMER', false,false),
+    ('oldschoolvinyl_09', 'oldschoolvinyl09@example.com', 'password123', 'Irene', 'Martinez', '1991-06-28', '636766940', 'CUSTOMER', false,true),
+    ('newagevinyl_10', 'newagevinyl10@example.com', 'password123', 'Jack', 'Wilson', '1974-02-15', '669067739', 'CUSTOMER', false,true);
 
 -- Employees
-INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_active, job_title, salary, work_hours)
+INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_deleted, job_title, salary, work_hours)
 VALUES
-    ('admin_lyla', 'lyla.gibson@vinylshop.com', 'admin', 'Lyla', 'Gibson', '1983-02-14', '612345678', 'EMPLOYEE', true, 'Store Manager', 6500.00, 40),
-    ('admin_amanda', 'amanda.fowler@vinylshop.com', 'admin', 'Amanda', 'Fowler', '1992-11-12', '656789012', 'EMPLOYEE', true, 'Store Manager', 6000.00, 40),
-    ('employee_marcus', 'marcus.hale@vinylshop.com', 'employee', 'Marcus', 'Hale', '1990-05-09', '623456789', 'EMPLOYEE', true, 'Sales Associate', 3600.00, 32),
-    ('employee_gina', 'gina.parker@vinylshop.com', 'employee', 'Gina', 'Parker', '1992-07-20', '634567890', 'EMPLOYEE', true, 'Sales Associate', 2900.00, 24),
-    ('employee_oliver', 'oliver.grant@vinylshop.com', 'employee', 'Oliver', 'Grant', '1988-03-22', '645678901', 'EMPLOYEE', true, 'Warehouse Coordinator', 5500.00, 32);
+    ('admin_lyla', 'lyla.gibson@vinylshop.com', 'admin', 'Lyla', 'Gibson', '1983-02-14', '612345678', 'EMPLOYEE', false, 'Store Manager', 6500.00, 40),
+    ('admin_amanda', 'amanda.fowler@vinylshop.com', 'admin', 'Amanda', 'Fowler', '1992-11-12', '656789012', 'EMPLOYEE', false, 'Store Manager', 6000.00, 40),
+    ('employee_marcus', 'marcus.hale@vinylshop.com', 'employee', 'Marcus', 'Hale', '1990-05-09', '623456789', 'EMPLOYEE', false,'Sales Associate', 3600.00, 32),
+    ('employee_gina', 'gina.parker@vinylshop.com', 'employee', 'Gina', 'Parker', '1992-07-20', '634567890', 'EMPLOYEE', false,'Sales Associate', 2900.00, 24),
+    ('employee_oliver', 'oliver.grant@vinylshop.com', 'employee', 'Oliver', 'Grant', '1988-03-22', '645678901', 'EMPLOYEE', false, 'Warehouse Coordinator', 5500.00, 32);
 
 
 -- Customer roles

@@ -111,6 +111,31 @@ public class ExceptionController {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = InvalidVerificationException.class)
+    public ResponseEntity<Object> handleInvalidVerificationException(InvalidVerificationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Invalid Verification");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = DeactivedException.class)
+    public ResponseEntity<Object> handleDeactivedException(DeactivedException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Deactived");
+        body.put("message", ex.getMessage());
+        if(ex.getEmail() != null) {
+            body.put("email", ex.getEmail());
+        }
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(value = TeapotException.class)
     public ResponseEntity<Object> handleTeapotException(TeapotException ex) {
         Map<String, Object> body = new HashMap<>();

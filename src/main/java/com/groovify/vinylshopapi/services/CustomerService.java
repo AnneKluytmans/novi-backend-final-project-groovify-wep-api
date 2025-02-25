@@ -4,18 +4,16 @@ import com.groovify.vinylshopapi.dtos.CustomerPatchDTO;
 import com.groovify.vinylshopapi.dtos.CustomerRegisterDTO;
 import com.groovify.vinylshopapi.dtos.CustomerResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
 import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.models.Role;
-import com.groovify.vinylshopapi.models.User;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.repositories.UserRepository;
+import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class CustomerService {
@@ -24,19 +22,22 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ValidationUtils validationUtils;
 
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, UserRepository userRepository, RoleRepository roleRepository) {
+    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, UserRepository userRepository,
+                           RoleRepository roleRepository, ValidationUtils validationUtils) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.validationUtils = validationUtils;
     }
 
     public CustomerResponseDTO registerCustomer(CustomerRegisterDTO customerRegisterDTO) {
         Customer customer = customerMapper.toEntity(customerRegisterDTO);
 
-        validateUniqueUsername(customerRegisterDTO.getUsername(), customer.getId());
-        validateUniqueEmail(customerRegisterDTO.getEmail(), customer.getId());
+        validationUtils.validateUniqueUsername(customerRegisterDTO.getUsername(), customer.getId());
+        validationUtils.validateUniqueEmail(customerRegisterDTO.getEmail(), customer.getId());
 
         Role userRole = roleRepository.findByRoleType(RoleType.USER)
                 .orElseThrow(() -> new RecordNotFoundException("Role '" + RoleType.USER + "' not found."));
@@ -52,12 +53,12 @@ public class CustomerService {
                 .orElseThrow(() -> new RecordNotFoundException("Customer with id " + id + " not found."));
 
         if (customerPatchDTO.getUsername() != null) {
-            validateUniqueUsername(customerPatchDTO.getUsername(), customer.getId());
+            validationUtils.validateUniqueUsername(customerPatchDTO.getUsername(), customer.getId());
             customer.setUsername(customerPatchDTO.getUsername());
         }
 
         if (customerPatchDTO.getEmail() != null) {
-            validateUniqueEmail(customerPatchDTO.getEmail(), customer.getId());
+            validationUtils.validateUniqueEmail(customerPatchDTO.getEmail(), customer.getId());
             customer.setEmail(customerPatchDTO.getEmail());
         }
 
@@ -83,24 +84,6 @@ public class CustomerService {
 
         Customer savedCustomer = customerRepository.save(customer);
         return customerMapper.toResponseDTO(savedCustomer);
-    }
-
-
-
-    private void validateUniqueUsername(String username, Long currentUserId) {
-        Optional<User> existingUser = userRepository.findByUsername(username.toLowerCase());
-
-        if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
-            throw new ConflictException("User with username " + username + " already exists.");
-        }
-    }
-
-    private void validateUniqueEmail(String email, Long currentUserId) {
-        Optional<User> existingUser = userRepository.findByEmail(email.toLowerCase());
-
-        if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
-            throw new ConflictException("User with email " + email + " already exists.");
-        }
     }
 
 }

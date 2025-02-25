@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,5 +67,7 @@ public abstract class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    private Boolean isActive = true;
+    private Boolean isDeleted = false;
+
+    private LocalDateTime deletedAt = null;
 }
