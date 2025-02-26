@@ -37,15 +37,15 @@ public class UserService {
     }
 
 
-    public List<UserSummaryResponseDTO> getAllUsers(String userType, Boolean isDeleted, String deletedAfter, String deletedBefore,
-                                                    String sortBy, String sortOrder) {
+    public List<UserSummaryResponseDTO> getUsers(String userType, String firstName, String lastName, Boolean isDeleted, String deletedAfter,
+                                                 String deletedBefore, String sortBy, String sortOrder) {
         Sort sort = switch (sortBy.toLowerCase()) {
             case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
             case "email" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("email") : Sort.Order.asc("email"));
             default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
         };
 
-        Specification<User> specification = UserSpecification.filterUsers(userType, isDeleted, deletedAfter, deletedBefore);
+        Specification<User> specification = UserSpecification.filterUsers(userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore);
         List<User> users = userRepository.findAll(specification, sort);
 
         List<UserSummaryResponseDTO> userSummaryResponseDTOS = new ArrayList<>();

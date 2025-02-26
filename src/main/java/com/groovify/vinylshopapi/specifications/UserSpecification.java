@@ -1,5 +1,7 @@
 package com.groovify.vinylshopapi.specifications;
 
+import com.groovify.vinylshopapi.models.Customer;
+import com.groovify.vinylshopapi.models.Employee;
 import com.groovify.vinylshopapi.models.User;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,16 +13,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserSpecification {
-    public static Specification<User> filterUsers(String userType, Boolean isDeleted, String deletedAfter, String deletedBefore) {
+    public static Specification<User> filterUsers(String userType, String firstName, String lastName, Boolean isDeleted,
+                                                  String deletedAfter, String deletedBefore) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (userType != null) {
-                if (!userType.equalsIgnoreCase("CUSTOMER") && !userType.equalsIgnoreCase("EMPLOYEE")) {
-                    throw new IllegalArgumentException("Invalid user type: " + userType + ". Must be customer or employee");
-                }
+                predicates.add(cb.equal(root.type(), userType.equalsIgnoreCase("EMPLOYEE") ? Employee.class : Customer.class));
+            }
 
-                predicates.add(cb.equal(root.get("userType"), userType.toUpperCase()));
+            if (firstName != null && !firstName.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%"));
+            }
+
+            if (lastName != null && !lastName.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("lastName")), "%" + lastName.toLowerCase() + "%"));
             }
 
             if (isDeleted != null) {
