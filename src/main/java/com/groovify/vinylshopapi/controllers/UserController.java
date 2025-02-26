@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,13 +24,22 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserSummaryResponseDTO>> getAllUsers(
-            @RequestParam(required = false) Boolean isDeleted,
             @RequestParam(required = false) String userType,
+            @RequestParam(required = false) Boolean isDeleted,
+            @RequestParam(required = false) String deletedAfter,
+            @RequestParam(required = false) String deletedBefore,
             @RequestParam(defaultValue = "lastName") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortOrder
     ) {
-            List<UserSummaryResponseDTO> users = userService.getAllUsers(isDeleted, userType, sortBy, sortOrder);
+            List<UserSummaryResponseDTO> users = userService.getAllUsers(userType, isDeleted, deletedAfter, deletedBefore,
+                    sortBy, sortOrder);
             return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+        UserResponseDTO user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
 
