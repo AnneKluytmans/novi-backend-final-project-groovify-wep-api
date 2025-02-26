@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.mappers;
 import com.groovify.vinylshopapi.dtos.CustomerRegisterDTO;
 import com.groovify.vinylshopapi.dtos.CustomerResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
+import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.models.VinylRecord;
 import org.mapstruct.Mapper;
@@ -25,6 +26,10 @@ public interface CustomerMapper {
     UserResponseDTO toUserResponseDTO(Customer customer);
 
     List<UserResponseDTO> toUserResponseDTOs(List<Customer> customers);
+
+    UserSummaryResponseDTO toUserSummaryResponseDTO(Customer customer);
+
+    List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Customer> customers);
 
     @Named("mapFavoriteVinylRecords")
     static List<Long> mapFavoriteVinylRecords(List<VinylRecord> vinylRecords) {

@@ -1,16 +1,26 @@
 package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
+import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
+import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.InvalidVerificationException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
+import com.groovify.vinylshopapi.models.Customer;
+import com.groovify.vinylshopapi.models.Employee;
 import com.groovify.vinylshopapi.models.User;
 import com.groovify.vinylshopapi.repositories.UserRepository;
+
+import com.groovify.vinylshopapi.specifications.UserSpecification;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -23,6 +33,31 @@ public class UserService {
         this.userRepository = userRepository;
         this.customerMapper = customerMapper;
         this.employeeMapper = employeeMapper;
+    }
+
+
+    public List<UserSummaryResponseDTO> getAllUsers(Boolean isDeleted, String userType, String sortBy, String sortOrder) {
+        Sort sort = switch (sortBy.toLowerCase()) {
+            case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
+            case "email" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("email") : Sort.Order.asc("email"));
+            default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
+        };
+
+        Specification<User> specification = UserSpecification.filterUsers(userType, isDeleted);
+        List<User> users = userRepository.findAll(specification, sort);
+
+        List<UserSummaryResponseDTO> userSummaryResponseDTOS = new ArrayList<>();
+
+        for (User user : users) {
+            if (user instanceof Customer) {
+                userSummaryResponseDTOS.add(customerMapper.toUserSummaryResponseDTO((Customer) user));
+            }
+            if (user instanceof Employee) {
+                userSummaryResponseDTOS.add(employeeMapper.toUserSummaryResponseDTO((Employee) user));
+            }
+        }
+
+        return userSummaryResponseDTOS;
     }
 
     public void softDeleteUser(Long id) {
