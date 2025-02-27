@@ -32,7 +32,7 @@ public class ArtistService {
 
     public List<ArtistResponseDTO> getArtists(String country, Integer minPopularity, Integer maxPopularity,
                                               String orderBy, String sortOrder, Integer limit) {
-        Sort sort = switch (orderBy.toLowerCase()) {
+        Sort sort = switch (orderBy.trim().toLowerCase()) {
           case "popularity" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("popularity") : Sort.Order.asc("popularity"));
           case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
           default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("name") : Sort.Order.asc("name"));

@@ -12,9 +12,9 @@ import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.models.Role;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
-import com.groovify.vinylshopapi.repositories.UserRepository;
 import com.groovify.vinylshopapi.specifications.CustomerSpecification;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -27,22 +27,20 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
-    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ValidationUtils validationUtils;
 
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, UserRepository userRepository,
+    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper,
                            RoleRepository roleRepository, ValidationUtils validationUtils) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
-        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.validationUtils = validationUtils;
     }
 
     public List<UserSummaryResponseDTO> getCustomers(String firstName, String lastName, Boolean newsletterSubscribed,
                                                      String sortBy, String sortOrder) {
-        Sort sort = switch (sortBy.toLowerCase()) {
+        Sort sort = switch (sortBy.trim().toLowerCase()) {
             case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
             case "email" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("email") : Sort.Order.asc("email"));
             default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));

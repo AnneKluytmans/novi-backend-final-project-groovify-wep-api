@@ -1,36 +1,67 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.EmployeeAdminPatchDTO;
-import com.groovify.vinylshopapi.dtos.EmployeeRegisterDTO;
-import com.groovify.vinylshopapi.dtos.EmployeeResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserPatchDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.enums.RoleType;
+import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
 import com.groovify.vinylshopapi.models.Employee;
 import com.groovify.vinylshopapi.models.Role;
 import com.groovify.vinylshopapi.repositories.EmployeeRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
-import com.groovify.vinylshopapi.repositories.UserRepository;
+import com.groovify.vinylshopapi.specifications.EmployeeSpecification;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
-    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ValidationUtils validationUtils;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, UserRepository userRepository,
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper,
                            RoleRepository roleRepository, ValidationUtils validationUtils) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
-        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.validationUtils = validationUtils;
+    }
+
+
+    public List<UserSummaryResponseDTO> getEmployees(String firstName, String lastName, String jobTitle, Double minSalary,
+                                                     Double maxSalary, String sortBy, String sortOrder) {
+        Sort sort = switch (sortBy.trim().toLowerCase()) {
+            case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
+            case "salary" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("salary") : Sort.Order.asc("salary"));
+            case "workhours" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("workHours") : Sort.Order.asc("workHours"));
+            default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
+        };
+
+        Specification<Employee> specification = EmployeeSpecification.filterEmployees(firstName, lastName, jobTitle, minSalary, maxSalary);
+        List<Employee> employees = employeeRepository.findAll(specification, sort);
+
+        return employeeMapper.toUserSummaryResponseDTOs(employees);
+    }
+
+    public EmployeeResponseDTO getEmployeeById(Long id) {
+        Employee employee = employeeRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
+
+        return employeeMapper.toResponseDTO(employee);
+    }
+
+    public EmployeeResponseDTO getEmployeeByUsername(String username) {
+        Employee employee = employeeRepository.findByUsernameIgnoreCaseAndIsDeletedFalse(username)
+                .orElseThrow(() -> new RecordNotFoundException("Employee with username " + username + " not found."));
+
+        return employeeMapper.toResponseDTO(employee);
     }
 
     public EmployeeResponseDTO registerEmployee(EmployeeRegisterDTO employeeRegisterDTO) {

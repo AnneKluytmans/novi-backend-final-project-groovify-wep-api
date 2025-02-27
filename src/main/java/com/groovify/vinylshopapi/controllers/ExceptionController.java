@@ -127,7 +127,7 @@ public class ExceptionController {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Deactived");
+        body.put("error", "Deactivated");
         body.put("message", ex.getMessage());
         if(ex.getEmail() != null) {
             body.put("email", ex.getEmail());
