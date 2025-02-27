@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.controllers;
 import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
+import com.groovify.vinylshopapi.enums.RoleType;
 import com.groovify.vinylshopapi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -55,4 +56,24 @@ public class UserController {
         userService.reactivateUser(reactivateUserDTO);
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<List<RoleType>> getUserRoles(@PathVariable("id") Long userId) {
+        List<RoleType> roles = userService.getUserRoles(userId);
+        return ResponseEntity.ok(roles);
+    }
+
+    @PostMapping("/{id}/roles")
+    public ResponseEntity<Void> addRolesToUser(@PathVariable("id") Long userId, @RequestBody List<String> roles) {
+        userService.addRolesToUser(userId, roles);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/roles")
+    public ResponseEntity<Void> removeRolesFromUser(@PathVariable("id") Long userId, @RequestBody List<String> roles) {
+        userService.removeRolesFromUser(userId, roles);
+        return ResponseEntity.noContent().build();
+    }
+
 }
