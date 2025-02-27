@@ -1,17 +1,17 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.CustomerPatchDTO;
-import com.groovify.vinylshopapi.dtos.CustomerRegisterDTO;
-import com.groovify.vinylshopapi.dtos.CustomerResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.enums.RoleType;
 import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
+import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
 import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.models.Role;
+import com.groovify.vinylshopapi.models.VinylRecord;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
+import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.specifications.CustomerSpecification;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
 
@@ -29,13 +29,17 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
     private final RoleRepository roleRepository;
     private final ValidationUtils validationUtils;
+    private final VinylRecordRepository vinylRecordRepository;
+    private final VinylRecordMapper vinylRecordMapper;
 
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper,
-                           RoleRepository roleRepository, ValidationUtils validationUtils) {
+    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, RoleRepository roleRepository,
+                           ValidationUtils validationUtils, VinylRecordRepository vinylRecordRepository, VinylRecordMapper vinylRecordMapper) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.roleRepository = roleRepository;
         this.validationUtils = validationUtils;
+        this.vinylRecordRepository = vinylRecordRepository;
+        this.vinylRecordMapper = vinylRecordMapper;
     }
 
     public List<UserSummaryResponseDTO> getCustomers(String firstName, String lastName, Boolean newsletterSubscribed,
@@ -119,4 +123,34 @@ public class CustomerService {
         return customerMapper.toResponseDTO(savedCustomer);
     }
 
+
+    public List<VinylRecordSummaryResponseDTO> getFavoriteRecords(Long customerId) {
+        Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
+                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
+
+        List<VinylRecord> favoriteRecords = customer.getFavoriteVinylRecords();
+        return vinylRecordMapper.toSummaryResponseDTOs(favoriteRecords);
+    }
+
+    public void addFavoriteRecordToCustomer(Long customerId, Long recordId) {
+        Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
+                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
+
+        VinylRecord favoriteRecord = vinylRecordRepository.findById(recordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + recordId + " not found."));
+
+        customer.getFavoriteVinylRecords().add(favoriteRecord);
+        customerRepository.save(customer);
+    }
+
+    public void removeFavoriteRecordFromCustomer(Long customerId, Long recordId) {
+        Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
+                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
+
+        VinylRecord favoriteRecord = vinylRecordRepository.findById(recordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + recordId + " not found."));
+
+        customer.getFavoriteVinylRecords().remove(favoriteRecord);
+        customerRepository.save(customer);
+    }
 }

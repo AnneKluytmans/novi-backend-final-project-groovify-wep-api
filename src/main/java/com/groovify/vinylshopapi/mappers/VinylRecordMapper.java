@@ -2,6 +2,7 @@ package com.groovify.vinylshopapi.mappers;
 
 import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
+import com.groovify.vinylshopapi.dtos.VinylRecordSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.models.VinylRecord;
 
@@ -26,6 +27,13 @@ public interface VinylRecordMapper {
     @Mapping(target = "stock", source = "stock")
     @Mapping(target = "cover", source = "cover")
     List<VinylRecordResponseDTO> toResponseDTOs(List<VinylRecord> vinylRecords);
+
+    @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
+    VinylRecordSummaryResponseDTO toSummaryResponseDTO(VinylRecord vinylRecord);
+
+    @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
+    List<VinylRecordSummaryResponseDTO> toSummaryResponseDTOs(List<VinylRecord> vinylRecords);
+
 
     @Named("stringToGenre")
     static Genre stringToGenre(String genre) {

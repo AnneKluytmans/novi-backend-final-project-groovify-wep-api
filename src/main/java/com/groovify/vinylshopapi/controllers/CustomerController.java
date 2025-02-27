@@ -1,9 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.CustomerPatchDTO;
-import com.groovify.vinylshopapi.dtos.CustomerRegisterDTO;
-import com.groovify.vinylshopapi.dtos.CustomerResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.services.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -74,5 +71,26 @@ public class CustomerController {
         }
         CustomerResponseDTO updatedCustomer = customerService.updateCustomer(id, customerPatchDTO);
         return ResponseEntity.ok(updatedCustomer);
+    }
+
+
+    @GetMapping("/{customerId}/favorite-records")
+    public ResponseEntity<List<VinylRecordSummaryResponseDTO>> getFavoriteRecords(@PathVariable Long customerId) {
+        List<VinylRecordSummaryResponseDTO> favoriteRecords = customerService.getFavoriteRecords(customerId);
+        return ResponseEntity.ok(favoriteRecords);
+    }
+
+    @PostMapping("/{customerId}/favorite-records/{recordId}")
+    public ResponseEntity<Void> addFavoriteRecordToCustomer(@PathVariable Long customerId,
+                                                            @PathVariable Long recordId) {
+        customerService.addFavoriteRecordToCustomer(customerId, recordId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{customerId}/favorite-records/{recordId}")
+    public ResponseEntity<Void> removeFavoriteRecordFromCustomer(@PathVariable Long customerId,
+                                                                 @PathVariable Long recordId) {
+        customerService.removeFavoriteRecordFromCustomer(customerId, recordId);
+        return ResponseEntity.noContent().build();
     }
 }

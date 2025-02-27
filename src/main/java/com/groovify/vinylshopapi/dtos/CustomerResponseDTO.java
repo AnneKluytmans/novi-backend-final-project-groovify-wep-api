@@ -9,5 +9,5 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class CustomerResponseDTO extends UserResponseDTO {
     private Boolean newsletterSubscribed;
-    private List<Long> favoriteVinylRecords;
+    private List<VinylRecordSummaryResponseDTO> favoriteVinylRecords;
 }

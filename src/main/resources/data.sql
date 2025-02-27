@@ -125,3 +125,47 @@ VALUES
     (13, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
     (14, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
     (15, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE'));
+
+
+
+--Favorite Vinyl Records
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'vinylfan_01'), (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
+    ((SELECT id FROM users WHERE username = 'vinylfan_01'), (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),
+    ((SELECT id FROM users WHERE username = 'vinylfan_01'), (SELECT id FROM vinyl_records WHERE title = '1989'));
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'groovehunter_02'), (SELECT id FROM vinyl_records WHERE title = 'Lemonade')),
+    ((SELECT id FROM users WHERE username = 'groovehunter_02'), (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida')),
+    ((SELECT id FROM users WHERE username = 'groovehunter_02'), (SELECT id FROM vinyl_records WHERE title = '21'));
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'recordlover_04'), (SELECT id FROM vinyl_records WHERE title = 'Rumours')),
+    ((SELECT id FROM users WHERE username = 'recordlover_04'), (SELECT id FROM vinyl_records WHERE title = 'Arrival')),
+    ((SELECT id FROM users WHERE username = 'recordlover_04'), (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?'));
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'spinningvinyl_05'), (SELECT id FROM vinyl_records WHERE title = 'AM')),
+    ((SELECT id FROM users WHERE username = 'spinningvinyl_05'), (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World')),
+    ((SELECT id FROM users WHERE username = 'spinningvinyl_05'), (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man'));
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'discophile_06'), (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution')),
+    ((SELECT id FROM users WHERE username = 'discophile_06'), (SELECT id FROM vinyl_records WHERE title = 'News of the World')),
+    ((SELECT id FROM users WHERE username = 'discophile_06'), (SELECT id FROM vinyl_records WHERE title = 'Revolver'));
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'thevinylman_08'), (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
+    ((SELECT id FROM users WHERE username = 'thevinylman_08'), (SELECT id FROM vinyl_records WHERE title = 'Abbey Road'));
+
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'oldschoolvinyl_09'), (SELECT id FROM vinyl_records WHERE title = '21')),
+    ((SELECT id FROM users WHERE username = 'oldschoolvinyl_09'), (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers'));
