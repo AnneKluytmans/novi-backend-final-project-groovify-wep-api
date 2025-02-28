@@ -10,11 +10,12 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {AddressMapper.class})
 public interface EmployeeMapper {
     @Mapping(target = "id", ignore = true)
     Employee toEntity(EmployeeRegisterDTO employeeRegisterDTO);
 
+    @Mapping(target = "address", source = "address")
     EmployeeResponseDTO toResponseDTO(Employee employee);
 
     List<EmployeeResponseDTO> toResponseDTOs(List<Employee> employees);

@@ -9,4 +9,5 @@ public class EmployeeResponseDTO extends UserResponseDTO {
     private String jobTitle;
     private Double salary;
     private Integer workHours;
+    private AddressResponseDTO address;
 }
