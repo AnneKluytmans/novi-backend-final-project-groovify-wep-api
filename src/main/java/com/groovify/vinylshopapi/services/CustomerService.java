@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.enums.RoleType;
 import com.groovify.vinylshopapi.enums.SortOrder;
+import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
@@ -139,6 +140,10 @@ public class CustomerService {
         VinylRecord favoriteRecord = vinylRecordRepository.findById(recordId)
                 .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + recordId + " not found."));
 
+        if (customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
+            throw new ConflictException("Vinyl record with id " + recordId + " is already a favorite record of this customer.");
+        }
+
         customer.getFavoriteVinylRecords().add(favoriteRecord);
         customerRepository.save(customer);
     }
@@ -149,6 +154,10 @@ public class CustomerService {
 
         VinylRecord favoriteRecord = vinylRecordRepository.findById(recordId)
                 .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + recordId + " not found."));
+
+        if (!customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
+            throw new ConflictException("Vinyl record with id " + recordId + " is not a favorite record of this customer.");
+        }
 
         customer.getFavoriteVinylRecords().remove(favoriteRecord);
         customerRepository.save(customer);
