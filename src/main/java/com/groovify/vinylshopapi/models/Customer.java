@@ -27,4 +27,7 @@ public class Customer extends User {
             inverseJoinColumns = @JoinColumn(name = "vinyl_record_id")
     )
     private List<VinylRecord> favoriteVinylRecords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
 }

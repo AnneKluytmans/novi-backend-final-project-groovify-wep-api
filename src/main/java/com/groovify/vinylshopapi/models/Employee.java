@@ -26,4 +26,7 @@ public class Employee extends User {
     @NotNull(message = "Work hours are required")
     @Positive(message = "Work hours must be a positive value")
     private Integer workHours;
+
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Address address;
 }

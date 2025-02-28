@@ -1,26 +1,14 @@
-package com.groovify.vinylshopapi.models;
+package com.groovify.vinylshopapi.dtos;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(
-        name = "addresses",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"customer_id", "isShippingAddress"}),
-                @UniqueConstraint(columnNames = {"customer_id", "isBillingAddress"})
-        })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class AddressRequestDTO {
     @NotBlank(message = "Street is required")
     @Size(max = 255, message = "Street cannot be longer than 255 characters")
     private String street;
@@ -44,12 +32,4 @@ public class Address {
     private Boolean isShippingAddress;
 
     private Boolean isBillingAddress;
-
-    @ManyToOne
-    @JoinColumn(name="customer_id")
-    private Customer customer;
-
-    @OneToOne
-    @JoinColumn(name = "employee_id", unique = true)
-    private Employee employee;
 }
