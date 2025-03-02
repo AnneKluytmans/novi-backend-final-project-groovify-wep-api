@@ -2,6 +2,8 @@ package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
+import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
+import com.groovify.vinylshopapi.dtos.DefaultAddressesRequestDTO;
 import com.groovify.vinylshopapi.services.CustomerAddressService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ public class CustomerAddressController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createCustomerAddress(@PathVariable Long customerId,
+    public ResponseEntity<?> createCustomerAddress(@PathVariable("customerId") Long customerId,
                                                    @Valid @RequestBody AddressRequestDTO addressRequestDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -36,4 +38,37 @@ public class CustomerAddressController {
                 .toUri();
         return ResponseEntity.created(location).body(newAddress);
     }
+
+    @PutMapping("/{addressId}")
+    public ResponseEntity<?> updateCustomerAddress(@PathVariable("customerId") Long customerId,
+                                                   @PathVariable("addressId") Long addressId,
+                                                   @Valid @RequestBody AddressUpdateDTO addressUpdateDTO,
+                                                   BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        AddressResponseDTO updatedAddress = customerAddressService.updateCustomerAddress(customerId, addressId, addressUpdateDTO);
+        return ResponseEntity.ok(updatedAddress);
+    }
+
+    @PatchMapping("/{addressId}/defaults")
+    public ResponseEntity<?> setDefaultAddresses(@PathVariable("customerId") Long customerId,
+                                                 @PathVariable("addressId") Long addressId,
+                                                 @Valid @RequestBody DefaultAddressesRequestDTO defaultAddressesRequestDTO,
+                                                 BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        customerAddressService.setDefaultAddresses(customerId, addressId, defaultAddressesRequestDTO);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @DeleteMapping("/{addressId}")
+    public ResponseEntity<Void> deleteCustomerAddress(@PathVariable("customerId") Long customerId,
+                                                      @PathVariable ("addressId") Long addressId) {
+        customerAddressService.deleteCustomerAddress(customerId, addressId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

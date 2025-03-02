@@ -7,12 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(
-        name = "addresses",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"customer_id", "isShippingAddress"}),
-                @UniqueConstraint(columnNames = {"customer_id", "isBillingAddress"})
-        })
+@Table(name = "addresses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

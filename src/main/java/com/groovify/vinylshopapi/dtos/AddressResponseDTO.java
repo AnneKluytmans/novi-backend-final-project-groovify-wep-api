@@ -14,5 +14,4 @@ public class AddressResponseDTO {
     private String city;
     private String postalCode;
     private String country;
-    private String recipient;
 }

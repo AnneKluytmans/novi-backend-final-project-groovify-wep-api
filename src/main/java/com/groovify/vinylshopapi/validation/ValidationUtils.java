@@ -1,7 +1,7 @@
 package com.groovify.vinylshopapi.validation;
 
 import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.DeactivedException;
+import com.groovify.vinylshopapi.exceptions.DeactivatedException;
 import com.groovify.vinylshopapi.models.User;
 import com.groovify.vinylshopapi.repositories.UserRepository;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class ValidationUtils {
 
         if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
             if (existingUser.get().getIsDeleted()) {
-                throw new DeactivedException("This username is linked to a deleted account. Do you want to reactivate it?");
+                throw new DeactivatedException("This username is linked to a deleted account. Do you want to reactivate it?");
             } else {
                 throw new ConflictException("Username " + username + " is already taken by another user. Please choose another username.");
             }
@@ -34,7 +34,7 @@ public class ValidationUtils {
 
         if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
             if (existingUser.get().getIsDeleted()) {
-                throw new DeactivedException("This email is linked to a deleted account. Do you want to reactivate it?", email);
+                throw new DeactivatedException("This email is linked to a deleted account. Do you want to reactivate it?", email);
             } else {
                 throw new ConflictException("Email " + email + " is already in use by another user. Please choose another email.");
             }

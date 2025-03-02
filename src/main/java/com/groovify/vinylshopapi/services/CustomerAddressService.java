@@ -2,6 +2,11 @@ package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
+import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
+import com.groovify.vinylshopapi.dtos.DefaultAddressesRequestDTO;
+import com.groovify.vinylshopapi.exceptions.BadRequestException;
+import com.groovify.vinylshopapi.exceptions.ForbiddenException;
+import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
 import com.groovify.vinylshopapi.models.Address;
 import com.groovify.vinylshopapi.models.Customer;
@@ -27,7 +32,7 @@ public class CustomerAddressService {
 
     public AddressResponseDTO createCustomerAddress(Long customerId, AddressRequestDTO addressRequestDTO) {
         Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer with id " + customerId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found"));
 
         if (addressRequestDTO.getIsBillingAddress() == null || addressRequestDTO.getIsShippingAddress() == null) {
             throw new IllegalArgumentException("Is billing and shipping status is required.");
@@ -37,7 +42,11 @@ public class CustomerAddressService {
 
         List<Address> existingAddresses = customer.getAddresses();
 
-        if (existingAddresses == null || existingAddresses.isEmpty()) {
+        if (existingAddresses.size() >= 6) {
+            throw new BadRequestException("Maximum number of addresses reached. Please remove at least one address before creating a new one.");
+        }
+
+        if (existingAddresses.isEmpty()) {
             newAddress.setIsBillingAddress(true);
             newAddress.setIsShippingAddress(true);
         } else {
@@ -65,6 +74,69 @@ public class CustomerAddressService {
         return addressMapper.toResponseDTO(savedAddress);
     }
 
+    public AddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressUpdateDTO addressUpdateDTO) {
+        Address address = validateCustomerAndAddress(customerId, addressId);
+
+        address.setStreet(addressUpdateDTO.getStreet());
+        address.setHouseNumber(addressUpdateDTO.getHouseNumber());
+        address.setCity(addressUpdateDTO.getCity());
+        address.setPostalCode(addressUpdateDTO.getPostalCode());
+        address.setCountry(addressUpdateDTO.getCountry());
+
+        Address savedAddress = addressRepository.save(address);
+        return addressMapper.toResponseDTO(savedAddress);
+    }
+
+    public void setDefaultAddresses(Long customerId, Long addressId, DefaultAddressesRequestDTO defaultAddressesRequestDTO) {
+        Address address = validateCustomerAndAddress(customerId, addressId);
+
+        if (defaultAddressesRequestDTO.getIsBillingAddress()) {
+            Address currentBillingAddress = findBillingAddress(address.getCustomer().getAddresses());
+            if (currentBillingAddress == null || !currentBillingAddress.getId().equals(addressId)) {
+                if (currentBillingAddress != null) {
+                    currentBillingAddress.setIsBillingAddress(false);
+                    addressRepository.save(currentBillingAddress);
+                }
+                address.setIsBillingAddress(true);
+            }
+        }
+
+        if (defaultAddressesRequestDTO.getIsShippingAddress()) {
+            Address currentShippingAddress = findShippingAddress(address.getCustomer().getAddresses());
+            if (currentShippingAddress == null || !currentShippingAddress.getId().equals(addressId)) {
+                if (currentShippingAddress != null) {
+                    currentShippingAddress.setIsShippingAddress(false);
+                    addressRepository.save(currentShippingAddress);
+                }
+                address.setIsShippingAddress(true);
+            }
+        }
+
+        addressRepository.save(address);
+    }
+
+    public void deleteCustomerAddress(Long customerId, Long addressId) {
+        Address address = validateCustomerAndAddress(customerId, addressId);
+
+        List<Address> customerAddresses = address.getCustomer().getAddresses();
+
+        if (address.getIsBillingAddress() || address.getIsShippingAddress()) {
+            Address newDefaultAddress = findNewDefaultAddress(customerAddresses, addressId);
+            if (newDefaultAddress != null) {
+                if (address.getIsBillingAddress()) {
+                    newDefaultAddress.setIsBillingAddress(true);
+                }
+                if (address.getIsShippingAddress()) {
+                    newDefaultAddress.setIsShippingAddress(true);
+                }
+                addressRepository.save(newDefaultAddress);
+            }
+        }
+
+        addressRepository.delete(address);
+    }
+
+
     private Address findBillingAddress(List<Address> addresses) {
         return addresses.stream()
                 .filter(Address::getIsBillingAddress)
@@ -77,5 +149,27 @@ public class CustomerAddressService {
                 .filter(Address::getIsShippingAddress)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private Address findNewDefaultAddress(List<Address> customerAddresses, Long excludedAddressId) {
+        return customerAddresses.stream()
+                .filter(address -> !address.getId().equals(excludedAddressId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Address validateCustomerAndAddress(Long customerId, Long addressId) {
+        if (!customerRepository.existsByIdAndIsDeletedFalse(customerId)) {
+            throw new RecordNotFoundException("Customer with id " + customerId + " not found");
+        }
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RecordNotFoundException("Address with id " + addressId + " not found"));
+
+        if (address.getCustomer() == null || !address.getCustomer().getId().equals(customerId)) {
+            throw new ForbiddenException("You cannot update this address as it doesn't belong to the specified customer");
+        }
+
+        return address;
     }
 }

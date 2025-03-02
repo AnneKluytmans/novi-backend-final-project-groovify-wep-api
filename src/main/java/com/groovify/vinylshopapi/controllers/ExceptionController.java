@@ -67,6 +67,16 @@ public class ExceptionController {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(value = ForbiddenException.class)
+    public ResponseEntity<Object> handleForbiddenException(ForbiddenException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.FORBIDDEN.value());
+        body.put("error", "Forbidden");
+        body.put("message", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(value = DeleteOperationException.class)
     public ResponseEntity<Object> handleDeleteOperationException(DeleteOperationException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -122,8 +132,8 @@ public class ExceptionController {
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(value = DeactivedException.class)
-    public ResponseEntity<Object> handleDeactivedException(DeactivedException ex) {
+    @ExceptionHandler(value = DeactivatedException.class)
+    public ResponseEntity<Object> handleDeactivatedException(DeactivatedException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());

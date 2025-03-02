@@ -1,13 +1,13 @@
 package com.groovify.vinylshopapi.exceptions;
 
-public class DeactivedException extends RuntimeException {
+public class DeactivatedException extends RuntimeException {
     private String email;
 
-    public DeactivedException(String message) {
+    public DeactivatedException(String message) {
         super(message);
     }
 
-    public DeactivedException(String message, String email) {
+    public DeactivatedException(String message, String email) {
         super(message);
         this.email = email;
     }
