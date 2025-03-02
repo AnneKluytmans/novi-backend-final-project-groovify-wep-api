@@ -10,5 +10,4 @@ import java.util.List;
 public class CustomerResponseDTO extends UserResponseDTO {
     private Boolean newsletterSubscribed;
     private List<VinylRecordSummaryResponseDTO> favoriteVinylRecords;
-    private List<AddressResponseDTO> addresses;
 }

@@ -1,9 +1,6 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
-import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
-import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
-import com.groovify.vinylshopapi.dtos.DefaultAddressesRequestDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.exceptions.BadRequestException;
 import com.groovify.vinylshopapi.exceptions.ForbiddenException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
@@ -13,6 +10,7 @@ import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 
@@ -28,6 +26,35 @@ public class CustomerAddressService {
         this.addressRepository = addressRepository;
         this.addressMapper = addressMapper;
         this.customerRepository = customerRepository;
+    }
+
+    public List<CustomerAddressResponseDTO> getCustomerAddresses(Long customerId) {
+        if (!customerRepository.existsByIdAndIsDeletedFalse(customerId)) {
+            throw new RecordNotFoundException("Customer with id " + customerId + " not found");
+        }
+
+        List<Address> customerAddresses = addressRepository.findAllByCustomerId(customerId);
+        return addressMapper.toCustomerAddressResponseDTOs(customerAddresses);
+    }
+
+    public CustomerAddressResponseDTO getCustomerAddressById(Long customerId, Long addressId) {
+        Address address = validateCustomerAndAddress(customerId, addressId);
+        return addressMapper.toCustomerAddressResponseDTO(address);
+    }
+
+    public DefaultAddressesResponseDTO getDefaultCustomerAddresses(Long customerId) {
+        if (!customerRepository.existsByIdAndIsDeletedFalse(customerId)) {
+            throw new RecordNotFoundException("Customer with id " + customerId + " not found");
+        }
+
+        Address shippingAddress = findShippingAddress(addressRepository.findAllByCustomerId(customerId));
+        Address billingAddress = findBillingAddress(addressRepository.findAllByCustomerId(customerId));
+
+        DefaultAddressesResponseDTO defaultAddressesResponseDTO = new DefaultAddressesResponseDTO();
+        defaultAddressesResponseDTO.setShippingAddress(addressMapper.toResponseDTO(shippingAddress));
+        defaultAddressesResponseDTO.setBillingAddress(addressMapper.toResponseDTO(billingAddress));
+
+        return defaultAddressesResponseDTO;
     }
 
     public AddressResponseDTO createCustomerAddress(Long customerId, AddressRequestDTO addressRequestDTO) {
@@ -167,7 +194,7 @@ public class CustomerAddressService {
                 .orElseThrow(() -> new RecordNotFoundException("Address with id " + addressId + " not found"));
 
         if (address.getCustomer() == null || !address.getCustomer().getId().equals(customerId)) {
-            throw new ForbiddenException("You cannot update this address as it doesn't belong to the specified customer");
+            throw new ForbiddenException("You cannot update or retrieve this address as it doesn't belong to the specified customer");
         }
 
         return address;

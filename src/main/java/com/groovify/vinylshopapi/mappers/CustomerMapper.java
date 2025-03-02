@@ -10,13 +10,12 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {VinylRecordMapper.class, AddressMapper.class})
+@Mapper(componentModel = "spring", uses = {VinylRecordMapper.class})
 public interface CustomerMapper {
     @Mapping(target = "id", ignore = true)
     Customer toEntity(CustomerRegisterDTO customerRegisterDTO);
 
     @Mapping(target = "favoriteVinylRecords", source = "favoriteVinylRecords")
-    @Mapping(target = "addresses", source = "addresses")
     CustomerResponseDTO toResponseDTO(Customer customer);
 
     List<CustomerResponseDTO> toResponseDTOs(List<Customer> customers);

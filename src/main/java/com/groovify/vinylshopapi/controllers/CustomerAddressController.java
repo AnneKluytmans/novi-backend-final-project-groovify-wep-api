@@ -1,9 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
-import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
-import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
-import com.groovify.vinylshopapi.dtos.DefaultAddressesRequestDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.services.CustomerAddressService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers/{customerId}/addresses")
@@ -21,6 +19,25 @@ public class CustomerAddressController {
 
     public CustomerAddressController(CustomerAddressService customerAddressService) {
         this.customerAddressService = customerAddressService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CustomerAddressResponseDTO>> getCustomerAddresses(@PathVariable("customerId") Long customerId) {
+        List<CustomerAddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
+        return ResponseEntity.ok(addresses);
+    }
+
+    @GetMapping("/{addressId}")
+    public ResponseEntity<CustomerAddressResponseDTO> getCustomerAddress(@PathVariable("customerId") Long customerId,
+                                                                         @PathVariable("addressId") Long addressId) {
+        CustomerAddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
+        return ResponseEntity.ok(address);
+    }
+
+    @GetMapping("/defaults")
+    public ResponseEntity<DefaultAddressesResponseDTO> getDefaultCustomerAddresses(@PathVariable("customerId") Long customerId) {
+        DefaultAddressesResponseDTO defaultAddresses = customerAddressService.getDefaultCustomerAddresses(customerId);
+        return ResponseEntity.ok(defaultAddresses);
     }
 
     @PostMapping()
