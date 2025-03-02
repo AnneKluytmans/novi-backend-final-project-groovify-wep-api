@@ -24,7 +24,7 @@ public class AddressUpdateDTO {
     private String city;
 
     @NotBlank(message = "Postal code is required")
-    @Pattern(regexp = "^[0-9]{4}[A-Za-z]{2}$", message = "Postal code must follow the pattern '1234AB'")
+    @Pattern(regexp = "^(?:[0-9]{4}[A-Za-z]{2}|[0-9]{4})$", message = "Postal code must follow the pattern '1234AB' (NL) or '1234' (BE)")
     private String postalCode;
 
     @NotBlank(message = "Country is required")

@@ -26,6 +26,12 @@ public class EmployeeAddressService {
         this.employeeRepository = employeeRepository;
     }
 
+    public AddressResponseDTO getEmployeeAddressById(Long employeeId) {
+        Address address = addressRepository.findByEmployeeId(employeeId)
+                .orElseThrow(() -> new RecordNotFoundException("Address of employee with id " + employeeId + " not found"));
+        return addressMapper.toResponseDTO(address);
+    }
+
     public AddressResponseDTO createEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
         Employee employee = employeeRepository.findByIdAndIsDeletedFalse(employeeId)
                 .orElseThrow(() -> new RecordNotFoundException("Employee with id " + employeeId + " not found"));

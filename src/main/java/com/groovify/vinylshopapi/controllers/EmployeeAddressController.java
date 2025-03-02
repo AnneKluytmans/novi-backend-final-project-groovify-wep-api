@@ -51,4 +51,10 @@ public class EmployeeAddressController {
         return ResponseEntity.ok(updatedAddress);
     }
 
+    @GetMapping()
+    public ResponseEntity<AddressResponseDTO> getEmployeeAddress(@PathVariable("employeeId") Long employeeId) {
+        AddressResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
+        return ResponseEntity.ok(address);
+    }
+
 }
