@@ -39,15 +39,14 @@ public class EmployeeAddressController {
         return ResponseEntity.created(location).body(newAddress);
     }
 
-    @PutMapping("/{addressId}")
+    @PutMapping()
     public ResponseEntity<?> updateEmployeeAddress(@PathVariable("employeeId") Long employeeId,
-                                                   @PathVariable("addressId") Long addressId,
                                                    @Valid @RequestBody AddressUpdateDTO addressUpdateDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        AddressResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressId, addressUpdateDTO);
+        AddressResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressUpdateDTO);
         return ResponseEntity.ok(updatedAddress);
     }
 

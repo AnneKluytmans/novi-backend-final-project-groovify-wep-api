@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface AddressRepository extends JpaRepository<Address, Long> {
     List<Address> findAllByCustomerId(Long customerId);
     Optional<Address> findByEmployeeId(Long employeeId);
+
+    Boolean existsByEmployeeId(Long employeeId);
 }
