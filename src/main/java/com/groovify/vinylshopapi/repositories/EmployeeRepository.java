@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
     Optional<Employee> findByIdAndIsDeletedFalse(Long id);
     Optional<Employee> findByUsernameIgnoreCaseAndIsDeletedFalse(String username);
+
+    Boolean existsByIdAndIsDeletedFalse(Long id);
 }

@@ -50,7 +50,7 @@ public class CustomerAddressController {
 
         AddressResponseDTO newAddress = customerAddressService.createCustomerAddress(customerId, addressRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
+                .path("/{addressId}")
                 .buildAndExpand(newAddress.getId())
                 .toUri();
         return ResponseEntity.created(location).body(newAddress);
