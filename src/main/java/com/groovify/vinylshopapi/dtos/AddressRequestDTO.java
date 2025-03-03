@@ -28,8 +28,4 @@ public class AddressRequestDTO {
     @NotBlank(message = "Country is required")
     @Size(max = 100, message = "Country cannot be longer than 100 characters")
     private String country;
-
-    private Boolean isShippingAddress;
-
-    private Boolean isBillingAddress;
 }

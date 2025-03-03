@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultAddressesResponseDTO {
-    private AddressResponseDTO shippingAddress;
-    private AddressResponseDTO billingAddress;
+    private AddressSummaryResponseDTO shippingAddress;
+    private AddressSummaryResponseDTO billingAddress;
 }

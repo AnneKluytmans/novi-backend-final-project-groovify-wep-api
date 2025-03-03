@@ -28,18 +28,18 @@ public class CustomerAddressService {
         this.customerRepository = customerRepository;
     }
 
-    public List<CustomerAddressResponseDTO> getCustomerAddresses(Long customerId) {
+    public List<AddressResponseDTO> getCustomerAddresses(Long customerId) {
         if (!customerRepository.existsByIdAndIsDeletedFalse(customerId)) {
             throw new RecordNotFoundException("Customer with id " + customerId + " not found");
         }
 
         List<Address> customerAddresses = addressRepository.findAllByCustomerId(customerId);
-        return addressMapper.toCustomerAddressResponseDTOs(customerAddresses);
+        return addressMapper.toResponseDTOs(customerAddresses);
     }
 
-    public CustomerAddressResponseDTO getCustomerAddressById(Long customerId, Long addressId) {
+    public AddressResponseDTO getCustomerAddressById(Long customerId, Long addressId) {
         Address address = validateCustomerAndAddress(customerId, addressId);
-        return addressMapper.toCustomerAddressResponseDTO(address);
+        return addressMapper.toResponseDTO(address);
     }
 
     public DefaultAddressesResponseDTO getDefaultCustomerAddresses(Long customerId) {
@@ -51,21 +51,17 @@ public class CustomerAddressService {
         Address billingAddress = findBillingAddress(addressRepository.findAllByCustomerId(customerId));
 
         DefaultAddressesResponseDTO defaultAddressesResponseDTO = new DefaultAddressesResponseDTO();
-        defaultAddressesResponseDTO.setShippingAddress(addressMapper.toResponseDTO(shippingAddress));
-        defaultAddressesResponseDTO.setBillingAddress(addressMapper.toResponseDTO(billingAddress));
+        defaultAddressesResponseDTO.setShippingAddress(addressMapper.toSummaryResponseDTO(shippingAddress));
+        defaultAddressesResponseDTO.setBillingAddress(addressMapper.toSummaryResponseDTO(billingAddress));
 
         return defaultAddressesResponseDTO;
     }
 
-    public AddressResponseDTO createCustomerAddress(Long customerId, AddressRequestDTO addressRequestDTO) {
+    public AddressResponseDTO createCustomerAddress(Long customerId, CustomerAddressRequestDTO addressRequestDTO) {
         Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
                 .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found"));
 
-        if (addressRequestDTO.getIsBillingAddress() == null || addressRequestDTO.getIsShippingAddress() == null) {
-            throw new IllegalArgumentException("Is billing and shipping status is required.");
-        }
-
-        Address newAddress = addressMapper.toEntity(addressRequestDTO);
+        Address newAddress = addressMapper.toCustomerAddressEntity(addressRequestDTO);
 
         List<Address> existingAddresses = customer.getAddresses();
 
@@ -101,14 +97,14 @@ public class CustomerAddressService {
         return addressMapper.toResponseDTO(savedAddress);
     }
 
-    public AddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressUpdateDTO addressUpdateDTO) {
+    public AddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {
         Address address = validateCustomerAndAddress(customerId, addressId);
 
-        address.setStreet(addressUpdateDTO.getStreet());
-        address.setHouseNumber(addressUpdateDTO.getHouseNumber());
-        address.setCity(addressUpdateDTO.getCity());
-        address.setPostalCode(addressUpdateDTO.getPostalCode());
-        address.setCountry(addressUpdateDTO.getCountry());
+        address.setStreet(addressRequestDTO.getStreet());
+        address.setHouseNumber(addressRequestDTO.getHouseNumber());
+        address.setCity(addressRequestDTO.getCity());
+        address.setPostalCode(addressRequestDTO.getPostalCode());
+        address.setCountry(addressRequestDTO.getCountry());
 
         Address savedAddress = addressRepository.save(address);
         return addressMapper.toResponseDTO(savedAddress);

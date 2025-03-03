@@ -1,8 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
-import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
-import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.services.EmployeeAddressService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +28,7 @@ public class EmployeeAddressController {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        AddressResponseDTO newAddress = employeeAddressService.createEmployeeAddress(employeeId, addressRequestDTO);
+        AddressSummaryResponseDTO newAddress = employeeAddressService.createEmployeeAddress(employeeId, addressRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
         return ResponseEntity.created(location).body(newAddress);
@@ -38,18 +36,18 @@ public class EmployeeAddressController {
 
     @PutMapping()
     public ResponseEntity<?> updateEmployeeAddress(@PathVariable("employeeId") Long employeeId,
-                                                   @Valid @RequestBody AddressUpdateDTO addressUpdateDTO,
+                                                   @Valid @RequestBody AddressRequestDTO addressRequestDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        AddressResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressUpdateDTO);
+        AddressSummaryResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressRequestDTO);
         return ResponseEntity.ok(updatedAddress);
     }
 
     @GetMapping()
-    public ResponseEntity<AddressResponseDTO> getEmployeeAddress(@PathVariable("employeeId") Long employeeId) {
-        AddressResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
+    public ResponseEntity<AddressSummaryResponseDTO> getEmployeeAddress(@PathVariable("employeeId") Long employeeId) {
+        AddressSummaryResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
         return ResponseEntity.ok(address);
     }
 

@@ -22,15 +22,15 @@ public class CustomerAddressController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerAddressResponseDTO>> getCustomerAddresses(@PathVariable("customerId") Long customerId) {
-        List<CustomerAddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
+    public ResponseEntity<List<AddressResponseDTO>> getCustomerAddresses(@PathVariable("customerId") Long customerId) {
+        List<AddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
         return ResponseEntity.ok(addresses);
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<CustomerAddressResponseDTO> getCustomerAddress(@PathVariable("customerId") Long customerId,
+    public ResponseEntity<AddressResponseDTO> getCustomerAddress(@PathVariable("customerId") Long customerId,
                                                                          @PathVariable("addressId") Long addressId) {
-        CustomerAddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
+        AddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
         return ResponseEntity.ok(address);
     }
 
@@ -42,7 +42,7 @@ public class CustomerAddressController {
 
     @PostMapping()
     public ResponseEntity<?> createCustomerAddress(@PathVariable("customerId") Long customerId,
-                                                   @Valid @RequestBody AddressRequestDTO addressRequestDTO,
+                                                   @Valid @RequestBody CustomerAddressRequestDTO addressRequestDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
@@ -59,12 +59,12 @@ public class CustomerAddressController {
     @PutMapping("/{addressId}")
     public ResponseEntity<?> updateCustomerAddress(@PathVariable("customerId") Long customerId,
                                                    @PathVariable("addressId") Long addressId,
-                                                   @Valid @RequestBody AddressUpdateDTO addressUpdateDTO,
+                                                   @Valid @RequestBody AddressRequestDTO addressRequestDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        AddressResponseDTO updatedAddress = customerAddressService.updateCustomerAddress(customerId, addressId, addressUpdateDTO);
+        AddressResponseDTO updatedAddress = customerAddressService.updateCustomerAddress(customerId, addressId, addressRequestDTO);
         return ResponseEntity.ok(updatedAddress);
     }
 

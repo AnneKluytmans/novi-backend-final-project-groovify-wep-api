@@ -1,8 +1,7 @@
 package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
-import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
-import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
+import com.groovify.vinylshopapi.dtos.AddressSummaryResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
@@ -27,16 +26,12 @@ public class EmployeeAddressService {
         this.employeeRepository = employeeRepository;
     }
 
-    public AddressResponseDTO getEmployeeAddressById(Long employeeId) {
+    public AddressSummaryResponseDTO getEmployeeAddressById(Long employeeId) {
         Address address = validateEmployeeAndAddress(employeeId);
-        return addressMapper.toResponseDTO(address);
+        return addressMapper.toSummaryResponseDTO(address);
     }
 
-    public AddressResponseDTO createEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
-
-        if (addressRequestDTO.getIsBillingAddress() != null || addressRequestDTO.getIsShippingAddress() != null) {
-            throw new IllegalArgumentException("Employee address cannot be a billing or shipping address. Is billing and shipping status must be null");
-        }
+    public AddressSummaryResponseDTO createEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
 
         if (addressRepository.existsByEmployeeId(employeeId)) {
             throw new ConflictException("Employee already has an address");
@@ -49,20 +44,20 @@ public class EmployeeAddressService {
 
         address.setEmployee(employee);
         Address savedAddress = addressRepository.save(address);
-        return addressMapper.toResponseDTO(savedAddress);
+        return addressMapper.toSummaryResponseDTO(savedAddress);
     }
 
-    public AddressResponseDTO updateEmployeeAddress(Long employeeId, AddressUpdateDTO addressUpdateDTO) {
+    public AddressSummaryResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
         Address address = validateEmployeeAndAddress(employeeId);
 
-        address.setStreet(addressUpdateDTO.getStreet());
-        address.setHouseNumber(addressUpdateDTO.getHouseNumber());
-        address.setCity(addressUpdateDTO.getCity());
-        address.setPostalCode(addressUpdateDTO.getPostalCode());
-        address.setCountry(addressUpdateDTO.getCountry());
+        address.setStreet(addressRequestDTO.getStreet());
+        address.setHouseNumber(addressRequestDTO.getHouseNumber());
+        address.setCity(addressRequestDTO.getCity());
+        address.setPostalCode(addressRequestDTO.getPostalCode());
+        address.setCountry(addressRequestDTO.getCountry());
 
         Address savedAddress = addressRepository.save(address);
-        return addressMapper.toResponseDTO(savedAddress);
+        return addressMapper.toSummaryResponseDTO(savedAddress);
     }
 
     private Address validateEmployeeAndAddress(Long employeeId) {
