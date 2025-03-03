@@ -13,7 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/employees/{employeeId}/addresses")
+@RequestMapping("/api/employees/{employeeId}/address")
 public class EmployeeAddressController {
 
     private final EmployeeAddressService employeeAddressService;
@@ -23,7 +23,7 @@ public class EmployeeAddressController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createEmployeeAddress(@PathVariable Long employeeId,
+    public ResponseEntity<?> createEmployeeAddress(@PathVariable("employeeId") Long employeeId,
                                                    @Valid @RequestBody AddressRequestDTO addressRequestDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -31,10 +31,7 @@ public class EmployeeAddressController {
         }
 
         AddressResponseDTO newAddress = employeeAddressService.createEmployeeAddress(employeeId, addressRequestDTO);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{addressId}")
-                .buildAndExpand(newAddress.getId())
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
         return ResponseEntity.created(location).body(newAddress);
     }

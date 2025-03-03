@@ -207,5 +207,4 @@ VALUES
     ('Lange Leidsedwarsstraat', '45', 'Amsterdam', '1017NG', 'Netherlands', NULL, NULL, 11),
     ('Meir', '78', 'Antwerpen', '2000', 'Belgium', NULL, NULL, 12),
     ('Hoogstraat', '15A', 'Rotterdam', '3011PN', 'Netherlands', NULL, NULL, 13),
-    ('Veldstraat', '22', 'Gent', '9000', 'Belgium', NULL, NULL, 14),
-    ('Reguliersdwarsstraat', '8B', 'Utrecht', '3511XK', 'Netherlands', NULL, NULL, 15);
+    ('Veldstraat', '22', 'Gent', '9000', 'Belgium', NULL, NULL, 14);

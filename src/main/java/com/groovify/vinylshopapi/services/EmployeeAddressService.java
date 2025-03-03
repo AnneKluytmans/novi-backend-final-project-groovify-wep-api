@@ -4,7 +4,6 @@ import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
 import com.groovify.vinylshopapi.dtos.AddressUpdateDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.ForbiddenException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
 import com.groovify.vinylshopapi.models.Address;
@@ -13,7 +12,6 @@ import com.groovify.vinylshopapi.repositories.AddressRepository;
 import com.groovify.vinylshopapi.repositories.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class EmployeeAddressService {
