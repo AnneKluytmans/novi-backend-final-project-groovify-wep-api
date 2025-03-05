@@ -36,15 +36,17 @@ public class EmployeeService {
 
 
     public List<UserSummaryResponseDTO> getEmployees(String firstName, String lastName, String jobTitle, Double minSalary,
-                                                     Double maxSalary, String sortBy, String sortOrder) {
+                                                     Double maxSalary, String country, String city, String sortBy, String sortOrder) {
         Sort sort = switch (sortBy.trim().toLowerCase()) {
             case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
             case "salary" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("salary") : Sort.Order.asc("salary"));
             case "workhours" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("workHours") : Sort.Order.asc("workHours"));
+            case "country" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("address.country") : Sort.Order.asc("address.country"));
+            case "city" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("address.city") : Sort.Order.asc("address.city"));
             default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
         };
 
-        Specification<Employee> specification = EmployeeSpecification.filterEmployees(firstName, lastName, jobTitle, minSalary, maxSalary);
+        Specification<Employee> specification = EmployeeSpecification.filterEmployees(firstName, lastName, jobTitle, minSalary, maxSalary, country, city);
         List<Employee> employees = employeeRepository.findAll(specification, sort);
 
         return employeeMapper.toUserSummaryResponseDTOs(employees);

@@ -26,11 +26,17 @@ public class CustomerController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Boolean newsLetterSubscribed,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String postalCode,
+            @RequestParam(required = false) String houseNumber,
             @RequestParam(defaultValue = "lastName") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortOrder
     ) {
-        List<UserSummaryResponseDTO> customers = customerService.getCustomers(firstName, lastName, newsLetterSubscribed,
-                sortBy, sortOrder);
+        List<UserSummaryResponseDTO> customers = customerService.getCustomers(
+                firstName, lastName, newsLetterSubscribed, country, city,
+                postalCode, houseNumber, sortBy, sortOrder
+        );
         return ResponseEntity.ok(customers);
     }
 

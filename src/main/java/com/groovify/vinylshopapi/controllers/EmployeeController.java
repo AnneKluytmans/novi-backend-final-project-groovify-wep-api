@@ -29,11 +29,15 @@ public class EmployeeController {
             @RequestParam(required = false) String jobTitle,
             @RequestParam(required = false) Double minSalary,
             @RequestParam(required = false) Double maxSalary,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String city,
             @RequestParam(defaultValue = "lastName") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortOrder
     ) {
-        List<UserSummaryResponseDTO> employees = employeeService.getEmployees(firstName, lastName, jobTitle, minSalary,
-                maxSalary, sortBy, sortOrder);
+        List<UserSummaryResponseDTO> employees = employeeService.getEmployees(
+                firstName, lastName, jobTitle, minSalary, maxSalary,
+                country, city, sortBy, sortOrder
+        );
         return ResponseEntity.ok(employees);
     }
 

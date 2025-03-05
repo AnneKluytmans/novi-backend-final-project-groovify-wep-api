@@ -44,14 +44,17 @@ public class CustomerService {
     }
 
     public List<UserSummaryResponseDTO> getCustomers(String firstName, String lastName, Boolean newsletterSubscribed,
+                                                     String country, String city, String postalCode, String houseNumber,
                                                      String sortBy, String sortOrder) {
         Sort sort = switch (sortBy.trim().toLowerCase()) {
             case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
             case "email" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("email") : Sort.Order.asc("email"));
+            case "country" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("addresses.country") : Sort.Order.asc("addresses.country"));
+            case "city" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("addresses.city") : Sort.Order.asc("addresses.city"));
             default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
         };
 
-        Specification<Customer> specification = CustomerSpecification.filterCustomers(firstName, lastName, newsletterSubscribed);
+        Specification<Customer> specification = CustomerSpecification.filterCustomers(firstName, lastName, newsletterSubscribed, country, city, postalCode, houseNumber);
         List<Customer> customers = customerRepository.findAll(specification, sort);
 
         return customerMapper.toUserSummaryResponseDTOs(customers);

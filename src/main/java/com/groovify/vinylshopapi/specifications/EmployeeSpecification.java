@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.specifications;
 
+import com.groovify.vinylshopapi.models.Address;
 import com.groovify.vinylshopapi.models.Employee;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class EmployeeSpecification {
     public static Specification<Employee> filterEmployees(String firstName, String lastName, String jobTitle,
-                                                          Double minSalary, Double maxSalary) {
+                                                          Double minSalary, Double maxSalary, String country, String city) {
         return (Root<Employee> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -31,6 +32,15 @@ public class EmployeeSpecification {
 
             if (maxSalary != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("salary"), maxSalary));
+            }
+
+            Join<Employee, Address> addressJoin = root.join("address", JoinType.INNER);
+            if (country != null && !country.isBlank()) {
+                predicates.add(cb.like(cb.lower(addressJoin.get("country")), "%" + country.toLowerCase() + "%"));
+            }
+
+            if (city != null && !city.isBlank()) {
+                predicates.add(cb.like(cb.lower(addressJoin.get("city")), "%" + city.toLowerCase() + "%"));
             }
 
             return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));
