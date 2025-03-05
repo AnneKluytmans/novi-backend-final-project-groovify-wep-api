@@ -67,3 +67,144 @@ VALUES
     (20, 25, (SELECT id FROM vinyl_records WHERE title = 'Revolver')),
     (15, 20, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew')),
     (10, 12, (SELECT id FROM vinyl_records WHERE title = 'Satchmo at Symphony Hall'));
+
+
+-- Authority roles
+INSERT INTO roles (role_type)
+VALUES
+    ('USER'),
+    ('EMPLOYEE'),
+    ('ADMIN');
+
+
+-- Customers
+INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_deleted, newsletter_subscribed)
+VALUES
+    ('vinylfan_01', 'max.stoop@example.com', 'password123', 'Max', 'Stoop', '1987-03-14', '0612345678', 'CUSTOMER', false, true),
+    ('groovehunter_02', 'eva.vandongen@example.com', 'password123', 'Eva', 'van Dongen', '1992-07-22', '0623456789', 'CUSTOMER', false, false),
+    ('turntableking_03', 'niels.verhoeven@example.com', 'password123', 'Niels', 'Verhoeven', '1990-11-30', '0634567890', 'CUSTOMER', false, true),
+    ('recordlover_04', 'sophie.maes@example.com', 'password123', 'Sophie', 'Maes', '1978-05-18', '0645678901', 'CUSTOMER', false, true),
+    ('spinningvinyl_05', 'jasper.vanrooij@example.com', 'password123', 'Jasper', 'van Rooij', '1985-09-10', '0656789012', 'CUSTOMER', false, true),
+    ('discophile_06', 'lisa.vanacker@example.com', 'password123', 'Lisa', 'Van Acker', '1995-01-25', '0667890123', 'CUSTOMER', false, false),
+    ('soundsystemfan_07', 'thomas.dekker@example.com', 'password123', 'Thomas', 'Dekker', '1983-04-12', '0678901234', 'CUSTOMER', false, true),
+    ('thevinylman_08', 'anne.vanbeek@example.com', 'password123', 'Anne', 'van Beek', '1999-12-05', '0689012345', 'CUSTOMER', false, false),
+    ('oldschoolvinyl_09', 'stefan.vanderlinden@example.com', 'password123', 'Stefan', 'van der Linden', '1991-06-28', '0690123456', 'CUSTOMER', false, true),
+    ('newagevinyl_10', 'mila.janssen@example.com', 'password123', 'Mila', 'Janssen', '1974-02-15', '0611234567', 'CUSTOMER', false, true);
+
+-- Employees
+INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_deleted, job_title, salary, work_hours)
+VALUES
+    ('admin_lars', 'lars.vanmeulen@vinylshop.com', 'admin', 'Lars', 'van Meulen', '1983-02-14', '0623344556', 'EMPLOYEE', false, 'Store Manager', 6500.00, 40),
+    ('admin_emma', 'emma.verstraeten@vinylshop.com', 'admin', 'Emma', 'Verstraeten', '1992-11-12', '0677889900', 'EMPLOYEE', false, 'Store Manager', 6000.00, 40),
+    ('employee_bram', 'bram.vanhof@vinylshop.com', 'employee', 'Bram', 'van Hof', '1990-05-09', '0611223344', 'EMPLOYEE', false, 'Sales Associate', 3600.00, 32),
+    ('employee_eline', 'eline.peeters@vinylshop.com', 'employee', 'Eline', 'Peeters', '1992-07-20', '0688997766', 'EMPLOYEE', false, 'Sales Associate', 2900.00, 24),
+    ('employee_dean', 'daan.koning@vinylshop.com', 'employee', 'Daan', 'Koning', '1988-03-22', '0622233344', 'EMPLOYEE', false, 'Warehouse Coordinator', 5500.00, 32);
+
+
+-- Customer roles
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    (1, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (2, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (3, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (4, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (5, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (6, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (7, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (8, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (9, (SELECT id FROM roles WHERE role_type = 'USER')),
+    (10, (SELECT id FROM roles WHERE role_type = 'USER'));
+
+-- Employee roles
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    (11, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (11, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (12, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (12, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (13, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (14, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (15, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE'));
+
+
+
+--Favorite Vinyl Records
+INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+VALUES
+    (1, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
+    (1, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),
+    (1, (SELECT id FROM vinyl_records WHERE title = '1989')),
+
+    (2, (SELECT id FROM vinyl_records WHERE title = 'Lemonade')),
+    (2, (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida')),
+    (2, (SELECT id FROM vinyl_records WHERE title = '21')),
+
+    (4, (SELECT id FROM vinyl_records WHERE title = 'Rumours')),
+    (4, (SELECT id FROM vinyl_records WHERE title = 'Arrival')),
+    (4, (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?')),
+
+    (5, (SELECT id FROM vinyl_records WHERE title = 'AM')),
+    (5, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World')),
+    (5, (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man')),
+
+    (6, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution')),
+    (6, (SELECT id FROM vinyl_records WHERE title = 'News of the World')),
+    (6, (SELECT id FROM vinyl_records WHERE title = 'Revolver')),
+
+    (8, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
+    (8, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),
+
+    (9, (SELECT id FROM vinyl_records WHERE title = '21')),
+    (9, (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers'));
+
+
+--Addresses
+
+-- Addresses for Customers
+INSERT INTO addresses (street, house_number, city, postal_code, country, is_shipping_address, is_billing_address, customer_id)
+VALUES
+    ('Kalverstraat', '101', 'Amsterdam', '1012NX', 'Netherlands', true, true, 1),
+    ('Nieuwendijk', '87', 'Amsterdam', '1012MB', 'Netherlands', false, false, 1),
+    ('Damrak', '33B', 'Amsterdam', '1012LK', 'Netherlands', false, false, 1),
+
+    ('Korte Lijnbaan', '5', 'Rotterdam', '3012ED', 'Netherlands', true, false, 2),
+    ('Coolsingel', '123A', 'Rotterdam', '3012AG', 'Netherlands', false, true, 2),
+
+    ('Steenstraat', '12', 'Brugge', '8000', 'Belgium', true, true, 3),
+    ('Zuidzandstraat', '45C', 'Brugge', '8000', 'Belgium', false, false, 3),
+
+    ('Hoogpoort', '88', 'Gent', '9000', 'Belgium', true, false, 4),
+    ('Veldstraat', '67', 'Gent', '9000', 'Belgium', false, true, 4),
+    ('Kouter', '9A', 'Gent', '9000', 'Belgium', false, false, 4),
+    ('Langemunt', '34', 'Gent', '9000', 'Belgium', false, false, 4),
+
+    ('Vrijthof', '23', 'Maastricht', '6211LC', 'Netherlands', true, false, 5),
+    ('Markt', '18', 'Maastricht', '6211CJ', 'Netherlands', false, true, 5),
+    ('Kleine Staat', '9B', 'Maastricht', '6211ED', 'Netherlands', false, false, 5),
+    ('Boschstraat', '67', 'Maastricht', '6211AX', 'Netherlands', false, false, 5),
+
+    ('Kapellestraat', '11', 'Oostende', '8400', 'Belgium', true, false, 6),
+    ('Alfons Pieterslaan', '23', 'Oostende', '8400', 'Belgium', false, true, 6),
+    ('Van Iseghemlaan', '45D', 'Oostende', '8400', 'Belgium', false, false, 6),
+
+    ('Haarlemmerstraat', '67', 'Leiden', '2312DM', 'Netherlands', true, false, 7),
+    ('Breestraat', '23', 'Leiden', '2311CG', 'Netherlands', false, true, 7),
+    ('Nieuwstraat', '19A', 'Leiden', '2312KL', 'Netherlands', false, false, 7),
+
+    ('Mariastraat', '6', 'Utrecht', '3511LP', 'Netherlands', true, false, 8),
+    ('Oudegracht', '100B', 'Utrecht', '3511AH', 'Netherlands', false, true, 8),
+    ('Neude', '12', 'Utrecht', '3512AD', 'Netherlands', false, false, 8),
+
+    ('Steenhouwersvest', '3A', 'Antwerpen', '2000', 'Belgium', true, true, 9),
+    ('Lombardenvest', '22', 'Antwerpen', '2000', 'Belgium', false, false, 9),
+
+    ('Leidsestraat', '48', 'Amsterdam', '1017PH', 'Netherlands', true, false, 10),
+    ('Spuistraat', '33', 'Amsterdam', '1012SR', 'Netherlands', false, true, 10);
+
+-- Addresses for Employees
+INSERT INTO addresses (street, house_number, city, postal_code, country, is_shipping_address, is_billing_address, employee_id)
+VALUES
+    ('Lange Leidsedwarsstraat', '45', 'Amsterdam', '1017NG', 'Netherlands', NULL, NULL, 11),
+    ('Meir', '78', 'Antwerpen', '2000', 'Belgium', NULL, NULL, 12),
+    ('Hoogstraat', '15A', 'Rotterdam', '3011PN', 'Netherlands', NULL, NULL, 13),
+    ('Veldstraat', '22', 'Gent', '9000', 'Belgium', NULL, NULL, 14);

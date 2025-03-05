@@ -67,6 +67,16 @@ public class ExceptionController {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(value = ForbiddenException.class)
+    public ResponseEntity<Object> handleForbiddenException(ForbiddenException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.FORBIDDEN.value());
+        body.put("error", "Forbidden");
+        body.put("message", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(value = DeleteOperationException.class)
     public ResponseEntity<Object> handleDeleteOperationException(DeleteOperationException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -109,6 +119,31 @@ public class ExceptionController {
         body.put("message", "File size exceeded max upload size. Max upload size is " + ex.getMaxUploadSize());
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = InvalidVerificationException.class)
+    public ResponseEntity<Object> handleInvalidVerificationException(InvalidVerificationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Invalid Verification");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = DeactivatedException.class)
+    public ResponseEntity<Object> handleDeactivatedException(DeactivatedException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Deactivated");
+        body.put("message", ex.getMessage());
+        if(ex.getEmail() != null) {
+            body.put("email", ex.getEmail());
+        }
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = TeapotException.class)

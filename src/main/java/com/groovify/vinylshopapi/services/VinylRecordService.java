@@ -35,7 +35,7 @@ public class VinylRecordService {
 
     public List<VinylRecordResponseDTO> getVinylRecords(String genre, String artist, BigDecimal minPrice, BigDecimal maxPrice,
                                                         Boolean isLimitedEdition, Boolean isAvailable, String orderBy, String sortOrder, Integer limit) {
-        Sort sort = switch (orderBy.toLowerCase()) {
+        Sort sort = switch (orderBy.trim().toLowerCase()) {
             case "price" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("price") : Sort.Order.asc("price"));
             case "releasedate" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("releaseDate") : Sort.Order.asc("releaseDate"));
             case "bestselling" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("stock.amountSold") : Sort.Order.asc("stock.amountSold"));
