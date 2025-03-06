@@ -99,18 +99,18 @@ public class CustomerController {
     @PostMapping("/{customerId}/favorite-records/{recordId}")
     public ResponseEntity<Void> addFavoriteRecordToCustomer(
             @PathVariable("customerId") Long customerId,
-            @PathVariable("recordId") Long recordId
+            @PathVariable("recordId") Long vinylRecordId
     ) {
-        customerService.addFavoriteRecordToCustomer(customerId, recordId);
+        customerService.addFavoriteRecordToCustomer(customerId, vinylRecordId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{customerId}/favorite-records/{recordId}")
     public ResponseEntity<Void> removeFavoriteRecordFromCustomer(
             @PathVariable("customerId") Long customerId,
-            @PathVariable("recordId") Long recordId
+            @PathVariable("recordId") Long vinylRecordId
     ) {
-        customerService.removeFavoriteRecordFromCustomer(customerId, recordId);
+        customerService.removeFavoriteRecordFromCustomer(customerId, vinylRecordId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -139,30 +139,30 @@ public class CustomerService {
         return vinylRecordMapper.toSummaryResponseDTOs(favoriteRecords);
     }
 
-    public void addFavoriteRecordToCustomer(Long customerId, Long recordId) {
+    public void addFavoriteRecordToCustomer(Long customerId, Long vinylRecordId) {
         Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
                 .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
 
-        VinylRecord favoriteRecord = vinylRecordRepository.findById(recordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + recordId + " not found."));
+        VinylRecord favoriteRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found."));
 
         if (customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
-            throw new ConflictException("Vinyl record with id " + recordId + " is already a favorite record of this customer.");
+            throw new ConflictException("Vinyl record with id " + vinylRecordId + " is already a favorite record of this customer.");
         }
 
         customer.getFavoriteVinylRecords().add(favoriteRecord);
         customerRepository.save(customer);
     }
 
-    public void removeFavoriteRecordFromCustomer(Long customerId, Long recordId) {
+    public void removeFavoriteRecordFromCustomer(Long customerId, Long vinylRecordId) {
         Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
                 .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
 
-        VinylRecord favoriteRecord = vinylRecordRepository.findById(recordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + recordId + " not found."));
+        VinylRecord favoriteRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found."));
 
         if (!customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
-            throw new ConflictException("Vinyl record with id " + recordId + " is not a favorite record of this customer.");
+            throw new ConflictException("Vinyl record with id " + vinylRecordId + " is not a favorite record of this customer.");
         }
 
         customer.getFavoriteVinylRecords().remove(favoriteRecord);
