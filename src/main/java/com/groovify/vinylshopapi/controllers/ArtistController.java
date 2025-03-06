@@ -41,13 +41,17 @@ public class ArtistController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ArtistResponseDTO> getArtistById(@PathVariable Long id) {
+    public ResponseEntity<ArtistResponseDTO> getArtistById(
+            @PathVariable Long id
+    ) {
         ArtistResponseDTO artist = artistService.getArtistById(id);
         return ResponseEntity.ok(artist);
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<ArtistResponseDTO> getArtistByName(@PathVariable String name) {
+    public ResponseEntity<ArtistResponseDTO> getArtistByName(
+            @PathVariable String name
+    ) {
         ArtistResponseDTO artist = artistService.getArtistByName(name);
         return ResponseEntity.ok(artist);
     }
@@ -98,7 +102,9 @@ public class ArtistController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteArtist(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteArtist(
+            @PathVariable Long id
+    ) {
         artistService.deleteArtist(id);
         return ResponseEntity.noContent().build();
     }

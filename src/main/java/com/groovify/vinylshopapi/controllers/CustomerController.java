@@ -30,8 +30,8 @@ public class CustomerController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String postalCode,
             @RequestParam(required = false) String houseNumber,
-            @RequestParam(defaultValue = "lastName") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortOrder
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<UserSummaryResponseDTO> customers = customerService.getCustomers(
                 firstName, lastName, newsLetterSubscribed, country, city,
@@ -41,21 +41,27 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponseDTO> getCustomerById(@PathVariable Long id) {
+    public ResponseEntity<CustomerResponseDTO> getCustomerById(
+            @PathVariable Long id
+    ) {
         CustomerResponseDTO customer = customerService.getCustomerById(id);
         return ResponseEntity.ok(customer);
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<CustomerResponseDTO> getCustomerByUsername(@PathVariable String username) {
+    public ResponseEntity<CustomerResponseDTO> getCustomerByUsername(
+            @PathVariable String username
+    ) {
         CustomerResponseDTO customer = customerService.getCustomerByUsername(username);
         return ResponseEntity.ok(customer);
     }
 
 
     @PostMapping
-    public ResponseEntity<?> registerCustomer(@Valid @RequestBody CustomerRegisterDTO customerRegisterDTO,
-                                              BindingResult bindingResult) {
+    public ResponseEntity<?> registerCustomer(
+            @Valid @RequestBody CustomerRegisterDTO customerRegisterDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -69,9 +75,11 @@ public class CustomerController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@PathVariable Long id,
-                                            @Valid @RequestBody CustomerPatchDTO customerPatchDTO,
-                                            BindingResult bindingResult) {
+    public ResponseEntity<?> updateCustomer(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerPatchDTO customerPatchDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -81,21 +89,27 @@ public class CustomerController {
 
 
     @GetMapping("/{customerId}/favorite-records")
-    public ResponseEntity<List<VinylRecordSummaryResponseDTO>> getFavoriteRecords(@PathVariable Long customerId) {
+    public ResponseEntity<List<VinylRecordSummaryResponseDTO>> getFavoriteRecords(
+            @PathVariable("customerId") Long customerId
+    ) {
         List<VinylRecordSummaryResponseDTO> favoriteRecords = customerService.getFavoriteRecords(customerId);
         return ResponseEntity.ok(favoriteRecords);
     }
 
     @PostMapping("/{customerId}/favorite-records/{recordId}")
-    public ResponseEntity<Void> addFavoriteRecordToCustomer(@PathVariable Long customerId,
-                                                            @PathVariable Long recordId) {
+    public ResponseEntity<Void> addFavoriteRecordToCustomer(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable("recordId") Long recordId
+    ) {
         customerService.addFavoriteRecordToCustomer(customerId, recordId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{customerId}/favorite-records/{recordId}")
-    public ResponseEntity<Void> removeFavoriteRecordFromCustomer(@PathVariable Long customerId,
-                                                                 @PathVariable Long recordId) {
+    public ResponseEntity<Void> removeFavoriteRecordFromCustomer(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable("recordId") Long recordId
+    ) {
         customerService.removeFavoriteRecordFromCustomer(customerId, recordId);
         return ResponseEntity.noContent().build();
     }

@@ -23,15 +23,19 @@ public class VinylRecordStockController {
     }
 
     @GetMapping()
-    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(@PathVariable("id") Long vinylRecordId) {
+    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(
+            @PathVariable("id") Long vinylRecordId
+    ) {
         VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(vinylRecordId);
         return ResponseEntity.ok(stock);
     }
 
     @PostMapping
-    public ResponseEntity<?> createStock(@PathVariable("id") Long vinylRecordId,
-                                         @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
-                                         BindingResult bindingResult) {
+    public ResponseEntity<?> createStock(
+            @PathVariable("id") Long vinylRecordId,
+            @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -43,9 +47,11 @@ public class VinylRecordStockController {
     }
 
     @PatchMapping()
-    public ResponseEntity<?> updateStock(@PathVariable("id") Long vinylRecordId,
-                                         @Valid @RequestBody VinylRecordStockPatchDTO stockPatchDTO,
-                                         BindingResult bindingResult) {
+    public ResponseEntity<?> updateStock(
+            @PathVariable("id") Long vinylRecordId,
+            @Valid @RequestBody VinylRecordStockPatchDTO stockPatchDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -54,7 +60,9 @@ public class VinylRecordStockController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> deleteStock(@PathVariable("id") Long vinylRecordId) {
+    public ResponseEntity<Void> deleteStock(
+            @PathVariable("id") Long vinylRecordId
+    ) {
         vinylRecordStockService.deleteStock(vinylRecordId);
         return ResponseEntity.noContent().build();
     }

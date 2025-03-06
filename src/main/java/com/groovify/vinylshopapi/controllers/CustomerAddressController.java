@@ -22,28 +22,36 @@ public class CustomerAddressController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AddressResponseDTO>> getCustomerAddresses(@PathVariable("customerId") Long customerId) {
+    public ResponseEntity<List<AddressResponseDTO>> getCustomerAddresses(
+            @PathVariable("customerId") Long customerId
+    ) {
         List<AddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
         return ResponseEntity.ok(addresses);
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<AddressResponseDTO> getCustomerAddress(@PathVariable("customerId") Long customerId,
-                                                                         @PathVariable("addressId") Long addressId) {
+    public ResponseEntity<AddressResponseDTO> getCustomerAddress(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable("addressId") Long addressId
+    ) {
         AddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
         return ResponseEntity.ok(address);
     }
 
     @GetMapping("/defaults")
-    public ResponseEntity<DefaultAddressesResponseDTO> getDefaultCustomerAddresses(@PathVariable("customerId") Long customerId) {
+    public ResponseEntity<DefaultAddressesResponseDTO> getDefaultCustomerAddresses(
+            @PathVariable("customerId") Long customerId
+    ) {
         DefaultAddressesResponseDTO defaultAddresses = customerAddressService.getDefaultCustomerAddresses(customerId);
         return ResponseEntity.ok(defaultAddresses);
     }
 
     @PostMapping()
-    public ResponseEntity<?> createCustomerAddress(@PathVariable("customerId") Long customerId,
-                                                   @Valid @RequestBody CustomerAddressRequestDTO addressRequestDTO,
-                                                   BindingResult bindingResult) {
+    public ResponseEntity<?> createCustomerAddress(
+            @PathVariable("customerId") Long customerId,
+            @Valid @RequestBody CustomerAddressRequestDTO addressRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -57,10 +65,12 @@ public class CustomerAddressController {
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<?> updateCustomerAddress(@PathVariable("customerId") Long customerId,
-                                                   @PathVariable("addressId") Long addressId,
-                                                   @Valid @RequestBody AddressRequestDTO addressRequestDTO,
-                                                   BindingResult bindingResult) {
+    public ResponseEntity<?> updateCustomerAddress(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable("addressId") Long addressId,
+            @Valid @RequestBody AddressRequestDTO addressRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -69,10 +79,12 @@ public class CustomerAddressController {
     }
 
     @PatchMapping("/{addressId}/defaults")
-    public ResponseEntity<?> setDefaultAddresses(@PathVariable("customerId") Long customerId,
-                                                 @PathVariable("addressId") Long addressId,
-                                                 @Valid @RequestBody DefaultAddressesRequestDTO defaultAddressesRequestDTO,
-                                                 BindingResult bindingResult) {
+    public ResponseEntity<?> setDefaultAddresses(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable("addressId") Long addressId,
+            @Valid @RequestBody DefaultAddressesRequestDTO defaultAddressesRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -82,8 +94,10 @@ public class CustomerAddressController {
 
 
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<Void> deleteCustomerAddress(@PathVariable("customerId") Long customerId,
-                                                      @PathVariable ("addressId") Long addressId) {
+    public ResponseEntity<Void> deleteCustomerAddress(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable ("addressId") Long addressId
+    ) {
         customerAddressService.deleteCustomerAddress(customerId, addressId);
         return ResponseEntity.noContent().build();
     }

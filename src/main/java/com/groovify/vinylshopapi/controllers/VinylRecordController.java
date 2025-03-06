@@ -32,30 +32,38 @@ public class VinylRecordController {
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean isLimitedEdition,
             @RequestParam(required = false) Boolean isAvailable,
-            @RequestParam(defaultValue = "title") String orderBy,
-            @RequestParam(defaultValue = "ASC") String sortOrder,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) Integer limit)
     {
-        List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition,
-                isAvailable, orderBy, sortOrder, limit);
+        List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(
+                genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable,
+                sortBy, sortOrder, limit
+        );
         return ResponseEntity.ok(vinylRecords);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VinylRecordResponseDTO> getVinylRecordById(@PathVariable Long id) {
+    public ResponseEntity<VinylRecordResponseDTO> getVinylRecordById(
+            @PathVariable Long id
+    ) {
         VinylRecordResponseDTO vinylRecord = vinylRecordService.getVinylRecordById(id);
         return ResponseEntity.ok(vinylRecord);
     }
 
     @GetMapping("/title/{title}")
-    public ResponseEntity<VinylRecordResponseDTO> getVinylRecordByTitle(@PathVariable String title) {
+    public ResponseEntity<VinylRecordResponseDTO> getVinylRecordByTitle(
+            @PathVariable String title
+    ) {
         VinylRecordResponseDTO vinylRecord = vinylRecordService.getVinylRecordByTitle(title);
         return ResponseEntity.ok(vinylRecord);
     }
 
     @PostMapping
-    public ResponseEntity<?> createVinylRecord(@Valid @RequestBody VinylRecordRequestDTO vinylRecordRequestDTO,
-                                               BindingResult bindingResult) {
+    public ResponseEntity<?> createVinylRecord(
+            @Valid @RequestBody VinylRecordRequestDTO vinylRecordRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -68,9 +76,11 @@ public class VinylRecordController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateVinylRecord(@PathVariable Long id,
-                                               @Valid @RequestBody VinylRecordRequestDTO vinylRecordRequestDTO,
-                                               BindingResult bindingResult) {
+    public ResponseEntity<?> updateVinylRecord(
+            @PathVariable Long id,
+            @Valid @RequestBody VinylRecordRequestDTO vinylRecordRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -80,9 +90,11 @@ public class VinylRecordController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> partialUpdateVinylRecord(@PathVariable Long id,
-                                                      @Valid @RequestBody VinylRecordPatchDTO vinylRecordPatchDTO,
-                                                      BindingResult bindingResult) {
+    public ResponseEntity<?> partialUpdateVinylRecord(
+            @PathVariable Long id,
+            @Valid @RequestBody VinylRecordPatchDTO vinylRecordPatchDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -92,20 +104,27 @@ public class VinylRecordController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVinylRecord(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteVinylRecord(
+            @PathVariable Long id
+    ) {
         vinylRecordService.deleteVinylRecord(id);
         return ResponseEntity.noContent().build();
     }
 
 
     @PutMapping("/{vinylId}/artist/{artistId}")
-    public ResponseEntity<VinylRecordResponseDTO> linkArtistToVinyl(@PathVariable Long vinylId, @PathVariable Long artistId) {
+    public ResponseEntity<VinylRecordResponseDTO> linkArtistToVinyl(
+            @PathVariable("vinylId") Long vinylId,
+            @PathVariable("artistId") Long artistId
+    ) {
         VinylRecordResponseDTO linkedVinylRecord = vinylRecordService.linkArtistToVinyl(vinylId, artistId);
         return ResponseEntity.ok(linkedVinylRecord);
     }
 
     @PutMapping("/{vinylId}/artist")
-    public ResponseEntity<VinylRecordResponseDTO> unlinkArtistFromVinyl(@PathVariable Long vinylId) {
+    public ResponseEntity<VinylRecordResponseDTO> unlinkArtistFromVinyl(
+            @PathVariable("vinylId") Long vinylId
+    ) {
         VinylRecordResponseDTO unlinkedVinylRecord = vinylRecordService.unlinkArtistFromVinyl(vinylId);
         return ResponseEntity.ok(unlinkedVinylRecord);
     }
