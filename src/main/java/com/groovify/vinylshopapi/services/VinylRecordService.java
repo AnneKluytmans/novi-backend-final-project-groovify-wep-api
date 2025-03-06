@@ -34,6 +34,7 @@ public class VinylRecordService {
     }
 
     public List<VinylRecordResponseDTO> getVinylRecords(
+            String title,
             String genre,
             String artist,
             BigDecimal minPrice,
@@ -52,7 +53,7 @@ public class VinylRecordService {
             sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "price", "releaseDate", "title"));
         }
         Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(
-                genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable
+                title, genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable
         );
         List<VinylRecord> vinylRecords = vinylRecordRepository.findAll(specification, sort);
 
@@ -71,7 +72,7 @@ public class VinylRecordService {
     }
 
     public VinylRecordResponseDTO getVinylRecordByTitle(String title) {
-        VinylRecord vinylRecord = vinylRecordRepository.findByTitleContainingIgnoreCase(title)
+        VinylRecord vinylRecord = vinylRecordRepository.findByTitleIgnoreCase(title)
                 .orElseThrow(() -> new RecordNotFoundException("Vinyl record with title " + title + " not found"));
 
         return vinylRecordMapper.toResponseDTO(vinylRecord);
@@ -154,26 +155,22 @@ public class VinylRecordService {
     }
 
 
-    public VinylRecordResponseDTO linkArtistToVinyl(Long vinylId, Long artistId) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylId + " not found"));
+    public void addArtistToVinyl(Long vinylRecordId, Long artistId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
 
         Artist artist = artistRepository.findById(artistId)
                 .orElseThrow(() -> new RecordNotFoundException("Artist with id " + artistId + " not found"));
 
         vinylRecord.setArtist(artist);
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        vinylRecordRepository.save(vinylRecord);
     }
 
-    public VinylRecordResponseDTO unlinkArtistFromVinyl(Long vinylId) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylId + " not found"));
+    public void removeArtistFromVinyl(Long vinylRecordId) {
+        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
 
         vinylRecord.setArtist(null);
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        vinylRecordRepository.save(vinylRecord);
     }
 }

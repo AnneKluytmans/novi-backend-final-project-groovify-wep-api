@@ -14,6 +14,7 @@ import java.util.List;
 public class VinylRecordSpecification {
 
     public static Specification<VinylRecord> filterVinylRecords(
+            String title,
             String genre,
             String artist,
             BigDecimal minPrice,
@@ -23,6 +24,8 @@ public class VinylRecordSpecification {
     ) {
         return (Root<VinylRecord> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            SpecificationUtils.addStringPredicate(predicates, cb, root.get("title"), title, false);
 
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("genre"), genre, false);
 

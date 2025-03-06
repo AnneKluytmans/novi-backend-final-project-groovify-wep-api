@@ -26,6 +26,7 @@ public class VinylRecordController {
 
     @GetMapping
     public ResponseEntity<List<VinylRecordResponseDTO>> getVinylRecords(
+            @RequestParam(required = false) String title,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String artist,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -37,7 +38,7 @@ public class VinylRecordController {
             @RequestParam(required = false) Integer limit)
     {
         List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(
-                genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable,
+                title, genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable,
                 sortBy, sortOrder, limit
         );
         return ResponseEntity.ok(vinylRecords);
@@ -112,21 +113,21 @@ public class VinylRecordController {
     }
 
 
-    @PutMapping("/{vinylId}/artist/{artistId}")
-    public ResponseEntity<VinylRecordResponseDTO> linkArtistToVinyl(
-            @PathVariable("vinylId") Long vinylId,
+    @PostMapping("/{recordId}/artist/{artistId}")
+    public ResponseEntity<Void> addArtistToVinyl(
+            @PathVariable("recordId") Long vinylRecordId,
             @PathVariable("artistId") Long artistId
     ) {
-        VinylRecordResponseDTO linkedVinylRecord = vinylRecordService.linkArtistToVinyl(vinylId, artistId);
-        return ResponseEntity.ok(linkedVinylRecord);
+        vinylRecordService.addArtistToVinyl(vinylRecordId, artistId);
+        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{vinylId}/artist")
-    public ResponseEntity<VinylRecordResponseDTO> unlinkArtistFromVinyl(
-            @PathVariable("vinylId") Long vinylId
+    @DeleteMapping("/{recordId}/artist")
+    public ResponseEntity<Void> removeArtistFromVinyl(
+            @PathVariable("recordId") Long vinylRecordId
     ) {
-        VinylRecordResponseDTO unlinkedVinylRecord = vinylRecordService.unlinkArtistFromVinyl(vinylId);
-        return ResponseEntity.ok(unlinkedVinylRecord);
+        vinylRecordService.removeArtistFromVinyl(vinylRecordId);
+        return ResponseEntity.noContent().build();
     }
 
 }

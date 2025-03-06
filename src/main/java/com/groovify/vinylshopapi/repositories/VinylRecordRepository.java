@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface VinylRecordRepository extends JpaRepository<VinylRecord, Long>, JpaSpecificationExecutor<VinylRecord> {
-    Optional<VinylRecord> findByTitleContainingIgnoreCase(String title);
+    Optional<VinylRecord> findByTitleIgnoreCase(String title);
 }
