@@ -3,7 +3,6 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.ArtistPatchDTO;
 import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
-import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
@@ -12,6 +11,7 @@ import com.groovify.vinylshopapi.models.Artist;
 import com.groovify.vinylshopapi.repositories.ArtistRepository;
 
 import com.groovify.vinylshopapi.specifications.ArtistSpecification;
+import com.groovify.vinylshopapi.utils.SortHelper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -30,15 +30,14 @@ public class ArtistService {
         this.artistMapper = artistMapper;
     }
 
-    public List<ArtistResponseDTO> getArtists(String country, Integer minPopularity, Integer maxPopularity,
-                                              String orderBy, String sortOrder, Integer limit) {
-        Sort sort = switch (orderBy.trim().toLowerCase()) {
-          case "popularity" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("popularity") : Sort.Order.asc("popularity"));
-          case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
-          default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("name") : Sort.Order.asc("name"));
-        };
-
-        Specification<Artist> specification = ArtistSpecification.filterArtists(country, minPopularity, maxPopularity);
+    public List<ArtistResponseDTO> getArtists(
+            String country, String name, Integer minPopularity, Integer maxPopularity,
+            String sortBy, String sortOrder, Integer limit
+    ) {
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "countryOfOrigin"));
+        Specification<Artist> specification = ArtistSpecification.filterArtists(
+                country, name, minPopularity, maxPopularity
+        );
         List<Artist> artists = artistRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < artists.size()) {
@@ -56,7 +55,7 @@ public class ArtistService {
     }
 
     public ArtistResponseDTO getArtistByName(String name) {
-        Artist artist = artistRepository.findByNameContainingIgnoreCase(name)
+        Artist artist = artistRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new RecordNotFoundException("Artist with name " + name + " not found"));
 
         return artistMapper.toResponseDTO(artist);
@@ -77,7 +76,7 @@ public class ArtistService {
         Artist artist = artistRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
 
-        checkForDuplicateName(artistRequestDTO.getName(), id);
+        validateUniqueArtistName(artistRequestDTO.getName(), id);
 
         artist.setName(artistRequestDTO.getName());
         artist.setIsGroup(artistRequestDTO.getIsGroup());
@@ -95,7 +94,7 @@ public class ArtistService {
 
 
         if (artistPatchDTO.getName() != null && !artistPatchDTO.getName().trim().isEmpty()) {
-            checkForDuplicateName(artistPatchDTO.getName(), id);
+            validateUniqueArtistName(artistPatchDTO.getName(), id);
             artist.setName(artistPatchDTO.getName());
         }
 
@@ -130,8 +129,8 @@ public class ArtistService {
         artistRepository.deleteById(id);
     }
 
-    private void checkForDuplicateName(String name, Long currentArtistId) {
-        Optional<Artist> existingArtist = artistRepository.findByNameContainingIgnoreCase(name);
+    private void validateUniqueArtistName(String name, Long currentArtistId) {
+        Optional<Artist> existingArtist = artistRepository.findByNameIgnoreCase(name);
 
         if (existingArtist.isPresent() && !existingArtist.get().getId().equals(currentArtistId)) {
             throw new ConflictException("Artist with name " + name + " already exists");

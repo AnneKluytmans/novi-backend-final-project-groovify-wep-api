@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.utils;
 
-import com.groovify.vinylshopapi.models.Address;
 import jakarta.persistence.criteria.*;
 
 import java.util.List;

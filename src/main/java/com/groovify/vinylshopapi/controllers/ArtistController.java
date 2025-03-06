@@ -27,13 +27,16 @@ public class ArtistController {
     @GetMapping
     public ResponseEntity<List<ArtistResponseDTO>> getArtists(
             @RequestParam(required = false) String country,
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer minPopularity,
             @RequestParam(required = false) Integer maxPopularity,
-            @RequestParam(defaultValue = "name") String orderBy,
-            @RequestParam(defaultValue = "ASC") String sortOrder,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) Integer limit)
     {
-        List<ArtistResponseDTO> artists = artistService.getArtists(country, minPopularity, maxPopularity, orderBy, sortOrder, limit);
+        List<ArtistResponseDTO> artists = artistService.getArtists(
+                country, name, minPopularity, maxPopularity, sortBy, sortOrder, limit
+        );
         return ResponseEntity.ok(artists);
     }
 
@@ -50,11 +53,14 @@ public class ArtistController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createArtist(@Valid @RequestBody ArtistRequestDTO artistRequestDTO,
-                                          BindingResult bindingResult) {
+    public ResponseEntity<?> createArtist(
+            @Valid @RequestBody ArtistRequestDTO artistRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
+
         ArtistResponseDTO newArtist = artistService.createArtist(artistRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -64,9 +70,11 @@ public class ArtistController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateArtist(@PathVariable Long id,
-                                          @Valid @RequestBody ArtistRequestDTO artistRequestDTO,
-                                          BindingResult bindingResult) {
+    public ResponseEntity<?> updateArtist(
+            @PathVariable Long id,
+            @Valid @RequestBody ArtistRequestDTO artistRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -76,9 +84,11 @@ public class ArtistController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> partialUpdateArtist(@PathVariable Long id,
-                                                 @Valid @RequestBody ArtistPatchDTO artistPatchDTO,
-                                                 BindingResult bindingResult) {
+    public ResponseEntity<?> partialUpdateArtist(
+            @PathVariable Long id,
+            @Valid @RequestBody ArtistPatchDTO artistPatchDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
