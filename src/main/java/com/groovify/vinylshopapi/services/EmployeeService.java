@@ -2,7 +2,6 @@ package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
 import com.groovify.vinylshopapi.models.Employee;
@@ -10,6 +9,7 @@ import com.groovify.vinylshopapi.models.Role;
 import com.groovify.vinylshopapi.repositories.EmployeeRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.specifications.EmployeeSpecification;
+import com.groovify.vinylshopapi.utils.SortHelper;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
 
 import org.springframework.data.domain.Sort;
@@ -35,18 +35,21 @@ public class EmployeeService {
     }
 
 
-    public List<UserSummaryResponseDTO> getEmployees(String firstName, String lastName, String jobTitle, Double minSalary,
-                                                     Double maxSalary, String country, String city, String sortBy, String sortOrder) {
-        Sort sort = switch (sortBy.trim().toLowerCase()) {
-            case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
-            case "salary" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("salary") : Sort.Order.asc("salary"));
-            case "workhours" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("workHours") : Sort.Order.asc("workHours"));
-            case "country" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("address.country") : Sort.Order.asc("address.country"));
-            case "city" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("address.city") : Sort.Order.asc("address.city"));
-            default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
-        };
-
-        Specification<Employee> specification = EmployeeSpecification.filterEmployees(firstName, lastName, jobTitle, minSalary, maxSalary, country, city);
+    public List<UserSummaryResponseDTO> getEmployees(
+            String firstName,
+            String lastName,
+            String jobTitle,
+            Double minSalary,
+            Double maxSalary,
+            String country,
+            String city,
+            String sortBy,
+            String sortOrder
+    ) {
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "lastName", "salary", "workHours"));
+        Specification<Employee> specification = EmployeeSpecification.filterEmployees(
+                firstName, lastName, jobTitle, minSalary, maxSalary, country, city
+        );
         List<Employee> employees = employeeRepository.findAll(specification, sort);
 
         return employeeMapper.toUserSummaryResponseDTOs(employees);

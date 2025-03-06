@@ -31,8 +31,13 @@ public class ArtistService {
     }
 
     public List<ArtistResponseDTO> getArtists(
-            String country, String name, Integer minPopularity, Integer maxPopularity,
-            String sortBy, String sortOrder, Integer limit
+            String country,
+            String name,
+            Integer minPopularity,
+            Integer maxPopularity,
+            String sortBy,
+            String sortOrder,
+            Integer limit
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "countryOfOrigin"));
         Specification<Artist> specification = ArtistSpecification.filterArtists(

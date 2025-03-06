@@ -4,7 +4,6 @@ import com.groovify.vinylshopapi.dtos.VinylRecordPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
 import com.groovify.vinylshopapi.enums.Genre;
-import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
 import com.groovify.vinylshopapi.models.Artist;
@@ -13,6 +12,7 @@ import com.groovify.vinylshopapi.repositories.ArtistRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.specifications.VinylRecordSpecification;
 
+import com.groovify.vinylshopapi.utils.SortHelper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -33,17 +33,27 @@ public class VinylRecordService {
         this.vinylRecordMapper = vinylRecordMapper;
     }
 
-    public List<VinylRecordResponseDTO> getVinylRecords(String genre, String artist, BigDecimal minPrice, BigDecimal maxPrice,
-                                                        Boolean isLimitedEdition, Boolean isAvailable, String orderBy, String sortOrder, Integer limit) {
-        Sort sort = switch (orderBy.trim().toLowerCase()) {
-            case "price" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("price") : Sort.Order.asc("price"));
-            case "releasedate" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("releaseDate") : Sort.Order.asc("releaseDate"));
-            case "bestselling" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("stock.amountSold") : Sort.Order.asc("stock.amountSold"));
-            case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
-            default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("title") : Sort.Order.asc("title"));
-        };
-
-        Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable);
+    public List<VinylRecordResponseDTO> getVinylRecords(
+            String genre,
+            String artist,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean isLimitedEdition,
+            Boolean isAvailable,
+            String sortBy,
+            String sortOrder,
+            Integer limit
+    ) {
+        Sort sort;
+        if (sortBy.trim().equalsIgnoreCase("bestselling")) {
+            Sort.Direction direction = Sort.Direction.DESC;
+            sort = Sort.by(direction, "stock.amountSold");
+        } else {
+            sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "price", "releaseDate", "title"));
+        }
+        Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(
+                genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable
+        );
         List<VinylRecord> vinylRecords = vinylRecordRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < vinylRecords.size()) {

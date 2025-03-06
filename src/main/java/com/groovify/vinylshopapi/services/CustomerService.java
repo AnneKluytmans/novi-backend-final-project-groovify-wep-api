@@ -2,7 +2,6 @@ package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
@@ -14,6 +13,7 @@ import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.specifications.CustomerSpecification;
+import com.groovify.vinylshopapi.utils.SortHelper;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
 
 import org.springframework.data.domain.Sort;
@@ -43,18 +43,21 @@ public class CustomerService {
         this.vinylRecordMapper = vinylRecordMapper;
     }
 
-    public List<UserSummaryResponseDTO> getCustomers(String firstName, String lastName, Boolean newsletterSubscribed,
-                                                     String country, String city, String postalCode, String houseNumber,
-                                                     String sortBy, String sortOrder) {
-        Sort sort = switch (sortBy.trim().toLowerCase()) {
-            case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
-            case "email" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("email") : Sort.Order.asc("email"));
-            case "country" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("addresses.country") : Sort.Order.asc("addresses.country"));
-            case "city" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("addresses.city") : Sort.Order.asc("addresses.city"));
-            default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
-        };
-
-        Specification<Customer> specification = CustomerSpecification.filterCustomers(firstName, lastName, newsletterSubscribed, country, city, postalCode, houseNumber);
+    public List<UserSummaryResponseDTO> getCustomers(
+            String firstName,
+            String lastName,
+            Boolean newsletterSubscribed,
+            String country,
+            String city,
+            String postalCode,
+            String houseNumber,
+            String sortBy,
+            String sortOrder
+    ) {
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "lastName", "email"));
+        Specification<Customer> specification = CustomerSpecification.filterCustomers(
+                firstName, lastName, newsletterSubscribed, country, city, postalCode, houseNumber
+        );
         List<Customer> customers = customerRepository.findAll(specification, sort);
 
         return customerMapper.toUserSummaryResponseDTOs(customers);
