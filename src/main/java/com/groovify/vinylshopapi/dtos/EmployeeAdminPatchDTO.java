@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class EmployeeAdminPatchDTO {
-    @Size(min = 3, max = 50, message = "Job title must be between 3 and 50 characters")
+    @Size(min = 1, max = 50, message = "Job title cannot be longer than 50 characters")
     private String jobTitle;
 
     @Positive(message = "Salary must be a positive value")

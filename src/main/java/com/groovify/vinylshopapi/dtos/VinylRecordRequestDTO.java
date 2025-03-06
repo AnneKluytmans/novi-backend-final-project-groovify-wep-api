@@ -9,18 +9,18 @@ import java.time.LocalDate;
 
 @Data
 public class VinylRecordRequestDTO {
-    @NotBlank(message = "Title cannot be blank")
-    @Size(max = 100, message = "Title must not exceed 100 characters")
+    @NotBlank(message = "Title is required")
+    @Size(max = 100, message = "Title cannot be longer than 100 characters")
     private String title;
 
-    @Size(max = 500, message = "Description must not exceed 500 characters")
+    @Size(max = 500, message = "Description cannot be longer than 500 characters")
     private String description;
 
     @NotNull(message = "Genre is required")
     private String genre;
 
-    @NotBlank(message = "Label cannot be blank")
-    @Size(max = 100, message = "Label must not exceed 100 characters")
+    @NotBlank(message = "Label is required")
+    @Size(max = 100, message = "Label cannot be longer than 100 characters")
     private String label;
 
     @NotNull(message = "Price is required")

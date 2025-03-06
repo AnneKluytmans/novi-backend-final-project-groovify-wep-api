@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 public class ArtistPatchDTO {
-    @Size(max = 100, message = "Name must not exceed 100 characters")
+    @Size(min = 1, max = 100, message = "Name cannot be longer than 100 characters")
     private String name;
 
     private Boolean isGroup;
@@ -16,7 +16,7 @@ public class ArtistPatchDTO {
     @ValidDate(min = "1500-01-01", mustBePast = true, message = "Debut date must be between 1500 and now")
     private LocalDate debutDate;
 
-    @Size(max = 100, message = "Country of origin must not exceed 100 characters")
+    @Size(min = 1, max = 100, message = "Country of origin cannot be longer than 100 characters")
     private String countryOfOrigin;
 
     @Min(value = 0, message = "Popularity score must be between 0 and 100")

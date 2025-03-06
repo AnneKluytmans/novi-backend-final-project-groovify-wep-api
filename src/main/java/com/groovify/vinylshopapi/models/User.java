@@ -36,15 +36,15 @@ public abstract class User {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Size(min = 8, max = 200, message = "Password must be between 8 and 200 characters long")
     private String password;
 
     @NotBlank(message = "First name is required")
-    @Size(max = 100, message = "First name cannot be longer than 100 characters")
+    @Size(max = 100, message = "First name cannot exceed 100 characters")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(max = 100, message = "Last name cannot be longer than 100 characters")
+    @Size(max = 100, message = "Last name cannot exceed 100 characters")
     private String lastName;
 
     @NotNull(message = "Birth date is required")

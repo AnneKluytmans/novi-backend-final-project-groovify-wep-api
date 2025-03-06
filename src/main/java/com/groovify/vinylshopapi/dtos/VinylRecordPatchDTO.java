@@ -9,15 +9,15 @@ import java.time.LocalDate;
 
 @Data
 public class VinylRecordPatchDTO {
-    @Size(max = 100, message = "Title must not exceed 100 characters")
+    @Size(min = 1, max = 100, message = "Title cannot be longer than 100 characters")
     private String title;
 
-    @Size(max = 500, message = "Description must not exceed 500 characters")
+    @Size(min = 1, max = 500, message = "Description cannot be longer than 500 characters")
     private String description;
 
     private String genre;
 
-    @Size(max = 100, message = "Label must not exceed 100 characters")
+    @Size(min = 1, max = 100, message = "Label cannot be longer than 100 characters")
     private String label;
 
     @DecimalMin(value = "0.01", inclusive = false, message = "Price must be greater than 0")
