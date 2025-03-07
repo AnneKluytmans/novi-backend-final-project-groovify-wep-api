@@ -1,13 +1,9 @@
 package com.groovify.vinylshopapi.dtos;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AddressRequestDTO {
     @NotBlank(message = "Street is required")
     @Size(max = 255, message = "Street cannot be longer than 255 characters")
