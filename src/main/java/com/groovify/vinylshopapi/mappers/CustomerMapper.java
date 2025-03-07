@@ -22,8 +22,6 @@ public interface CustomerMapper {
 
     UserResponseDTO toUserResponseDTO(Customer customer);
 
-    List<UserResponseDTO> toUserResponseDTOs(List<Customer> customers);
-
     UserSummaryResponseDTO toUserSummaryResponseDTO(Customer customer);
 
     List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Customer> customers);

@@ -22,16 +22,11 @@ public interface VinylRecordMapper {
     @Mapping(target = "cover", source = "cover")
     VinylRecordResponseDTO toResponseDTO(VinylRecord vinylRecord);
 
-    @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
-    @Mapping(target = "artist", source = "artist")
-    @Mapping(target = "stock", source = "stock")
-    @Mapping(target = "cover", source = "cover")
     List<VinylRecordResponseDTO> toResponseDTOs(List<VinylRecord> vinylRecords);
 
     @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
     VinylRecordSummaryResponseDTO toSummaryResponseDTO(VinylRecord vinylRecord);
 
-    @Mapping(target = "genre", source = "genre", qualifiedByName = "genreToString")
     List<VinylRecordSummaryResponseDTO> toSummaryResponseDTOs(List<VinylRecord> vinylRecords);
 
 

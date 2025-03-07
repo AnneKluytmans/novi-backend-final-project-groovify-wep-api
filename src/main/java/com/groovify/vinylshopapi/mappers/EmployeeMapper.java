@@ -22,8 +22,6 @@ public interface EmployeeMapper {
 
     UserResponseDTO toUserResponseDTO(Employee employee);
 
-    List<UserResponseDTO> toUserResponseDTOs(List<Employee> employees);
-
     UserSummaryResponseDTO toUserSummaryResponseDTO(Employee employee);
 
     List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Employee> employees);
