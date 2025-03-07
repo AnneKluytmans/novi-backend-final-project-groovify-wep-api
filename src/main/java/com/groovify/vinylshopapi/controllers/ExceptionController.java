@@ -12,149 +12,113 @@ import java.util.Map;
 
 @ControllerAdvice
 public class ExceptionController {
-    @ExceptionHandler(value = BadRequestException.class)
-    public ResponseEntity<Object> handleBadRequestException(BadRequestException ex) {
+
+    private ResponseEntity<Object> buildErrorResponse(HttpStatus status, String error, String message, Map<String, Object> extraFields) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", ex.getMessage());
+        body.put("status", status.value());
+        body.put("error", error);
+        body.put("message", message);
+        if (extraFields != null) {
+            body.putAll(extraFields);
+        }
+        return new ResponseEntity<>(body, status);
+    }
 
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(value = BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(BadRequestException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,"Bad Request", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Illegal Argument");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Illegal Argument", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = RecordNotFoundException.class)
     public ResponseEntity<Object> handleRecordNotFoundException(RecordNotFoundException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND, "Not Found", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = IndexOutOfBoundsException.class)
     public ResponseEntity<Object> handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "Index out of bounds");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND, "Index Out Of Bounds", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = ConflictException.class)
     public ResponseEntity<Object> handleConflictException(ConflictException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Conflict");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+        return buildErrorResponse(
+                HttpStatus.CONFLICT, "Conflict", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = ForbiddenException.class)
     public ResponseEntity<Object> handleForbiddenException(ForbiddenException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.FORBIDDEN.value());
-        body.put("error", "Forbidden");
-        body.put("message", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+        return buildErrorResponse(
+                HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = DeleteOperationException.class)
     public ResponseEntity<Object> handleDeleteOperationException(DeleteOperationException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Conflict");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+        return buildErrorResponse(
+                HttpStatus.CONFLICT, "Delete Operation Conflict", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = IOException.class)
     public ResponseEntity<Object> handleIOException(IOException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "File Processing Error");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "File Processing Error", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = InvalidFileTypeException.class)
     public ResponseEntity<Object> handleInvalidFileTypeException(InvalidFileTypeException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
-        body.put("error", "Invalid File Type");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        return buildErrorResponse(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Invalid File Type", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Max Upload Size Exceeded");
-        body.put("message", "File size exceeded max upload size. Max upload size is " + ex.getMaxUploadSize());
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        String message = "File size exceeded max upload size. Max upload size is " + ex.getMessage();
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Max Upload Size Exceeded", message, null
+        );
     }
 
     @ExceptionHandler(value = InvalidVerificationException.class)
     public ResponseEntity<Object> handleInvalidVerificationException(InvalidVerificationException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.UNAUTHORIZED.value());
-        body.put("error", "Invalid Verification");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED, "Invalid Verification", ex.getMessage(), null
+        );
     }
 
     @ExceptionHandler(value = DeactivatedException.class)
     public ResponseEntity<Object> handleDeactivatedException(DeactivatedException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Deactivated");
-        body.put("message", ex.getMessage());
+        Map<String, Object> extraFields = new HashMap<>();
         if(ex.getEmail() != null) {
-            body.put("email", ex.getEmail());
+            extraFields.put("email", ex.getEmail());
         }
-
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+        return buildErrorResponse(
+                HttpStatus.CONFLICT, "Deactivated Conflict", ex.getMessage(), extraFields
+        );
     }
 
     @ExceptionHandler(value = TeapotException.class)
     public ResponseEntity<Object> handleTeapotException(TeapotException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.I_AM_A_TEAPOT.value());
-        body.put("error", "I'm a teapot");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.I_AM_A_TEAPOT);
+        return buildErrorResponse(
+                HttpStatus.I_AM_A_TEAPOT,"I'm A Teapot", ex.getMessage(), null
+        );
     }
 }
 
