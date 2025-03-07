@@ -57,10 +57,9 @@ public class VinylRecordStockService {
                 .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
 
         VinylRecordStock stock = vinylRecordStockRepository.findByVinylRecord(vinylRecord)
-                .orElseThrow(() -> new RecordNotFoundException("Stock of record " + vinylRecord.getTitle() + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("Stock of vinyl record " + vinylRecord.getTitle() + " not found"));
 
-        stock.setAmountInStock(stockPatchDTO.getAmountInStock());
-        stock.setAmountSold(stockPatchDTO.getAmountSold());
+        vinylRecordStockMapper.partialUpdateVinylRecordStock(stockPatchDTO, stock);
 
         VinylRecordStock savedStock = vinylRecordStockRepository.save(stock);
         return vinylRecordStockMapper.toResponseDTO(savedStock);

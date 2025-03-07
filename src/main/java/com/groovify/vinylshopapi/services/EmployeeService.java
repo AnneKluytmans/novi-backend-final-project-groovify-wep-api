@@ -96,29 +96,13 @@ public class EmployeeService {
 
         if (employeePatchDTO.getUsername() != null) {
             validationUtils.validateUniqueUsername(employeePatchDTO.getUsername(), employee.getId());
-            employee.setUsername(employeePatchDTO.getUsername());
         }
 
         if (employeePatchDTO.getEmail() != null) {
             validationUtils.validateUniqueEmail(employeePatchDTO.getEmail(), employee.getId());
-            employee.setEmail(employeePatchDTO.getEmail());
         }
 
-        if (employeePatchDTO.getFirstName() != null && !employeePatchDTO.getFirstName().trim().isEmpty()) {
-            employee.setFirstName(employeePatchDTO.getFirstName());
-        }
-
-        if (employeePatchDTO.getLastName() != null && !employeePatchDTO.getLastName().trim().isEmpty()) {
-            employee.setLastName(employeePatchDTO.getLastName());
-        }
-
-        if (employeePatchDTO.getDateOfBirth() != null) {
-            employee.setDateOfBirth(employeePatchDTO.getDateOfBirth());
-        }
-
-        if (employeePatchDTO.getPhone() != null) {
-            employee.setPhone(employeePatchDTO.getPhone());
-        }
+        employeeMapper.partialUpdateEmployee(employeePatchDTO, employee);
 
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toResponseDTO(savedEmployee);
@@ -128,17 +112,7 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
 
-        if (employeePatchDTO.getJobTitle() != null) {
-            employee.setJobTitle(employeePatchDTO.getJobTitle());
-        }
-
-        if (employeePatchDTO.getSalary() != null) {
-            employee.setSalary(employeePatchDTO.getSalary());
-        }
-
-        if (employeePatchDTO.getWorkHours() != null) {
-            employee.setWorkHours(employeePatchDTO.getWorkHours());
-        }
+        employeeMapper.partialUpdateEmployeeByAdmin(employeePatchDTO, employee);
 
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toResponseDTO(savedEmployee);

@@ -83,11 +83,7 @@ public class ArtistService {
 
         validateUniqueArtistName(artistRequestDTO.getName(), id);
 
-        artist.setName(artistRequestDTO.getName());
-        artist.setIsGroup(artistRequestDTO.getIsGroup());
-        artist.setDebutDate(artistRequestDTO.getDebutDate());
-        artist.setCountryOfOrigin(artistRequestDTO.getCountryOfOrigin());
-        artist.setPopularity(artistRequestDTO.getPopularity());
+        artistMapper.updateArtist(artistRequestDTO, artist);
 
         Artist savedArtist = artistRepository.save(artist);
         return artistMapper.toResponseDTO(savedArtist);
@@ -97,27 +93,11 @@ public class ArtistService {
         Artist artist = artistRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
 
-
-        if (artistPatchDTO.getName() != null && !artistPatchDTO.getName().trim().isEmpty()) {
+        if (artistPatchDTO.getName() != null) {
             validateUniqueArtistName(artistPatchDTO.getName(), id);
-            artist.setName(artistPatchDTO.getName());
         }
 
-        if (artistPatchDTO.getIsGroup() != null) {
-            artist.setIsGroup(artistPatchDTO.getIsGroup());
-        }
-
-        if (artistPatchDTO.getDebutDate() != null) {
-            artist.setDebutDate(artistPatchDTO.getDebutDate());
-        }
-
-        if (artistPatchDTO.getCountryOfOrigin() != null && !artistPatchDTO.getCountryOfOrigin().trim().isEmpty()) {
-            artist.setCountryOfOrigin(artistPatchDTO.getCountryOfOrigin());
-        }
-
-        if (artistPatchDTO.getPopularity() != null) {
-            artist.setPopularity(artistPatchDTO.getPopularity());
-        }
+        artistMapper.partialUpdateArtist(artistPatchDTO, artist);
 
         Artist savedArtist = artistRepository.save(artist);
         return artistMapper.toResponseDTO(savedArtist);

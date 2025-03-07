@@ -50,11 +50,7 @@ public class EmployeeAddressService {
     public AddressSummaryResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
         Address address = validateEmployeeAndAddress(employeeId);
 
-        address.setStreet(addressRequestDTO.getStreet());
-        address.setHouseNumber(addressRequestDTO.getHouseNumber());
-        address.setCity(addressRequestDTO.getCity());
-        address.setPostalCode(addressRequestDTO.getPostalCode());
-        address.setCountry(addressRequestDTO.getCountry());
+        addressMapper.updateAddress(addressRequestDTO, address);
 
         Address savedAddress = addressRepository.save(address);
         return addressMapper.toSummaryResponseDTO(savedAddress);

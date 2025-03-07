@@ -1,10 +1,10 @@
 package com.groovify.vinylshopapi.mappers;
 
+import com.groovify.vinylshopapi.dtos.ArtistPatchDTO;
 import com.groovify.vinylshopapi.dtos.ArtistRequestDTO;
 import com.groovify.vinylshopapi.dtos.ArtistResponseDTO;
 import com.groovify.vinylshopapi.models.Artist;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -16,4 +16,9 @@ public interface ArtistMapper {
     ArtistResponseDTO toResponseDTO(Artist artist);
 
     List<ArtistResponseDTO> toResponseDTOs(List<Artist> artists);
+
+    void updateArtist(ArtistRequestDTO artistRequestDTO, @MappingTarget Artist artist);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdateArtist(ArtistPatchDTO artistPatchDTO, @MappingTarget Artist artist);
 }

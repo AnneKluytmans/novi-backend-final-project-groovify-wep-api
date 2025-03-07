@@ -100,11 +100,7 @@ public class CustomerAddressService {
     public AddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {
         Address address = validateCustomerAndAddress(customerId, addressId);
 
-        address.setStreet(addressRequestDTO.getStreet());
-        address.setHouseNumber(addressRequestDTO.getHouseNumber());
-        address.setCity(addressRequestDTO.getCity());
-        address.setPostalCode(addressRequestDTO.getPostalCode());
-        address.setCountry(addressRequestDTO.getCountry());
+        addressMapper.updateAddress(addressRequestDTO, address);
 
         Address savedAddress = addressRepository.save(address);
         return addressMapper.toResponseDTO(savedAddress);

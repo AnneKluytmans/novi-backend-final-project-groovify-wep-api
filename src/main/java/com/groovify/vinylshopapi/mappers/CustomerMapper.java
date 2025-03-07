@@ -1,12 +1,8 @@
 package com.groovify.vinylshopapi.mappers;
 
-import com.groovify.vinylshopapi.dtos.CustomerRegisterDTO;
-import com.groovify.vinylshopapi.dtos.CustomerResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.models.Customer;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -25,4 +21,7 @@ public interface CustomerMapper {
     UserSummaryResponseDTO toUserSummaryResponseDTO(Customer customer);
 
     List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Customer> customers);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdateCustomer(CustomerPatchDTO customerPatchDTO, @MappingTarget Customer customer);
 }

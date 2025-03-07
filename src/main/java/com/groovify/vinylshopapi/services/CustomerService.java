@@ -98,33 +98,13 @@ public class CustomerService {
 
         if (customerPatchDTO.getUsername() != null) {
             validationUtils.validateUniqueUsername(customerPatchDTO.getUsername(), customer.getId());
-            customer.setUsername(customerPatchDTO.getUsername());
         }
 
         if (customerPatchDTO.getEmail() != null) {
             validationUtils.validateUniqueEmail(customerPatchDTO.getEmail(), customer.getId());
-            customer.setEmail(customerPatchDTO.getEmail());
         }
 
-        if (customerPatchDTO.getFirstName() != null && !customerPatchDTO.getFirstName().trim().isEmpty()) {
-            customer.setFirstName(customerPatchDTO.getFirstName());
-        }
-
-        if (customerPatchDTO.getLastName() != null && !customerPatchDTO.getLastName().trim().isEmpty()) {
-            customer.setLastName(customerPatchDTO.getLastName());
-        }
-
-        if (customerPatchDTO.getDateOfBirth() != null) {
-            customer.setDateOfBirth(customerPatchDTO.getDateOfBirth());
-        }
-
-        if (customerPatchDTO.getPhone() != null) {
-            customer.setPhone(customerPatchDTO.getPhone());
-        }
-
-        if (customerPatchDTO.getNewsletterSubscribed() != null) {
-            customer.setNewsletterSubscribed(customerPatchDTO.getNewsletterSubscribed());
-        }
+        customerMapper.partialUpdateCustomer(customerPatchDTO, customer);
 
         Customer savedCustomer = customerRepository.save(customer);
         return customerMapper.toResponseDTO(savedCustomer);
