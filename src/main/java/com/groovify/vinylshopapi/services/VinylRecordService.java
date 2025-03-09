@@ -6,6 +6,7 @@ import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
 import com.groovify.vinylshopapi.models.Artist;
+import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.models.VinylRecord;
 import com.groovify.vinylshopapi.repositories.ArtistRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
@@ -26,7 +27,11 @@ public class VinylRecordService {
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordMapper vinylRecordMapper;
 
-    public VinylRecordService(ArtistRepository artistRepository, VinylRecordRepository vinylRecordRepository, VinylRecordMapper vinylRecordMapper) {
+    public VinylRecordService(
+            ArtistRepository artistRepository,
+            VinylRecordRepository vinylRecordRepository,
+            VinylRecordMapper vinylRecordMapper
+    ) {
         this.artistRepository = artistRepository;
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordMapper = vinylRecordMapper;
@@ -44,13 +49,7 @@ public class VinylRecordService {
             String sortOrder,
             Integer limit
     ) {
-        Sort sort;
-        if (sortBy.trim().equalsIgnoreCase("bestselling")) {
-            Sort.Direction direction = Sort.Direction.DESC;
-            sort = Sort.by(direction, "stock.amountSold");
-        } else {
-            sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "price", "releaseDate", "title"));
-        }
+        Sort sort = getVinylRecordsSort(sortBy, sortOrder);
         Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(
                 title, genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable
         );
@@ -64,9 +63,7 @@ public class VinylRecordService {
     }
 
     public VinylRecordResponseDTO getVinylRecordById(Long id) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + id + " not found"));
-
+        VinylRecord vinylRecord = findVinylRecord(id);
         return vinylRecordMapper.toResponseDTO(vinylRecord);
     }
 
@@ -85,8 +82,7 @@ public class VinylRecordService {
     }
 
     public VinylRecordResponseDTO updateVinylRecord(Long id, VinylRecordRequestDTO vinylRecordRequestDTO) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + id + " not found"));
+        VinylRecord vinylRecord = findVinylRecord(id);
 
         vinylRecordMapper.updateVinylRecord(vinylRecordRequestDTO, vinylRecord);
 
@@ -95,26 +91,27 @@ public class VinylRecordService {
     }
 
     public VinylRecordResponseDTO partialUpdateVinylRecord(Long id, VinylRecordPatchDTO vinylRecordPatchDTO) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + id + " not found"));
+        VinylRecord vinylRecord = findVinylRecord(id);
 
-       vinylRecordMapper.partialUpdateVinylRecord(vinylRecordPatchDTO, vinylRecord);
+        vinylRecordMapper.partialUpdateVinylRecord(vinylRecordPatchDTO, vinylRecord);
 
         VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
         return vinylRecordMapper.toResponseDTO(savedRecord);
     }
 
     public void deleteVinylRecord(Long id) {
-        if (!vinylRecordRepository.existsById(id)) {
-            throw new RecordNotFoundException("Vinyl record with id " + id + " not found");
+        VinylRecord vinylRecord = findVinylRecord(id);
+
+        for (Customer customer : vinylRecord.getCustomers()) {
+            customer.getFavoriteVinylRecords().remove(vinylRecord);
         }
+
         vinylRecordRepository.deleteById(id);
     }
 
 
     public void addArtistToVinyl(Long vinylRecordId, Long artistId) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+        VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         Artist artist = artistRepository.findById(artistId)
                 .orElseThrow(() -> new RecordNotFoundException("Artist with id " + artistId + " not found"));
@@ -124,10 +121,26 @@ public class VinylRecordService {
     }
 
     public void removeArtistFromVinyl(Long vinylRecordId) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+        VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         vinylRecord.setArtist(null);
         vinylRecordRepository.save(vinylRecord);
+    }
+
+
+    private Sort getVinylRecordsSort(String sortBy, String sortOrder) {
+        Sort sort;
+        if (sortBy.trim().equalsIgnoreCase("bestselling")) {
+            Sort.Direction direction = "asc".equalsIgnoreCase(sortOrder) ? Sort.Direction.ASC : Sort.Direction.DESC;
+            sort = Sort.by(direction, "stock.amountSold");
+        } else {
+            sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "price", "releaseDate", "title"));
+        }
+        return sort;
+    }
+
+    private VinylRecord findVinylRecord(Long vinylRecordId) {
+        return vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
     }
 }

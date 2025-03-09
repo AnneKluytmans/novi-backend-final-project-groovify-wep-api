@@ -26,8 +26,12 @@ public class EmployeeService {
     private final RoleRepository roleRepository;
     private final ValidationUtils validationUtils;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper,
-                           RoleRepository roleRepository, ValidationUtils validationUtils) {
+    public EmployeeService(
+            EmployeeRepository employeeRepository,
+            EmployeeMapper employeeMapper,
+            RoleRepository roleRepository,
+            ValidationUtils validationUtils
+    ) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
         this.roleRepository = roleRepository;
@@ -56,10 +60,7 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO getEmployeeById(Long id) {
-        Employee employee = employeeRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
-
-        return employeeMapper.toResponseDTO(employee);
+        return employeeMapper.toResponseDTO(findEmployee(id));
     }
 
     public EmployeeResponseDTO getEmployeeByUsername(String username) {
@@ -75,15 +76,10 @@ public class EmployeeService {
         validationUtils.validateUniqueUsername(employeeRegisterDTO.getUsername(), employee.getId());
         validationUtils.validateUniqueEmail(employeeRegisterDTO.getEmail(), employee.getId());
 
-        Role employeeRole = roleRepository.findByRoleType(RoleType.EMPLOYEE)
-                .orElseThrow(() -> new RecordNotFoundException("Role '" + RoleType.EMPLOYEE + "' not found."));
-
-        employee.getRoles().add(employeeRole);
+        employee.getRoles().add(findRoleByRoleType(RoleType.EMPLOYEE));
 
         if (employeeRegisterDTO.getIsAdmin()) {
-            Role adminRole = roleRepository.findByRoleType(RoleType.ADMIN)
-                    .orElseThrow(() -> new RecordNotFoundException("Role '" + RoleType.ADMIN + "' not found."));
-            employee.getRoles().add(adminRole);
+            employee.getRoles().add(findRoleByRoleType(RoleType.ADMIN));
         }
 
         Employee savedEmployee = employeeRepository.save(employee);
@@ -91,8 +87,7 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, UserPatchDTO employeePatchDTO) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
+        Employee employee = findEmployee(id);
 
         if (employeePatchDTO.getUsername() != null) {
             validationUtils.validateUniqueUsername(employeePatchDTO.getUsername(), employee.getId());
@@ -109,13 +104,23 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO updateEmployeeByAdmin(Long id, EmployeeAdminPatchDTO employeePatchDTO) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
+        Employee employee = findEmployee(id);
 
         employeeMapper.partialUpdateEmployeeByAdmin(employeePatchDTO, employee);
 
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toResponseDTO(savedEmployee);
+    }
+
+
+    private Employee findEmployee(Long id) {
+        return employeeRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
+    }
+
+    private Role findRoleByRoleType(RoleType roleType) {
+        return roleRepository.findByRoleType(roleType)
+                .orElseThrow(() -> new RecordNotFoundException("Role '" + roleType + "' not found."));
     }
 
 }

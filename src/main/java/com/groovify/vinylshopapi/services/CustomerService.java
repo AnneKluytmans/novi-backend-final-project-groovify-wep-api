@@ -33,8 +33,14 @@ public class CustomerService {
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordMapper vinylRecordMapper;
 
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, RoleRepository roleRepository,
-                           ValidationUtils validationUtils, VinylRecordRepository vinylRecordRepository, VinylRecordMapper vinylRecordMapper) {
+    public CustomerService(
+            CustomerRepository customerRepository,
+            CustomerMapper customerMapper,
+            RoleRepository roleRepository,
+            ValidationUtils validationUtils,
+            VinylRecordRepository vinylRecordRepository,
+            VinylRecordMapper vinylRecordMapper
+    ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.roleRepository = roleRepository;
@@ -64,10 +70,7 @@ public class CustomerService {
     }
 
     public CustomerResponseDTO getCustomerById(Long id) {
-        Customer customer = customerRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + id + " not found."));
-
-        return customerMapper.toResponseDTO(customer);
+        return customerMapper.toResponseDTO(findCustomer(id));
     }
 
     public CustomerResponseDTO getCustomerByUsername(String username) {
@@ -93,8 +96,7 @@ public class CustomerService {
     }
 
     public CustomerResponseDTO updateCustomer(Long id, CustomerPatchDTO customerPatchDTO) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + id + " not found."));
+        Customer customer = findCustomer(id);
 
         if (customerPatchDTO.getUsername() != null) {
             validationUtils.validateUniqueUsername(customerPatchDTO.getUsername(), customer.getId());
@@ -112,19 +114,13 @@ public class CustomerService {
 
 
     public List<VinylRecordSummaryResponseDTO> getFavoriteRecords(Long customerId) {
-        Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
-
-        List<VinylRecord> favoriteRecords = customer.getFavoriteVinylRecords();
+        List<VinylRecord> favoriteRecords = findCustomer(customerId).getFavoriteVinylRecords();
         return vinylRecordMapper.toSummaryResponseDTOs(favoriteRecords);
     }
 
     public void addFavoriteRecordToCustomer(Long customerId, Long vinylRecordId) {
-        Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
-
-        VinylRecord favoriteRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found."));
+        Customer customer = findCustomer(customerId);
+        VinylRecord favoriteRecord = findVinylRecord(vinylRecordId);
 
         if (customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
             throw new ConflictException("Vinyl record with id " + vinylRecordId + " is already a favorite record of this customer.");
@@ -135,11 +131,8 @@ public class CustomerService {
     }
 
     public void removeFavoriteRecordFromCustomer(Long customerId, Long vinylRecordId) {
-        Customer customer = customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
-
-        VinylRecord favoriteRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found."));
+        Customer customer = findCustomer(customerId);
+        VinylRecord favoriteRecord = findVinylRecord(vinylRecordId);
 
         if (!customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
             throw new ConflictException("Vinyl record with id " + vinylRecordId + " is not a favorite record of this customer.");
@@ -147,5 +140,16 @@ public class CustomerService {
 
         customer.getFavoriteVinylRecords().remove(favoriteRecord);
         customerRepository.save(customer);
+    }
+
+
+    private Customer findCustomer(Long customerId) {
+        return customerRepository.findByIdAndIsDeletedFalse(customerId)
+                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
+    }
+
+    private VinylRecord findVinylRecord(Long vinylRecordId) {
+        return vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found."));
     }
 }

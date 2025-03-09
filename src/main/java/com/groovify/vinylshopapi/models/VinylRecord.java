@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vinyl_records")
@@ -67,4 +69,7 @@ public class VinylRecord {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cover_id", referencedColumnName = "id")
     private VinylRecordCover cover;
+
+    @ManyToMany(mappedBy = "favoriteVinylRecords")
+    private List<Customer> customers = new ArrayList<>();
 }

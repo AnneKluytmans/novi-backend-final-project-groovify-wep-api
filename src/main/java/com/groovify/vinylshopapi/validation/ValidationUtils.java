@@ -2,10 +2,13 @@ package com.groovify.vinylshopapi.validation;
 
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.DeactivatedException;
+import com.groovify.vinylshopapi.exceptions.InvalidFileTypeException;
 import com.groovify.vinylshopapi.models.User;
 import com.groovify.vinylshopapi.repositories.UserRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -38,6 +41,16 @@ public class ValidationUtils {
             } else {
                 throw new ConflictException("Email " + email + " is already in use by another user. Please choose another email.");
             }
+        }
+    }
+
+    public void validateFile(MultipartFile file, List<String> allowedFileTypes) {
+        if (file.isEmpty()) {
+            throw new InvalidFileTypeException("Uploaded file is empty");
+        }
+
+        if (!allowedFileTypes.contains(file.getContentType())) {
+            throw new InvalidFileTypeException("File type is invalid. Only JPEG and PNG files are allowed.");
         }
     }
 }

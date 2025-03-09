@@ -25,7 +25,10 @@ public class ArtistService {
     private final ArtistRepository artistRepository;
     private final ArtistMapper artistMapper;
 
-    public ArtistService(ArtistRepository artistRepository, ArtistMapper artistMapper) {
+    public ArtistService(
+            ArtistRepository artistRepository,
+            ArtistMapper artistMapper
+    ) {
         this.artistRepository = artistRepository;
         this.artistMapper = artistMapper;
     }
@@ -53,9 +56,7 @@ public class ArtistService {
     }
 
     public ArtistResponseDTO getArtistById(Long id) {
-        Artist artist = artistRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
-
+        Artist artist = findArtist(id);
         return artistMapper.toResponseDTO(artist);
     }
 
@@ -68,19 +69,14 @@ public class ArtistService {
 
     public ArtistResponseDTO createArtist(ArtistRequestDTO artistRequestDTO) {
         Artist artist = artistMapper.toEntity(artistRequestDTO);
-
-        if (artistRepository.existsByName(artist.getName())) {
-            throw new ConflictException("Artist with name " + artist.getName() + " already exists");
-        }
+        validateUniqueArtistName(artist.getName(), artist.getId());
 
         Artist savedArtist = artistRepository.save(artist);
         return artistMapper.toResponseDTO(savedArtist);
     }
 
     public ArtistResponseDTO updateArtist(Long id, ArtistRequestDTO artistRequestDTO) {
-        Artist artist = artistRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
-
+        Artist artist = findArtist(id);
         validateUniqueArtistName(artistRequestDTO.getName(), id);
 
         artistMapper.updateArtist(artistRequestDTO, artist);
@@ -90,8 +86,7 @@ public class ArtistService {
     }
 
     public ArtistResponseDTO partialUpdateArtist(Long id, ArtistPatchDTO artistPatchDTO) {
-        Artist artist = artistRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
+        Artist artist = findArtist(id);
 
         if (artistPatchDTO.getName() != null) {
             validateUniqueArtistName(artistPatchDTO.getName(), id);
@@ -104,8 +99,7 @@ public class ArtistService {
     }
 
     public void deleteArtist(Long id) {
-        Artist artist = artistRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
+        Artist artist = findArtist(id);
 
         if (!artist.getVinylRecords().isEmpty()) {
             throw new DeleteOperationException("Artist " + artist.getName() + " cannot be deleted while linked to vinyl records");
@@ -120,6 +114,11 @@ public class ArtistService {
         if (existingArtist.isPresent() && !existingArtist.get().getId().equals(currentArtistId)) {
             throw new ConflictException("Artist with name " + name + " already exists");
         }
+    }
+
+    private Artist findArtist(Long id) {
+        return artistRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
     }
 }
 

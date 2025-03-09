@@ -3,7 +3,6 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.VinylRecordCoverDownloadDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordCoverResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.InvalidFileTypeException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordCoverMapper;
 import com.groovify.vinylshopapi.models.VinylRecord;
@@ -11,11 +10,13 @@ import com.groovify.vinylshopapi.models.VinylRecordCover;
 import com.groovify.vinylshopapi.repositories.VinylRecordCoverRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 
+import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VinylRecordCoverService {
@@ -25,25 +26,24 @@ public class VinylRecordCoverService {
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordCoverRepository vinylRecordCoverRepository;
     private final VinylRecordCoverMapper vinylRecordCoverMapper;
+    private final ValidationUtils validationUtils;
 
-    public VinylRecordCoverService(VinylRecordRepository vinylRecordRepository, VinylRecordCoverRepository vinylRecordCoverRepository, VinylRecordCoverMapper vinylRecordCoverMapper) {
+    public VinylRecordCoverService(
+            VinylRecordRepository vinylRecordRepository,
+            VinylRecordCoverRepository vinylRecordCoverRepository,
+            VinylRecordCoverMapper vinylRecordCoverMapper,
+            ValidationUtils validationUtils
+    ) {
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordCoverRepository = vinylRecordCoverRepository;
         this.vinylRecordCoverMapper = vinylRecordCoverMapper;
+        this.validationUtils = validationUtils;
     }
 
     public VinylRecordCoverResponseDTO uploadCover(Long vinylRecordId, MultipartFile file, String downloadUrl) throws IOException {
-        if (file.isEmpty()) {
-            throw new InvalidFileTypeException("Uploaded file is empty");
-        }
+        validationUtils.validateFile(file, allowedFileTypes);
 
-        if (!allowedFileTypes.contains(file.getContentType())) {
-            throw new InvalidFileTypeException("File type is invalid. Only JPEG and PNG files are allowed.");
-        }
-
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
-
+        VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         if (vinylRecord.getCover() != null) {
             throw new ConflictException("Vinyl record with id " + vinylRecordId + " already has a cover");
@@ -64,31 +64,30 @@ public class VinylRecordCoverService {
     }
 
     public VinylRecordCoverDownloadDTO downloadCover(Long vinylRecordId) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
-
-        VinylRecordCover cover = vinylRecord.getCover();
-
-        if (cover == null) {
-            throw new RecordNotFoundException("Cover of vinyl record with id " + vinylRecordId + " not found");
-        }
+        VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
+        VinylRecordCover cover = findVinylRecordCover(vinylRecord);
 
         return vinylRecordCoverMapper.toDownloadDTO(cover);
     }
 
     public void deleteCover(Long vinylRecordId) {
-        VinylRecord vinylRecord = vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
-
-        VinylRecordCover cover = vinylRecord.getCover();
-
-        if (cover == null) {
-            throw new RecordNotFoundException("Cover of vinyl record with id " + vinylRecordId + " not found");
-        }
+        VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
+        VinylRecordCover cover = findVinylRecordCover(vinylRecord);
 
         vinylRecord.setCover(null);
 
         vinylRecordCoverRepository.delete(cover);
+    }
+
+
+    private VinylRecord findVinylRecord(Long vinylRecordId) {
+        return vinylRecordRepository.findById(vinylRecordId)
+                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+    }
+
+    private VinylRecordCover findVinylRecordCover(VinylRecord vinylRecord) {
+        return Optional.ofNullable(vinylRecord.getCover())
+                .orElseThrow(() -> new RecordNotFoundException("Cover of vinyl record " + vinylRecord.getTitle() + " not found"));
     }
 }
 
