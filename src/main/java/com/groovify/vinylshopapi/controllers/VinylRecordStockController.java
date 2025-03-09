@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.VinylRecordStockPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockResponseDTO;
 import com.groovify.vinylshopapi.services.VinylRecordStockService;
@@ -46,16 +45,16 @@ public class VinylRecordStockController {
         return ResponseEntity.created(location).body(newStock);
     }
 
-    @PatchMapping()
+    @PutMapping()
     public ResponseEntity<?> updateStock(
             @PathVariable("id") Long vinylRecordId,
-            @Valid @RequestBody VinylRecordStockPatchDTO stockPatchDTO,
+            @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        VinylRecordStockResponseDTO updatedStock = vinylRecordStockService.updateStock(vinylRecordId, stockPatchDTO);
+        VinylRecordStockResponseDTO updatedStock = vinylRecordStockService.updateStock(vinylRecordId, stockRequestDTO);
         return ResponseEntity.ok(updatedStock);
     }
 

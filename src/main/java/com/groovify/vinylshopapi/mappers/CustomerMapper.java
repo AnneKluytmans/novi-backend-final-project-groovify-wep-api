@@ -22,6 +22,5 @@ public interface CustomerMapper {
 
     List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Customer> customers);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdateCustomer(CustomerPatchDTO customerPatchDTO, @MappingTarget Customer customer);
+    void updateCustomer(CustomerUpdateDTO customerUpdateDTO, @MappingTarget Customer customer);
 }

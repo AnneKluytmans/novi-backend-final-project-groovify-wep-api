@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customers/{customerId}/addresses")
+@RequestMapping("/api/customers/{id}/addresses")
 public class CustomerAddressController {
 
     private final CustomerAddressService customerAddressService;
@@ -23,7 +23,7 @@ public class CustomerAddressController {
 
     @GetMapping
     public ResponseEntity<List<AddressResponseDTO>> getCustomerAddresses(
-            @PathVariable("customerId") Long customerId
+            @PathVariable("id") Long customerId
     ) {
         List<AddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
         return ResponseEntity.ok(addresses);
@@ -31,7 +31,7 @@ public class CustomerAddressController {
 
     @GetMapping("/{addressId}")
     public ResponseEntity<AddressResponseDTO> getCustomerAddress(
-            @PathVariable("customerId") Long customerId,
+            @PathVariable("id") Long customerId,
             @PathVariable("addressId") Long addressId
     ) {
         AddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
@@ -40,7 +40,7 @@ public class CustomerAddressController {
 
     @GetMapping("/defaults")
     public ResponseEntity<DefaultAddressesResponseDTO> getDefaultCustomerAddresses(
-            @PathVariable("customerId") Long customerId
+            @PathVariable("id") Long customerId
     ) {
         DefaultAddressesResponseDTO defaultAddresses = customerAddressService.getDefaultCustomerAddresses(customerId);
         return ResponseEntity.ok(defaultAddresses);
@@ -48,7 +48,7 @@ public class CustomerAddressController {
 
     @PostMapping()
     public ResponseEntity<?> createCustomerAddress(
-            @PathVariable("customerId") Long customerId,
+            @PathVariable("id") Long customerId,
             @Valid @RequestBody CustomerAddressRequestDTO addressRequestDTO,
             BindingResult bindingResult
     ) {
@@ -66,7 +66,7 @@ public class CustomerAddressController {
 
     @PutMapping("/{addressId}")
     public ResponseEntity<?> updateCustomerAddress(
-            @PathVariable("customerId") Long customerId,
+            @PathVariable("id") Long customerId,
             @PathVariable("addressId") Long addressId,
             @Valid @RequestBody AddressRequestDTO addressRequestDTO,
             BindingResult bindingResult
@@ -80,7 +80,7 @@ public class CustomerAddressController {
 
     @PatchMapping("/{addressId}/defaults")
     public ResponseEntity<?> setDefaultAddresses(
-            @PathVariable("customerId") Long customerId,
+            @PathVariable("id") Long customerId,
             @PathVariable("addressId") Long addressId,
             @Valid @RequestBody DefaultAddressesRequestDTO defaultAddressesRequestDTO,
             BindingResult bindingResult
@@ -95,7 +95,7 @@ public class CustomerAddressController {
 
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteCustomerAddress(
-            @PathVariable("customerId") Long customerId,
+            @PathVariable("id") Long customerId,
             @PathVariable ("addressId") Long addressId
     ) {
         customerAddressService.deleteCustomerAddress(customerId, addressId);

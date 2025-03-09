@@ -74,29 +74,29 @@ public class EmployeeController {
         return ResponseEntity.created(location).body(newEmployee);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(
             @PathVariable Long id,
-            @Valid @RequestBody UserPatchDTO employeePatchDTO,
+            @Valid @RequestBody UserUpdateDTO employeeUpdateDTO,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployee(id, employeePatchDTO);
+        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployee(id, employeeUpdateDTO);
         return ResponseEntity.ok(updatedEmployee);
     }
 
-    @PatchMapping("/{id}/admin")
+    @PutMapping("/{id}/admin")
     public ResponseEntity<?> updateEmployeeByAdmin(
             @PathVariable Long id,
-            @Valid @RequestBody EmployeeAdminPatchDTO employeeAdminPatchDTO,
+            @Valid @RequestBody EmployeeAdminUpdateDTO employeeAdminUpdateDTO,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployeeByAdmin(id, employeeAdminPatchDTO);
+        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployeeByAdmin(id, employeeAdminUpdateDTO);
         return ResponseEntity.ok(updatedEmployee);
     }
 }

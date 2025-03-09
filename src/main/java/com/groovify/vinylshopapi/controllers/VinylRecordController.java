@@ -113,18 +113,18 @@ public class VinylRecordController {
     }
 
 
-    @PostMapping("/{recordId}/artist/{artistId}")
+    @PostMapping("/{id}/artist/{artistId}")
     public ResponseEntity<Void> addArtistToVinyl(
-            @PathVariable("recordId") Long vinylRecordId,
+            @PathVariable("id") Long vinylRecordId,
             @PathVariable("artistId") Long artistId
     ) {
         vinylRecordService.addArtistToVinyl(vinylRecordId, artistId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{recordId}/artist")
+    @DeleteMapping("/{id}/artist")
     public ResponseEntity<Void> removeArtistFromVinyl(
-            @PathVariable("recordId") Long vinylRecordId
+            @PathVariable("id") Long vinylRecordId
     ) {
         vinylRecordService.removeArtistFromVinyl(vinylRecordId);
         return ResponseEntity.noContent().build();

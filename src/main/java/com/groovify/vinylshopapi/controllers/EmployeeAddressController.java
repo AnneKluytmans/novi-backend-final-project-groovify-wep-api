@@ -11,7 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/employees/{employeeId}/address")
+@RequestMapping("/api/employees/{id}/address")
 public class EmployeeAddressController {
 
     private final EmployeeAddressService employeeAddressService;
@@ -22,7 +22,7 @@ public class EmployeeAddressController {
 
     @PostMapping()
     public ResponseEntity<?> createEmployeeAddress(
-            @PathVariable("employeeId") Long employeeId,
+            @PathVariable("id") Long employeeId,
             @Valid @RequestBody AddressRequestDTO addressRequestDTO,
             BindingResult bindingResult
     ) {
@@ -38,7 +38,7 @@ public class EmployeeAddressController {
 
     @PutMapping()
     public ResponseEntity<?> updateEmployeeAddress(
-            @PathVariable("employeeId") Long employeeId,
+            @PathVariable("id") Long employeeId,
             @Valid @RequestBody AddressRequestDTO addressRequestDTO,
             BindingResult bindingResult
     ) {
@@ -51,7 +51,7 @@ public class EmployeeAddressController {
 
     @GetMapping()
     public ResponseEntity<AddressSummaryResponseDTO> getEmployeeAddress(
-            @PathVariable("employeeId") Long employeeId
+            @PathVariable("id") Long employeeId
     ) {
         AddressSummaryResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
         return ResponseEntity.ok(address);

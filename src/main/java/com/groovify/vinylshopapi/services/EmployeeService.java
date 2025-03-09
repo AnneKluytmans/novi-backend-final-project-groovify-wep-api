@@ -86,27 +86,22 @@ public class EmployeeService {
         return employeeMapper.toResponseDTO(savedEmployee);
     }
 
-    public EmployeeResponseDTO updateEmployee(Long id, UserPatchDTO employeePatchDTO) {
+    public EmployeeResponseDTO updateEmployee(Long id, UserUpdateDTO employeeUpdateDTO) {
         Employee employee = findEmployee(id);
 
-        if (employeePatchDTO.getUsername() != null) {
-            validationUtils.validateUniqueUsername(employeePatchDTO.getUsername(), employee.getId());
-        }
+        validationUtils.validateUniqueUsername(employeeUpdateDTO.getUsername(), id);
+        validationUtils.validateUniqueEmail(employeeUpdateDTO.getEmail(), id);
 
-        if (employeePatchDTO.getEmail() != null) {
-            validationUtils.validateUniqueEmail(employeePatchDTO.getEmail(), employee.getId());
-        }
-
-        employeeMapper.partialUpdateEmployee(employeePatchDTO, employee);
+        employeeMapper.updateEmployee(employeeUpdateDTO, employee);
 
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toResponseDTO(savedEmployee);
     }
 
-    public EmployeeResponseDTO updateEmployeeByAdmin(Long id, EmployeeAdminPatchDTO employeePatchDTO) {
+    public EmployeeResponseDTO updateEmployeeByAdmin(Long id, EmployeeAdminUpdateDTO employeeUpdateDTO) {
         Employee employee = findEmployee(id);
 
-        employeeMapper.partialUpdateEmployeeByAdmin(employeePatchDTO, employee);
+        employeeMapper.updateEmployeeByAdmin(employeeUpdateDTO, employee);
 
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toResponseDTO(savedEmployee);

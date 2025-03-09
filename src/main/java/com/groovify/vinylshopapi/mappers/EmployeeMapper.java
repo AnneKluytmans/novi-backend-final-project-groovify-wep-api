@@ -22,9 +22,7 @@ public interface EmployeeMapper {
 
     List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Employee> employees);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdateEmployee(UserPatchDTO userPatchDTO, @MappingTarget Employee employee);
+    void updateEmployee(UserUpdateDTO userUpdateDTO, @MappingTarget Employee employee);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdateEmployeeByAdmin(EmployeeAdminPatchDTO employeeAdminPatchDTO, @MappingTarget Employee employee);
+    void updateEmployeeByAdmin(EmployeeAdminUpdateDTO employeeAdminUpdateDTO, @MappingTarget Employee employee);
 }

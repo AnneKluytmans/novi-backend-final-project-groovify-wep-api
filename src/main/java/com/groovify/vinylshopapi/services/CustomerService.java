@@ -95,18 +95,13 @@ public class CustomerService {
         return customerMapper.toResponseDTO(savedCustomer);
     }
 
-    public CustomerResponseDTO updateCustomer(Long id, CustomerPatchDTO customerPatchDTO) {
+    public CustomerResponseDTO updateCustomer(Long id, CustomerUpdateDTO customerUpdateDTO) {
         Customer customer = findCustomer(id);
 
-        if (customerPatchDTO.getUsername() != null) {
-            validationUtils.validateUniqueUsername(customerPatchDTO.getUsername(), customer.getId());
-        }
+        validationUtils.validateUniqueUsername(customerUpdateDTO.getUsername(), id);
+        validationUtils.validateUniqueEmail(customerUpdateDTO.getEmail(), id);
 
-        if (customerPatchDTO.getEmail() != null) {
-            validationUtils.validateUniqueEmail(customerPatchDTO.getEmail(), customer.getId());
-        }
-
-        customerMapper.partialUpdateCustomer(customerPatchDTO, customer);
+        customerMapper.updateCustomer(customerUpdateDTO, customer);
 
         Customer savedCustomer = customerRepository.save(customer);
         return customerMapper.toResponseDTO(savedCustomer);

@@ -49,7 +49,7 @@ public class UserController {
     }
 
 
-    @PutMapping("/{id}/deactivate")
+    @DeleteMapping("/{id}/deactivate")
     public ResponseEntity<Void> softDeleteUser(
             @PathVariable Long id
     ) {
@@ -57,7 +57,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/reactivate")
+    @PostMapping("/reactivate")
     public ResponseEntity<Void> reactivateUser(
             @Valid @RequestBody ReactivateUserDTO reactivateUserDTO
     ) {

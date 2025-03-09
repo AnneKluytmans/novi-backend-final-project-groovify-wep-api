@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.VinylRecordStockPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
@@ -49,10 +48,10 @@ public class VinylRecordStockService {
         return vinylRecordStockMapper.toResponseDTO(savedStock);
     }
 
-    public VinylRecordStockResponseDTO updateStock(Long vinylRecordId, VinylRecordStockPatchDTO stockPatchDTO) {
+    public VinylRecordStockResponseDTO updateStock(Long vinylRecordId, VinylRecordStockRequestDTO stockRequestDTO) {
         VinylRecordStock stock = findStock(vinylRecordId);
 
-        vinylRecordStockMapper.partialUpdateVinylRecordStock(stockPatchDTO, stock);
+        vinylRecordStockMapper.updateVinylRecordStock(stockRequestDTO, stock);
 
         VinylRecordStock savedStock = vinylRecordStockRepository.save(stock);
         return vinylRecordStockMapper.toResponseDTO(savedStock);

@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.mappers;
 
-import com.groovify.vinylshopapi.dtos.VinylRecordStockPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockResponseDTO;
 import com.groovify.vinylshopapi.models.VinylRecordStock;
@@ -14,6 +13,5 @@ public interface VinylRecordStockMapper {
 
     VinylRecordStockResponseDTO toResponseDTO(VinylRecordStock stock);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdateVinylRecordStock(VinylRecordStockPatchDTO stockPatchDTO, @MappingTarget VinylRecordStock stock);
+    void updateVinylRecordStock(VinylRecordStockRequestDTO stockRequestDTO, @MappingTarget VinylRecordStock stock);
 }
