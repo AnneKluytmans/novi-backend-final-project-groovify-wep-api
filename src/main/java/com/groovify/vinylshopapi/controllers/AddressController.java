@@ -30,7 +30,7 @@ public class AddressController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String postalCode,
-            @RequestParam(defaultValue = "country") String sortBy,
+            @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<AddressResponseDTO> addresses = addressService.getAddresses(
@@ -45,7 +45,7 @@ public class AddressController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String postalCode,
-            @RequestParam(defaultValue = "country") String sortBy,
+            @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<AddressResponseDTO> addresses = addressService.getCustomerShippingAddresses(

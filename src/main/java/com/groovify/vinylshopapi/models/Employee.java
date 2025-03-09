@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee extends User {
-    @NotNull(message = "Job title is required")
-    @Size(min = 3, max = 50, message = "Job title must be between 3 and 50 characters")
+    @NotBlank(message = "Job title is required")
+    @Size(max = 50, message = "Job title cannot be longer than 50 characters")
     private String jobTitle;
 
     @NotNull(message = "Salary is required")

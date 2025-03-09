@@ -19,8 +19,11 @@ public class EmployeeAddressService {
     private final AddressMapper addressMapper;
     private final EmployeeRepository employeeRepository;
 
-    private EmployeeAddressService(AddressRepository addressRepository, AddressMapper addressMapper,
-                                   EmployeeRepository employeeRepository) {
+    private EmployeeAddressService(
+            AddressRepository addressRepository,
+            AddressMapper addressMapper,
+            EmployeeRepository employeeRepository
+    ) {
         this.addressRepository = addressRepository;
         this.addressMapper = addressMapper;
         this.employeeRepository = employeeRepository;
@@ -37,12 +40,9 @@ public class EmployeeAddressService {
             throw new ConflictException("Employee already has an address");
         }
 
-        Employee employee = employeeRepository.findByIdAndIsDeletedFalse(employeeId)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + employeeId + " not found"));
-
         Address address = addressMapper.toEntity(addressRequestDTO);
+        address.setEmployee(findEmployee(employeeId));
 
-        address.setEmployee(employee);
         Address savedAddress = addressRepository.save(address);
         return addressMapper.toSummaryResponseDTO(savedAddress);
     }
@@ -50,15 +50,12 @@ public class EmployeeAddressService {
     public AddressSummaryResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
         Address address = validateEmployeeAndAddress(employeeId);
 
-        address.setStreet(addressRequestDTO.getStreet());
-        address.setHouseNumber(addressRequestDTO.getHouseNumber());
-        address.setCity(addressRequestDTO.getCity());
-        address.setPostalCode(addressRequestDTO.getPostalCode());
-        address.setCountry(addressRequestDTO.getCountry());
+        addressMapper.updateAddress(addressRequestDTO, address);
 
         Address savedAddress = addressRepository.save(address);
         return addressMapper.toSummaryResponseDTO(savedAddress);
     }
+
 
     private Address validateEmployeeAndAddress(Long employeeId) {
         if (!employeeRepository.existsByIdAndIsDeletedFalse(employeeId)) {
@@ -67,5 +64,10 @@ public class EmployeeAddressService {
 
         return addressRepository.findByEmployeeId(employeeId)
                 .orElseThrow(() -> new RecordNotFoundException("Address of employee with id " + employeeId + " not found"));
+    }
+
+    private Employee findEmployee(Long employeeId) {
+        return employeeRepository.findByIdAndIsDeletedFalse(employeeId)
+                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + employeeId + " not found"));
     }
 }

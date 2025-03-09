@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vinyl_records")
@@ -22,19 +24,19 @@ public class VinylRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title cannot be blank")
-    @Size(max = 100, message = "Title must not exceed 100 characters")
+    @NotBlank(message = "Title is required")
+    @Size(max = 100, message = "Title cannot be longer than 100 characters")
     private String title;
 
-    @Size(max = 500, message = "Description must not exceed 500 characters")
+    @Size(max = 500, message = "Description cannot be longer than 500 characters")
     private String description;
 
     @NotNull(message = "Genre is required")
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
-    @NotBlank(message = "Label cannot be blank")
-    @Size(max = 100, message = "Label must not exceed 100 characters")
+    @NotBlank(message = "Label is required")
+    @Size(max = 100, message = "Label cannot be longer than 100 characters")
     private String label;
 
     @NotNull(message = "Price is required")
@@ -67,4 +69,7 @@ public class VinylRecord {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cover_id", referencedColumnName = "id")
     private VinylRecordCover cover;
+
+    @ManyToMany(mappedBy = "favoriteVinylRecords")
+    private List<Customer> customers = new ArrayList<>();
 }

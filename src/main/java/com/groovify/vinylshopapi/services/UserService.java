@@ -4,7 +4,6 @@ import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.enums.SortOrder;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.InvalidVerificationException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
@@ -18,6 +17,7 @@ import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.repositories.UserRepository;
 import com.groovify.vinylshopapi.specifications.UserSpecification;
 
+import com.groovify.vinylshopapi.utils.SortHelper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,12 @@ public class UserService {
     private final CustomerMapper customerMapper;
     private final EmployeeMapper employeeMapper;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, CustomerMapper customerMapper, EmployeeMapper employeeMapper) {
+    public UserService(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            CustomerMapper customerMapper,
+            EmployeeMapper employeeMapper
+    ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.customerMapper = customerMapper;
@@ -43,51 +48,37 @@ public class UserService {
     }
 
 
-    public List<UserSummaryResponseDTO> getUsers(String userType, String firstName, String lastName, Boolean isDeleted, String deletedAfter,
-                                                 String deletedBefore, String sortBy, String sortOrder) {
-        Sort sort = switch (sortBy.trim().toLowerCase()) {
-            case "id" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("id") : Sort.Order.asc("id"));
-            case "email" -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("email") : Sort.Order.asc("email"));
-            default -> Sort.by(SortOrder.stringToSortOrder(sortOrder) == SortOrder.DESC ? Sort.Order.desc("lastName") : Sort.Order.asc("lastName"));
-        };
-
-        Specification<User> specification = UserSpecification.filterUsers(userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore);
+    public List<UserSummaryResponseDTO> getUsers(
+            String userType,
+            String firstName,
+            String lastName,
+            Boolean isDeleted,
+            String deletedAfter,
+            String deletedBefore,
+            String sortBy,
+            String sortOrder
+    ) {
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "lastName", "email"));
+        Specification<User> specification = UserSpecification.filterUsers(
+                userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore
+        );
         List<User> users = userRepository.findAll(specification, sort);
 
         List<UserSummaryResponseDTO> userSummaryResponseDTOS = new ArrayList<>();
 
         for (User user : users) {
-            if (user instanceof Customer) {
-                userSummaryResponseDTOS.add(customerMapper.toUserSummaryResponseDTO((Customer) user));
-            }
-            if (user instanceof Employee) {
-                userSummaryResponseDTOS.add(employeeMapper.toUserSummaryResponseDTO((Employee) user));
-            }
+            userSummaryResponseDTOS.add(mapToUserSummaryDTO(user));
         }
 
         return userSummaryResponseDTOS;
     }
 
-
     public UserResponseDTO getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + id + " not found"));
-
-        if (user instanceof Customer) {
-            return customerMapper.toUserResponseDTO((Customer) user);
-        }
-
-        if (user instanceof Employee) {
-           return employeeMapper.toUserResponseDTO((Employee) user);
-        }
-
-        throw new RecordNotFoundException("Unknown user type");
+        return mapToUserResponseDTO(findUser(id));
     }
 
     public void softDeleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + id + " not found"));
-
+        User user = findUser(id);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
 
@@ -114,10 +105,7 @@ public class UserService {
 
 
     public List<RoleType> getUserRoles(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
-
-        Set<Role> userRoles = user.getRoles();
+        Set<Role> userRoles = findUser(userId).getRoles();
 
         List<RoleType> roles = new ArrayList<>();
         for (Role role : userRoles) {
@@ -128,50 +116,70 @@ public class UserService {
     }
 
     public void addRolesToUser(Long userId, List<String> roles) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
-
-        if (user instanceof Customer) {
-            for (String role : roles) {
-                if (role.equalsIgnoreCase("EMPLOYEE") || role.equalsIgnoreCase("ADMIN")) {
-                    throw new IllegalArgumentException("Customers cannot be assigned employee or admin roles");
-                }
-            }
-        }
+        User user = findUser(userId);
+        validateRolesForUserType(user, roles, true);
 
         for (String role : roles) {
-            RoleType roleType = RoleType.stringToRole(role);
-            Role newRole = roleRepository.findByRoleType(roleType)
-                    .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found"));
-
-            user.getRoles().add(newRole);
+            user.getRoles().add(findRoleByType(role));
         }
 
         userRepository.save(user);
     }
 
     public void removeRolesFromUser(Long userId, List<String> roles) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
+        User user = findUser(userId);
+        validateRolesForUserType(user, roles, false);
 
         for (String role : roles) {
-            RoleType roleType = RoleType.stringToRole(role);
-
-            if (user instanceof Customer && role.equalsIgnoreCase("USER")) {
-                throw new IllegalArgumentException("The role USER is mandatory for customers and cannot be removed from customer users.");
-            }
-
-            if (user instanceof Employee && role.equalsIgnoreCase("EMPLOYEE")) {
-                throw new IllegalArgumentException("The role EMPLOYEE is mandatory for employees and cannot be removed from employee users.");
-            }
-
-            Role removeRole = roleRepository.findByRoleType(roleType)
-                    .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found"));
-
-            user.getRoles().remove(removeRole);
+            user.getRoles().remove(findRoleByType(role));
         }
 
         userRepository.save(user);
     }
 
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
+    }
+
+    private Role findRoleByType(String role) {
+        RoleType roleType = RoleType.stringToRole(role);
+        return roleRepository.findByRoleType(roleType)
+                .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found"));
+    }
+
+    private void validateRolesForUserType(User user, List<String> roles, Boolean isNewRole) {
+        for (String role : roles) {
+            if (user instanceof Customer && (role.equalsIgnoreCase("EMPLOYEE") || role.equalsIgnoreCase("ADMIN"))) {
+                throw new IllegalArgumentException("Customers cannot be assigned employee or admin roles");
+            }
+            if (!isNewRole) {
+                if (user instanceof Employee && role.equalsIgnoreCase("EMPLOYEE")) {
+                    throw new IllegalArgumentException("The role EMPLOYEE is mandatory for employees and cannot be removed.");
+                }
+                if (user instanceof Customer && role.equalsIgnoreCase("USER")) {
+                    throw new IllegalArgumentException("The role USER is mandatory for customers and cannot be removed.");
+                }
+            }
+        }
+    }
+
+    private UserSummaryResponseDTO mapToUserSummaryDTO(User user) {
+        if (user instanceof Customer) {
+            return customerMapper.toUserSummaryResponseDTO((Customer) user);
+        } else if (user instanceof Employee) {
+            return employeeMapper.toUserSummaryResponseDTO((Employee) user);
+        }
+        throw new RecordNotFoundException("Unknown user type");
+    }
+
+    private UserResponseDTO mapToUserResponseDTO(User user) {
+        if (user instanceof Customer) {
+            return customerMapper.toUserResponseDTO((Customer) user);
+        } else if (user instanceof Employee) {
+            return employeeMapper.toUserResponseDTO((Employee) user);
+        }
+        throw new RecordNotFoundException("Unknown user type");
+    }
 }

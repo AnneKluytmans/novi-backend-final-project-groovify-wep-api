@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ArtistRepository extends JpaRepository<Artist, Long>, JpaSpecificationExecutor<Artist> {
-    Optional<Artist> findByNameContainingIgnoreCase(String name);
+    Optional<Artist> findByNameIgnoreCase(String name);
 
     Boolean existsByName(String name);
 }

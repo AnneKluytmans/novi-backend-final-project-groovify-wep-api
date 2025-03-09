@@ -18,7 +18,10 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
-    public AddressService(AddressRepository addressRepository, AddressMapper addressMapper) {
+    public AddressService(
+            AddressRepository addressRepository,
+            AddressMapper addressMapper
+    ) {
         this.addressRepository = addressRepository;
         this.addressMapper = addressMapper;
     }
@@ -38,13 +41,11 @@ public class AddressService {
             String sortOrder
     ) {
         Sort sort = getAddressesSort(sortBy, sortOrder);
-
         Specification<Address> specification = AddressSpecification.filterAddresses(
                 addressId, customerId, employeeId, userType, inactiveUsers, isShipping, isBilling,
                 country, city, postalCode
         );
         List<Address> addresses = addressRepository.findAll(specification, sort);
-
         return addressMapper.toResponseDTOs(addresses);
     }
 

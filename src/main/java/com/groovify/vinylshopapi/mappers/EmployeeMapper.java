@@ -1,12 +1,8 @@
 package com.groovify.vinylshopapi.mappers;
 
-import com.groovify.vinylshopapi.dtos.EmployeeRegisterDTO;
-import com.groovify.vinylshopapi.dtos.EmployeeResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserResponseDTO;
-import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.models.Employee;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -22,9 +18,11 @@ public interface EmployeeMapper {
 
     UserResponseDTO toUserResponseDTO(Employee employee);
 
-    List<UserResponseDTO> toUserResponseDTOs(List<Employee> employees);
-
     UserSummaryResponseDTO toUserSummaryResponseDTO(Employee employee);
 
     List<UserSummaryResponseDTO> toUserSummaryResponseDTOs(List<Employee> employees);
+
+    void updateEmployee(UserUpdateDTO userUpdateDTO, @MappingTarget Employee employee);
+
+    void updateEmployeeByAdmin(EmployeeAdminUpdateDTO employeeAdminUpdateDTO, @MappingTarget Employee employee);
 }

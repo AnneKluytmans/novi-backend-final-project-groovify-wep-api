@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.VinylRecordStockPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordStockResponseDTO;
 import com.groovify.vinylshopapi.services.VinylRecordStockService;
@@ -23,15 +22,19 @@ public class VinylRecordStockController {
     }
 
     @GetMapping()
-    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(@PathVariable("id") Long vinylRecordId) {
+    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(
+            @PathVariable("id") Long vinylRecordId
+    ) {
         VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(vinylRecordId);
         return ResponseEntity.ok(stock);
     }
 
     @PostMapping
-    public ResponseEntity<?> createStock(@PathVariable("id") Long vinylRecordId,
-                                         @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
-                                         BindingResult bindingResult) {
+    public ResponseEntity<?> createStock(
+            @PathVariable("id") Long vinylRecordId,
+            @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -42,19 +45,23 @@ public class VinylRecordStockController {
         return ResponseEntity.created(location).body(newStock);
     }
 
-    @PatchMapping()
-    public ResponseEntity<?> updateStock(@PathVariable("id") Long vinylRecordId,
-                                         @Valid @RequestBody VinylRecordStockPatchDTO stockPatchDTO,
-                                         BindingResult bindingResult) {
+    @PutMapping()
+    public ResponseEntity<?> updateStock(
+            @PathVariable("id") Long vinylRecordId,
+            @Valid @RequestBody VinylRecordStockRequestDTO stockRequestDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        VinylRecordStockResponseDTO updatedStock = vinylRecordStockService.updateStock(vinylRecordId, stockPatchDTO);
+        VinylRecordStockResponseDTO updatedStock = vinylRecordStockService.updateStock(vinylRecordId, stockRequestDTO);
         return ResponseEntity.ok(updatedStock);
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> deleteStock(@PathVariable("id") Long vinylRecordId) {
+    public ResponseEntity<Void> deleteStock(
+            @PathVariable("id") Long vinylRecordId
+    ) {
         vinylRecordStockService.deleteStock(vinylRecordId);
         return ResponseEntity.noContent().build();
     }

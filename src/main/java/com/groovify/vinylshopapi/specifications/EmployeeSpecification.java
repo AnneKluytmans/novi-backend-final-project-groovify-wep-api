@@ -2,6 +2,7 @@ package com.groovify.vinylshopapi.specifications;
 
 import com.groovify.vinylshopapi.models.Address;
 import com.groovify.vinylshopapi.models.Employee;
+import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -9,22 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeSpecification {
-    public static Specification<Employee> filterEmployees(String firstName, String lastName, String jobTitle,
-                                                          Double minSalary, Double maxSalary, String country, String city) {
+    public static Specification<Employee> filterEmployees(
+            String firstName,
+            String lastName,
+            String jobTitle,
+            Double minSalary,
+            Double maxSalary,
+            String country,
+            String city
+    ) {
         return (Root<Employee> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            Join<Employee, Address> addressJoin = root.join("address", JoinType.LEFT);
 
-            if (firstName != null && !firstName.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%"));
-            }
+            SpecificationUtils.addStringPredicate(predicates, cb, root.get("firstName"), firstName, false);
 
-            if (lastName != null && !lastName.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("lastName")), "%" + lastName.toLowerCase() + "%"));
-            }
+            SpecificationUtils.addStringPredicate(predicates, cb, root.get("lastName"), lastName, false);
 
-            if (jobTitle != null && !jobTitle.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("jobTitle")), "%" + jobTitle.toLowerCase() + "%"));
-            }
+            SpecificationUtils.addStringPredicate(predicates, cb, root.get("jobTitle"), jobTitle, false);
 
             if (minSalary != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("salary"), minSalary));
@@ -34,14 +37,9 @@ public class EmployeeSpecification {
                 predicates.add(cb.lessThanOrEqualTo(root.get("salary"), maxSalary));
             }
 
-            Join<Employee, Address> addressJoin = root.join("address", JoinType.INNER);
-            if (country != null && !country.isBlank()) {
-                predicates.add(cb.like(cb.lower(addressJoin.get("country")), "%" + country.toLowerCase() + "%"));
-            }
+            SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("country"), country, false);
 
-            if (city != null && !city.isBlank()) {
-                predicates.add(cb.like(cb.lower(addressJoin.get("city")), "%" + city.toLowerCase() + "%"));
-            }
+            SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("city"), city, false);
 
             return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));
         };

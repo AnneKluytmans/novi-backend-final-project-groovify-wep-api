@@ -31,8 +31,8 @@ public class EmployeeController {
             @RequestParam(required = false) Double maxSalary,
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String city,
-            @RequestParam(defaultValue = "lastName") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortOrder
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<UserSummaryResponseDTO> employees = employeeService.getEmployees(
                 firstName, lastName, jobTitle, minSalary, maxSalary,
@@ -42,20 +42,26 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(
+            @PathVariable Long id
+    ) {
         EmployeeResponseDTO employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<EmployeeResponseDTO> getEmployeeByUsername(@PathVariable String username) {
+    public ResponseEntity<EmployeeResponseDTO> getEmployeeByUsername(
+            @PathVariable String username
+    ) {
         EmployeeResponseDTO employee = employeeService.getEmployeeByUsername(username);
         return ResponseEntity.ok(employee);
     }
 
     @PostMapping
-    public ResponseEntity<?> registerEmployee(@Valid @RequestBody EmployeeRegisterDTO employeeRegisterDTO,
-                                              BindingResult bindingResult) {
+    public ResponseEntity<?> registerEmployee(
+            @Valid @RequestBody EmployeeRegisterDTO employeeRegisterDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -68,25 +74,29 @@ public class EmployeeController {
         return ResponseEntity.created(location).body(newEmployee);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateEmployee(@PathVariable Long id,
-                                            @Valid @RequestBody UserPatchDTO employeePatchDTO,
-                                            BindingResult bindingResult) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEmployee(
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdateDTO employeeUpdateDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployee(id, employeePatchDTO);
+        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployee(id, employeeUpdateDTO);
         return ResponseEntity.ok(updatedEmployee);
     }
 
-    @PatchMapping("/{id}/admin")
-    public ResponseEntity<?> updateEmployeeByAdmin(@PathVariable Long id,
-                                                   @Valid @RequestBody EmployeeAdminPatchDTO employeeAdminPatchDTO,
-                                                   BindingResult bindingResult) {
+    @PutMapping("/{id}/admin")
+    public ResponseEntity<?> updateEmployeeByAdmin(
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeAdminUpdateDTO employeeAdminUpdateDTO,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployeeByAdmin(id, employeeAdminPatchDTO);
+        EmployeeResponseDTO updatedEmployee = employeeService.updateEmployeeByAdmin(id, employeeAdminUpdateDTO);
         return ResponseEntity.ok(updatedEmployee);
     }
 }

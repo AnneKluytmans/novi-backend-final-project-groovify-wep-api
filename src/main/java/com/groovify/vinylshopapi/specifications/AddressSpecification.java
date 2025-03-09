@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.specifications;
 import com.groovify.vinylshopapi.models.Address;
 import com.groovify.vinylshopapi.models.Customer;
 import com.groovify.vinylshopapi.models.Employee;
+import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -25,54 +26,14 @@ public class AddressSpecification {
         return (Root<Address> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
           List<Predicate> predicates = new ArrayList<>();
 
+          Join<Address, Customer> customerJoin = root.join("customer", JoinType.LEFT);
+          Join<Address, Employee> employeeJoin = root.join("employee", JoinType.LEFT);
+
           if (addressId != null) {
               predicates.add(cb.equal(root.get("id"), addressId));
           }
 
-          if (customerId != null) {
-              predicates.add(cb.equal(root.get("customer").get("id"), customerId));
-          }
-
-          if (employeeId != null) {
-              predicates.add(cb.equal(root.get("employee").get("id"), employeeId));
-          }
-
-          if (userType != null) {
-              if ("customer".equalsIgnoreCase(userType)) {
-                  predicates.add(cb.isNotNull(root.get("customer")));
-              }
-              if ("employee".equalsIgnoreCase(userType)) {
-                  predicates.add(cb.isNotNull(root.get("employee")));
-              }
-          }
-
-          Join<Address, Customer> customerJoin = root.join("customer", JoinType.LEFT);
-          Join<Address, Employee> employeeJoin = root.join("employee", JoinType.LEFT);
-
-          Predicate customerCondition;
-          Predicate employeeCondition;
-
-          if (inactiveUsers != null && inactiveUsers) {
-              customerCondition = cb.and(
-                      cb.isNotNull(root.get("customer")),
-                      cb.equal(customerJoin.get("isDeleted"), true)
-              );
-              employeeCondition = cb.and(
-                      cb.isNotNull(root.get("employee")),
-                      cb.equal(employeeJoin.get("isDeleted"), true)
-              );
-              predicates.add(cb.or(customerCondition, employeeCondition));
-          } else {
-              customerCondition = cb.and(
-                      cb.isNotNull(root.get("customer")),
-                      cb.equal(customerJoin.get("isDeleted"), false)
-              );
-              employeeCondition = cb.and(
-                      cb.isNotNull(root.get("employee")),
-                      cb.equal(employeeJoin.get("isDeleted"), false)
-              );
-              predicates.add(cb.or(customerCondition, employeeCondition));
-          }
+          addUserConditions(customerId, employeeId, userType, inactiveUsers, predicates, cb, root, customerJoin, employeeJoin);
 
           if (isShipping != null) {
               predicates.add(cb.and(cb.isNotNull(root.get("customer")), cb.equal(root.get("isShippingAddress"), isShipping)));
@@ -82,19 +43,51 @@ public class AddressSpecification {
               predicates.add(cb.and(cb.isNotNull(root.get("customer")), cb.equal(root.get("isBillingAddress"), isBilling)));
           }
 
-          if (country != null && !country.isBlank()) {
-              predicates.add(cb.like(cb.lower(root.get("country")), "%" + country.toLowerCase() + "%"));
-          }
+          SpecificationUtils.addStringPredicate(predicates, cb, root.get("country"), country, false);
 
-          if (city != null && !city.isBlank()) {
-              predicates.add(cb.like(cb.lower(root.get("city")), "%" + city.toLowerCase() + "%"));
-          }
+          SpecificationUtils.addStringPredicate(predicates, cb, root.get("city"), city, false);
 
-          if (postalCode != null && !postalCode.isBlank()) {
-              predicates.add(cb.like(cb.lower(root.get("postalCode")), "%" + postalCode.replace(" ", "").toLowerCase() + "%"));
-          }
+          SpecificationUtils.addStringPredicate(predicates, cb, root.get("postalCode"), postalCode, true);
 
           return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private static void addUserConditions(
+            Long customerId, Long employeeId, String userType, Boolean inactiveUsers,
+            List<Predicate> predicates, CriteriaBuilder cb, Root<Address> root,
+            Join<Address, Customer> customerJoin, Join<Address, Employee> employeeJoin
+    ) {
+
+        if (customerId != null) {
+            predicates.add(cb.equal(root.get("customer").get("id"), customerId));
+        }
+
+        if (employeeId != null) {
+            predicates.add(cb.equal(root.get("employee").get("id"), employeeId));
+        }
+
+        if (userType != null) {
+            if ("customer".equalsIgnoreCase(userType)) {
+                predicates.add(cb.isNotNull(root.get("customer")));
+            }
+            if ("employee".equalsIgnoreCase(userType)) {
+                predicates.add(cb.isNotNull(root.get("employee")));
+            }
+        }
+
+        Boolean inactiveUserCondition = Boolean.TRUE.equals(inactiveUsers);
+
+        Predicate customerCondition = cb.and(
+                cb.isNotNull(root.get("customer")),
+                cb.equal(customerJoin.get("isDeleted"), inactiveUserCondition)
+            );
+
+        Predicate employeeCondition = cb.and(
+                cb.isNotNull(root.get("employee")),
+                cb.equal(employeeJoin.get("isDeleted"), inactiveUserCondition)
+            );
+
+        predicates.add(cb.or(customerCondition, employeeCondition));
     }
 }
