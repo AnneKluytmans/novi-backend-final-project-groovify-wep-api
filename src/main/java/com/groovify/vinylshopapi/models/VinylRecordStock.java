@@ -18,11 +18,11 @@ public class VinylRecordStock {
     private Long id;
 
     @NotNull(message = "Amount in stock is required")
-    @Min(value = 0)
+    @Min(value = 0, message = "Amount cannot be negative")
     private Integer amountInStock;
 
     @NotNull(message = "Amount sold is required")
-    @Min(value = 0)
+    @Min(value = 0, message = "Amount cannot be negative")
     private Integer amountSold;
 
     @OneToOne

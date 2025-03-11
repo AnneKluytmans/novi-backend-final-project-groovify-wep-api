@@ -72,4 +72,7 @@ public class VinylRecord {
 
     @ManyToMany(mappedBy = "favoriteVinylRecords")
     private List<Customer> customers = new ArrayList<>();
+
+    @OneToMany
+    private List<CartItem> cartItems = new ArrayList<>();
 }
