@@ -22,7 +22,7 @@ public class Customer extends User {
 
     @ManyToMany
     @JoinTable(
-            name = "favorite_vinyl_records",
+            name = "customer_favorite_vinyl_records",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "vinyl_record_id")
     )

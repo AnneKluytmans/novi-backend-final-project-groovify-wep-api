@@ -29,10 +29,10 @@ public class OrderItem {
     private BigDecimal priceAtTimeOfAdding;
 
     @ManyToOne
-    @JoinColumn(name = "vinyl_record_id", nullable = false)
+    @JoinColumn(name = "vinyl_record_id", referencedColumnName = "id", nullable = false)
     private VinylRecord vinylRecord;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
     private Order order;
 }

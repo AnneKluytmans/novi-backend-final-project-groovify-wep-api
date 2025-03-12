@@ -129,7 +129,7 @@ VALUES
 
 
 --Favorite Vinyl Records
-INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+INSERT INTO customer_favorite_vinyl_records (customer_id, vinyl_record_id)
 VALUES
     (1, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
     (1, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),

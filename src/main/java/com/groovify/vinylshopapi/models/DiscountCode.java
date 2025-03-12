@@ -56,14 +56,14 @@ public class DiscountCode {
     @ValidDate(mustBeFuture = true, message = "Start date must be in the future")
     private LocalDate endDate;
 
-    @ManyToMany()
+    @ManyToMany(mappedBy = "discountCodes")
     private List<Order> orders = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
-            name = "discount_vinyl_record",
+            name = "discount_applicable_vinyl_records",
             joinColumns = @JoinColumn(name = "discount_code_id"),
             inverseJoinColumns = @JoinColumn(name = "vinyl_record_id")
     )
-    private List<VinylRecord> restrictedVinylRecords = new ArrayList<>();
+    private List<VinylRecord> discountVinylRecords = new ArrayList<>();
 }

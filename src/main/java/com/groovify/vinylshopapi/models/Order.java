@@ -59,15 +59,15 @@ public class Order {
     private OrderStatus orderStatus;
 
     @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "shipping_address_id", nullable = false)
+    @JoinColumn(name = "shipping_address_id", referencedColumnName = "id", nullable = false)
     private Address shippingAddress;
 
     @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "billing_address_id", nullable = false)
+    @JoinColumn(name = "billing_address_id", referencedColumnName = "id", nullable = false)
     private Address billingAddress;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -75,7 +75,7 @@ public class Order {
 
     @ManyToMany
     @JoinTable(
-            name = "order_discount_code",
+            name = "orders_discount_codes",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "discount_code_id")
     )
