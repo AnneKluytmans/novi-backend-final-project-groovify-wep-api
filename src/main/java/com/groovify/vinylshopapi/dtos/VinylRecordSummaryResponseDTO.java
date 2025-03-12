@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.dtos;
 
+import com.groovify.vinylshopapi.enums.Genre;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class VinylRecordSummaryResponseDTO {
     private Long id;
     private String title;
-    private String genre;
+    private Genre genre;
 }

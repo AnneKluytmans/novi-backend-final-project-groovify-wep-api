@@ -23,9 +23,9 @@ public class OrderItem {
     @Min(value = 1, message = "Quantity cannot be negative or 0")
     private Integer quantity;
 
+    @Column(precision = 10, scale = 2)
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", inclusive = false, message = "Price must be greater than 0")
-    @Column(precision = 10, scale = 2)
     private BigDecimal priceAtTimeOfAdding;
 
     @ManyToOne

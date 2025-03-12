@@ -1,6 +1,9 @@
 package com.groovify.vinylshopapi.models;
 
+import com.groovify.vinylshopapi.enums.OrderStatus;
+import com.groovify.vinylshopapi.enums.PaymentMethod;
 import com.groovify.vinylshopapi.validation.ValidDate;
+import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -37,19 +40,23 @@ public class Order {
     @Size(max = 100, message = "Recipient name cannot exceed 100 characters")
     private String recipientName;
 
+    @Column(precision = 10, scale = 2)
     @NotNull(message = "Total price is required")
     @DecimalMin(value = "0.01", inclusive = false, message = "Price must be greater than 0")
-    @Column(precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
     @Size(max = 200, message = "Note cannot be longer than 200 characters")
     private String note;
 
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Payment method is required")
-    private String paymentMethod;
+    @ValidEnum(enumClass = PaymentMethod.class, message = "Invalid payment method")
+    private PaymentMethod paymentMethod;
 
-    @NotNull(message = "Status is required")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Order status is required")
+    @ValidEnum(enumClass = OrderStatus.class, message = "Invalid order status")
+    private OrderStatus orderStatus;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "shipping_address_id", nullable = false)

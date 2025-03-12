@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Customer extends User {
     @NotNull(message = "Subscribe status is required")
-    private boolean newsletterSubscribed = true;
+    private Boolean newsletterSubscribed = true;
 
     @ManyToMany
     @JoinTable(

@@ -3,7 +3,6 @@ package com.groovify.vinylshopapi.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 public class DateValidator implements ConstraintValidator<ValidDate, LocalDate> {
 
