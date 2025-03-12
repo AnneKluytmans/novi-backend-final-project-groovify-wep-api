@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "order_items")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItem {
+public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,13 +26,13 @@ public class CartItem {
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", inclusive = false, message = "Price must be greater than 0")
     @Column(precision = 10, scale = 2)
-    private BigDecimal priceAtAdding;
+    private BigDecimal priceAtTimeOfAdding;
 
     @ManyToOne
-    @JoinColumn(name = "vinyl_record_id")
+    @JoinColumn(name = "vinyl_record_id", nullable = false)
     private VinylRecord vinylRecord;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 }

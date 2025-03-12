@@ -74,5 +74,5 @@ public class VinylRecord {
     private List<Customer> customers = new ArrayList<>();
 
     @OneToMany
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 }

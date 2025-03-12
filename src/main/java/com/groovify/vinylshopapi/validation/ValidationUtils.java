@@ -8,6 +8,8 @@ import com.groovify.vinylshopapi.repositories.UserRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +53,29 @@ public class ValidationUtils {
 
         if (!allowedFileTypes.contains(file.getContentType())) {
             throw new InvalidFileTypeException("File type is invalid. Only JPEG and PNG files are allowed.");
+        }
+    }
+
+    public static LocalDate parseValidationDate(String dateString) {
+        if (dateString.matches("now[+\\-]\\d+[YM]")) {
+            int amountToAddOrSubtract = Integer.parseInt(dateString.substring(4, dateString.length() - 1));
+            char unit = dateString.charAt(dateString.length() - 1);
+
+            if (dateString.charAt(3) == '-') {
+                amountToAddOrSubtract *= -1;
+            }
+
+            if (unit == 'Y') {
+                return LocalDate.now().plusYears(amountToAddOrSubtract);
+            } else if (unit == 'M') {
+                return LocalDate.now().plusMonths(amountToAddOrSubtract);
+            }
+        }
+
+        try {
+            return LocalDate.parse(dateString);
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("Invalid date format in @Valid date. Valid format is 'now+X[M/Y]' or 'DD-MM-YYYY'.");
         }
     }
 }
