@@ -76,5 +76,8 @@ public class VinylRecord {
     private List<Customer> customers = new ArrayList<>();
 
     @OneToMany(mappedBy = "vinylRecord")
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "vinylRecord")
     private List<OrderItem> orderItems = new ArrayList<>();
 }

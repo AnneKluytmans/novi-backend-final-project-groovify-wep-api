@@ -42,13 +42,22 @@ public class Order {
 
     @Column(precision = 10, scale = 2)
     @NotNull(message = "Total price is required")
-    @DecimalMin(value = "0.00", inclusive = false, message = "Price must be positive")
+    @DecimalMin(value = "0.00", message = "Price must be positive")
     private BigDecimal totalPrice;
 
     @Column(precision = 10, scale = 2)
     @NotNull(message = "Shipping cost is required")
-    @DecimalMin(value = "0.00", inclusive = false, message = "Shipping cost must be positive")
+    @DecimalMin(value = "0.00", message = "Shipping cost must be positive")
     private BigDecimal shippingCost;
+
+    @Column(precision = 10, scale = 2)
+    @DecimalMin(value = "0.00", message = "Discount amount must be positive")
+    private BigDecimal fixedDiscountAmount;
+
+    @Column(precision = 10, scale = 2)
+    @DecimalMin(value = "0.00", message = "Discount must be at least 0%")
+    @DecimalMax(value = "100.00", message = "Discount cannot exceed 100%")
+    private BigDecimal percentageDiscount;
 
     @Size(max = 200, message = "Note cannot be longer than 200 characters")
     private String note;
@@ -72,7 +81,7 @@ public class Order {
     private Address billingAddress;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
