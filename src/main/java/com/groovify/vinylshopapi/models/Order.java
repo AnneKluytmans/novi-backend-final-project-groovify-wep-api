@@ -77,12 +77,4 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "orders_discount_codes",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "discount_code_id")
-    )
-    private List<DiscountCode> discountCodes = new ArrayList<>();
 }

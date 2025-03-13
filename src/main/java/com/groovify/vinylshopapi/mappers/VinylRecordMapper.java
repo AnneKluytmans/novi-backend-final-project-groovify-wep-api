@@ -8,7 +8,11 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {ArtistMapper.class, VinylRecordStockMapper.class, VinylRecordCoverMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {ArtistMapper.class,
+                VinylRecordStockMapper.class,
+                VinylRecordCoverMapper.class
+})
 public interface VinylRecordMapper {
     @Mapping(target = "id", ignore=true)
     VinylRecord toEntity(VinylRecordRequestDTO vinylRecordRequestDTO);

@@ -77,7 +77,4 @@ public class VinylRecord {
 
     @OneToMany(mappedBy = "vinylRecord")
     private List<OrderItem> orderItems = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "discountVinylRecords")
-    private List<DiscountCode> discountCodes = new ArrayList<>();
 }
