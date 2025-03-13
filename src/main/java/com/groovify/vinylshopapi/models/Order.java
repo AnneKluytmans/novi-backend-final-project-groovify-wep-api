@@ -45,6 +45,11 @@ public class Order {
     @DecimalMin(value = "0.00", inclusive = false, message = "Price must be positive")
     private BigDecimal totalPrice;
 
+    @Column(precision = 10, scale = 2)
+    @NotNull(message = "Shipping cost is required")
+    @DecimalMin(value = "0.00", inclusive = false, message = "Shipping cost must be positive")
+    private BigDecimal shippingCost;
+
     @Size(max = 200, message = "Note cannot be longer than 200 characters")
     private String note;
 
