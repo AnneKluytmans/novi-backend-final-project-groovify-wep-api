@@ -1,6 +1,7 @@
 package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.dtos.CartItemRequestDTO;
+import com.groovify.vinylshopapi.dtos.CartItemUpdateQuantityDTO;
 import com.groovify.vinylshopapi.dtos.CartResponseDTO;
 import com.groovify.vinylshopapi.services.CustomerCartService;
 import jakarta.validation.Valid;
@@ -32,14 +33,13 @@ public class CustomerCartController {
         return ResponseEntity.created(location).body(newCart);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteCart(
+    @DeleteMapping()
+    public ResponseEntity<CartResponseDTO> clearCart(
             @PathVariable("id") Long customerId
     ) {
-        customerCartService.deleteCart(customerId);
-        return ResponseEntity.noContent().build();
+        CartResponseDTO cart = customerCartService.clearCart(customerId);
+        return ResponseEntity.ok(cart);
     }
-
 
     @PostMapping("/cart-items")
     public ResponseEntity<?> addCartItemToCart(
@@ -54,12 +54,26 @@ public class CustomerCartController {
         return ResponseEntity.ok(cart);
     }
 
+    @PutMapping("/cart-items/{itemId}")
+    public ResponseEntity<?> updateCartItemQuantity(
+            @PathVariable("id") Long customerId,
+            @PathVariable("itemId") Long cartItemId,
+            @Valid @RequestBody CartItemUpdateQuantityDTO cartItemQuantityDTO,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        CartResponseDTO cart = customerCartService.updateCartItemQuantity(customerId, cartItemId, cartItemQuantityDTO);
+        return ResponseEntity.ok(cart);
+    }
+
     @DeleteMapping("/cart-items/{itemId}")
-    public ResponseEntity<CartResponseDTO> deleteCartItemFromCart(
+    public ResponseEntity<CartResponseDTO> removeCartItemFromCart(
             @PathVariable("id") Long customerId,
             @PathVariable("itemId") Long cartItemId
     ) {
-        CartResponseDTO cart = customerCartService.deleteCartItemFromCart(customerId, cartItemId);
+        CartResponseDTO cart = customerCartService.removeCartItemFromCart(customerId, cartItemId);
         return ResponseEntity.ok(cart);
     }
 }

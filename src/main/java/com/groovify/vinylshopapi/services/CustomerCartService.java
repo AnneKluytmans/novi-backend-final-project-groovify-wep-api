@@ -1,6 +1,7 @@
 package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.CartItemRequestDTO;
+import com.groovify.vinylshopapi.dtos.CartItemUpdateQuantityDTO;
 import com.groovify.vinylshopapi.dtos.CartResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
@@ -17,7 +18,6 @@ import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class CustomerCartService {
@@ -58,36 +58,35 @@ public class CustomerCartService {
         return cartMapper.toResponseDTO(savedCart);
     }
 
-    public void deleteCart(Long customerId) {
+    public CartResponseDTO clearCart(Long customerId) {
         Cart cart = findCart(customerId);
-        if (!cart.getCartItems().isEmpty()) {
-            throw new DeleteOperationException("Cart is not empty and cannot be deleted");
-        }
-        cartRepository.delete(cart);
+
+        cartItemRepository.deleteAll(cart.getCartItems());
+
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.toResponseDTO(savedCart);
     }
 
     public CartResponseDTO addCartItemToCart(Long customerId, CartItemRequestDTO cartItemRequestDTO) {
         Cart cart = findCart(customerId);
         VinylRecord vinylRecord = findVinylRecord(cartItemRequestDTO.getVinylRecordId());
-        CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
-        cartItem.setVinylRecord(vinylRecord);
 
-        List<CartItem> cartItemsInCart = cart.getCartItems();
-
-        for (CartItem cartItemInCart : cartItemsInCart) {
+        for (CartItem cartItemInCart : cart.getCartItems()) {
             if (cartItemInCart.getVinylRecord().equals(vinylRecord)) {
                 throw new ConflictException("The vinyl record '" + vinylRecord.getTitle() +
                         "' is already in your cart. You can update the quantity of this item.");
             }
         }
 
+        CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
+        cartItem.setVinylRecord(vinylRecord);
         cart.getCartItems().add(cartItem);
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);
     }
 
-    public CartResponseDTO deleteCartItemFromCart(Long customerId, Long cartItemId) {
+    public CartResponseDTO removeCartItemFromCart(Long customerId, Long cartItemId) {
         Cart cart = findCart(customerId);
         CartItem cartItem = findCartItem(cartItemId);
 
@@ -97,6 +96,20 @@ public class CustomerCartService {
 
         cart.getCartItems().remove(cartItem);
         cartItemRepository.delete(cartItem);
+
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.toResponseDTO(savedCart);
+    }
+
+    public CartResponseDTO updateCartItemQuantity(Long customerId, Long cartItemId, CartItemUpdateQuantityDTO cartItemQuantityDTO) {
+        Cart cart = findCart(customerId);
+        CartItem cartItem = findCartItem(cartItemId);
+
+        if (!cart.getCartItems().contains(cartItem)) {
+            throw new DeleteOperationException("Cart item not found in this cart");
+        }
+
+        cartItem.setQuantity(cartItemQuantityDTO.getNewQuantity());
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);
@@ -122,6 +135,5 @@ public class CustomerCartService {
         return cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RecordNotFoundException("Cart item with id " + cartItemId + " not found"));
     }
-
 
 }
