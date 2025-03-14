@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = CartItemMapper.class)
 public interface CartMapper {
     @Mapping(target = "cartItems", source = "cartItems")
-    CartResponseDTO toCartResponseDTO(Cart cart);
+    CartResponseDTO toResponseDTO(Cart cart);
 
-    List<CartResponseDTO> toCartResponseDTOs(List<Cart> carts);
+    List<CartResponseDTO> toResponseDTOs(List<Cart> carts);
 }
