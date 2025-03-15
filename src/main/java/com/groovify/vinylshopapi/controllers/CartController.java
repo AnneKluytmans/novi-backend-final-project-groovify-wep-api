@@ -26,13 +26,12 @@ public class CartController {
             @RequestParam(required = false) String updatedAfter,
             @RequestParam(required = false) Long customerId,
             @RequestParam(required = false) Boolean isEmpty,
-            @RequestParam(required = false) Integer minAmountOfItems,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<CartResponseDTO> carts = cartService.getAllCarts(
                 createdBefore, createdAfter, updatedBefore, updatedAfter, customerId,
-                isEmpty, minAmountOfItems, sortBy, sortOrder
+                isEmpty, sortBy, sortOrder
         );
         return ResponseEntity.ok(carts);
     }

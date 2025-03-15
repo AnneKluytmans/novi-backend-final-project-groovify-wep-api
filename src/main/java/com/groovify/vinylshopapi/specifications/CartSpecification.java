@@ -1,7 +1,6 @@
 package com.groovify.vinylshopapi.specifications;
 
 import com.groovify.vinylshopapi.models.Cart;
-import com.groovify.vinylshopapi.models.CartItem;
 import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,8 +15,7 @@ public class CartSpecification {
             String updatedBefore,
             String updatedAfter,
             Long customerId,
-            Boolean isEmpty,
-            Integer minAmountOfItems
+            Boolean isEmpty
     ) {
         return (Root<Cart> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -28,7 +26,7 @@ public class CartSpecification {
             SpecificationUtils.addDatePredicate(predicates, cb, root.get("updatedAt"), updatedAfter, true);
 
             if (customerId != null) {
-                predicates.add(cb.equal(root.get("customer"), customerId));
+                predicates.add(cb.equal(root.get("customer").get("id"), customerId));
             }
 
             if (isEmpty != null) {
@@ -37,12 +35,6 @@ public class CartSpecification {
                 } else {
                     predicates.add(cb.greaterThan(cb.size(root.get("cartItems")), 0));
                 }
-            }
-
-            if (minAmountOfItems != null) {
-                Join<Cart, CartItem> cartItemsJoin = root.join("cartItems", JoinType.LEFT);
-                Expression<Integer> totalItems = cb.sum(cartItemsJoin.get("quantity"));
-                predicates.add(cb.greaterThanOrEqualTo(totalItems, minAmountOfItems));
             }
 
             return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));

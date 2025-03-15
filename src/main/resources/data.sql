@@ -208,3 +208,43 @@ VALUES
     ('Meir', '78', 'Antwerpen', '2000', 'Belgium', NULL, NULL, 12),
     ('Hoogstraat', '15A', 'Rotterdam', '3011PN', 'Netherlands', NULL, NULL, 13),
     ('Veldstraat', '22', 'Gent', '9000', 'Belgium', NULL, NULL, 14);
+
+
+
+
+-- Carts and items
+
+-- Carts
+INSERT INTO carts (customer_id, created_at, updated_at)
+VALUES
+    (1, '2024-05-12 17:10:00', '2025-03-14 19:20:00'),
+    (2, '2024-06-05 16:20:00', '2024-10-05 17:40:00'),
+    (3, '2024-07-18 15:30:00', '2025-02-28 18:00:00'),
+    (4, '2024-08-30 14:00:00', '2024-12-20 14:30:00'),
+    (5, '2024-10-10 12:45:00', '2025-01-04 14:25:00'),
+    (6, '2024-11-20 11:00:00', '2025-03-14 15:30:00'),
+    (7, '2025-01-08 19:50:00', '2025-03-12 21:45:00'),
+    (8, '2025-01-10 09:30:00', '2025-01-10 09:30:00'),
+    (9, '2025-02-22 18:40:00', '2025-03-12 20:30:00'),
+    (10, '2025-03-05 13:15:00', '2025-03-13 16:45:00');
+
+-- Cart Items
+INSERT INTO cart_items (cart_id, vinyl_record_id, quantity)
+VALUES
+    (1, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road'), 1),
+    (1, (SELECT id FROM vinyl_records WHERE title = '21'), 2),
+
+    (3, (SELECT id FROM vinyl_records WHERE title = 'Lemonade'), 1),
+    (3, (SELECT id FROM vinyl_records WHERE title = 'Arrival'), 3),
+
+    (6, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1),
+    (6, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue'), 1),
+
+    (7, (SELECT id FROM vinyl_records WHERE title = 'Rumours'), 1),
+    (7, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew'), 2),
+
+    (9, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera'), 1),
+    (9, (SELECT id FROM vinyl_records WHERE title = 'Revolver'), 2),
+
+    (10, (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?'), 1),
+    (10, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 2);

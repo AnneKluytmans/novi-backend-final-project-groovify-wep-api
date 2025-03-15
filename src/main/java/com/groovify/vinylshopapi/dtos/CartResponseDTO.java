@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CartResponseDTO {
     private Long id;
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CartItemResponseDTO> cartItems;
 }

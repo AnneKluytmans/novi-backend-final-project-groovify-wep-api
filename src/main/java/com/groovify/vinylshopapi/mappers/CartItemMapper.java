@@ -17,5 +17,4 @@ public interface CartItemMapper {
 
     List<CartItemResponseDTO> toResponseDTOs(List<CartItem> cartItems);
 
-
 }

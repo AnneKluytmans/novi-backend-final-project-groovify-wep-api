@@ -67,7 +67,7 @@ public class CustomerCartService {
     public CartResponseDTO clearCart(Long customerId) {
         Cart cart = findCart(customerId);
 
-        cartItemRepository.deleteAll(cart.getCartItems());
+        cart.getCartItems().clear();
         cart.setUpdatedAt(LocalDateTime.now());
 
         Cart savedCart = cartRepository.save(cart);
@@ -87,6 +87,7 @@ public class CustomerCartService {
 
         CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
         cartItem.setVinylRecord(vinylRecord);
+        cartItem.setCart(cart);
         cart.getCartItems().add(cartItem);
         cart.setUpdatedAt(LocalDateTime.now());
 
@@ -104,7 +105,6 @@ public class CustomerCartService {
 
         cart.getCartItems().remove(cartItem);
         cart.setUpdatedAt(LocalDateTime.now());
-        cartItemRepository.delete(cartItem);
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);
