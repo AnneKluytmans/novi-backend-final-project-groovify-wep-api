@@ -3,7 +3,6 @@ package com.groovify.vinylshopapi.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 public class DateValidator implements ConstraintValidator<ValidDate, LocalDate> {
 
@@ -14,26 +13,8 @@ public class DateValidator implements ConstraintValidator<ValidDate, LocalDate> 
 
     @Override
     public void initialize(ValidDate constraintAnnotation) {
-        if (!constraintAnnotation.min().isEmpty()) {
-            try {
-                minDate = LocalDate.parse(constraintAnnotation.min());
-            } catch (DateTimeParseException ex) {
-                throw new IllegalArgumentException("Invalid min date format in @ValidDate");
-            }
-        }
-
-        if (!constraintAnnotation.max().isEmpty()) {
-            if (constraintAnnotation.max().equals("now+1Y")) {
-                maxDate = LocalDate.now().plusYears(1);
-            } else {
-                try {
-                    maxDate = LocalDate.parse(constraintAnnotation.max());
-                } catch (DateTimeParseException ex) {
-                    throw new IllegalArgumentException("Invalid max date format in @ValidDate");
-                }
-            }
-        }
-
+        minDate = constraintAnnotation.min().isEmpty() ? null : ValidationUtils.parseValidationDate(constraintAnnotation.min());
+        maxDate = constraintAnnotation.max().isEmpty() ? null : ValidationUtils.parseValidationDate(constraintAnnotation.max());
         mustBePast = constraintAnnotation.mustBePast();
         mustBeFuture = constraintAnnotation.mustBeFuture();
     }

@@ -1,6 +1,8 @@
 package com.groovify.vinylshopapi.dtos;
 
+import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.validation.ValidDate;
+import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -15,7 +17,8 @@ public class VinylRecordPatchDTO {
     @Size(min = 1, max = 500, message = "Description cannot be longer than 500 characters")
     private String description;
 
-    private String genre;
+    @ValidEnum(enumClass = Genre.class, message = "Invalid genre")
+    private Genre genre;
 
     @Size(min = 1, max = 100, message = "Label cannot be longer than 100 characters")
     private String label;

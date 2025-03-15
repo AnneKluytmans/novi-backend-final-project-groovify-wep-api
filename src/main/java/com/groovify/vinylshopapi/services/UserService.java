@@ -115,22 +115,22 @@ public class UserService {
         return roles;
     }
 
-    public void addRolesToUser(Long userId, List<String> roles) {
+    public void addRolesToUser(Long userId, List<RoleType> roles) {
         User user = findUser(userId);
         validateRolesForUserType(user, roles, true);
 
-        for (String role : roles) {
+        for (RoleType role : roles) {
             user.getRoles().add(findRoleByType(role));
         }
 
         userRepository.save(user);
     }
 
-    public void removeRolesFromUser(Long userId, List<String> roles) {
+    public void removeRolesFromUser(Long userId, List<RoleType> roles) {
         User user = findUser(userId);
         validateRolesForUserType(user, roles, false);
 
-        for (String role : roles) {
+        for (RoleType role : roles) {
             user.getRoles().remove(findRoleByType(role));
         }
 
@@ -143,22 +143,21 @@ public class UserService {
                 .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
     }
 
-    private Role findRoleByType(String role) {
-        RoleType roleType = RoleType.stringToRole(role);
-        return roleRepository.findByRoleType(roleType)
+    private Role findRoleByType(RoleType role) {
+        return roleRepository.findByRoleType(role)
                 .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found"));
     }
 
-    private void validateRolesForUserType(User user, List<String> roles, Boolean isNewRole) {
-        for (String role : roles) {
-            if (user instanceof Customer && (role.equalsIgnoreCase("EMPLOYEE") || role.equalsIgnoreCase("ADMIN"))) {
+    private void validateRolesForUserType(User user, List<RoleType> roles, Boolean isNewRole) {
+        for (RoleType role : roles) {
+            if (user instanceof Customer && (role == RoleType.EMPLOYEE || role == RoleType.ADMIN)) {
                 throw new IllegalArgumentException("Customers cannot be assigned employee or admin roles");
             }
             if (!isNewRole) {
-                if (user instanceof Employee && role.equalsIgnoreCase("EMPLOYEE")) {
+                if (user instanceof Employee && role == RoleType.EMPLOYEE) {
                     throw new IllegalArgumentException("The role EMPLOYEE is mandatory for employees and cannot be removed.");
                 }
-                if (user instanceof Customer && role.equalsIgnoreCase("USER")) {
+                if (user instanceof Customer && role == RoleType.USER) {
                     throw new IllegalArgumentException("The role USER is mandatory for customers and cannot be removed.");
                 }
             }

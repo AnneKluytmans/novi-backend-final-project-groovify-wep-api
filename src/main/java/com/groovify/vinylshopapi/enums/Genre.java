@@ -1,7 +1,5 @@
 package com.groovify.vinylshopapi.enums;
 
-import java.util.Arrays;
-
 public enum Genre {
     ROCK,
     POP,
@@ -23,13 +21,5 @@ public enum Genre {
     DISCO,
     HOUSE,
     TECHNO,
-    OTHER;
-
-    public static Genre stringToGenre(String genre) {
-        try {
-            return Genre.valueOf(genre.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid genre: " + genre + ". Valid genres are: " + Arrays.toString(Genre.values()));
-        }
-    }
+    OTHER
 }

@@ -8,5 +8,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class CustomerRegisterDTO extends UserRegisterDTO {
     @NotNull(message = "Subscribe status is required")
-    private boolean newsletterSubscribed = true;
+    private Boolean newsletterSubscribed = true;
 }

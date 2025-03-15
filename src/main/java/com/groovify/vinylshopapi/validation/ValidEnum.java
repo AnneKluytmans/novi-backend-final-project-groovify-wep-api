@@ -6,16 +6,13 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = DateValidator.class)
+@Constraint(validatedBy = EnumValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidDate {
-    String message() default "Date is not valid";
+public @interface ValidEnum {
+    String message() default "Invalid value for enum";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
-    String min() default "";
-    String max() default "";
-    boolean mustBePast() default false;
-    boolean mustBeFuture() default false;
+    Class<? extends Enum<?>> enumClass();
 }

@@ -48,7 +48,7 @@ public abstract class User {
     private String lastName;
 
     @NotNull(message = "Birth date is required")
-    @ValidDate(min = "1900-01-01", mustBePast = true, message = "Birth data must be in the past")
+    @ValidDate(min = "now-110Y", mustBePast = true, message = "Birth date must be in the past")
     private LocalDate dateOfBirth;
 
     @Pattern(regexp = "^\\+?([0-9]{1,4})?\\s?(\\(?\\d{1,4}\\)?\\s?)?\\d{6,10}$", message = "Invalid phone number format")

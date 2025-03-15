@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.models;
 import com.groovify.vinylshopapi.enums.Genre;
 
 import com.groovify.vinylshopapi.validation.ValidDate;
+import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -31,17 +32,18 @@ public class VinylRecord {
     @Size(max = 500, message = "Description cannot be longer than 500 characters")
     private String description;
 
-    @NotNull(message = "Genre is required")
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Genre is required")
+    @ValidEnum(enumClass = Genre.class, message = "Invalid genre")
     private Genre genre;
 
     @NotBlank(message = "Label is required")
     @Size(max = 100, message = "Label cannot be longer than 100 characters")
     private String label;
 
+    @Column(precision = 10, scale = 2)
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", inclusive = false, message = "Price must be greater than 0")
-    @Column(precision = 10, scale = 2)
     private BigDecimal price;
 
     @NotNull(message = "Release date is required")
@@ -72,4 +74,10 @@ public class VinylRecord {
 
     @ManyToMany(mappedBy = "favoriteVinylRecords")
     private List<Customer> customers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "vinylRecord")
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "vinylRecord")
+    private List<OrderItem> orderItems = new ArrayList<>();
 }
