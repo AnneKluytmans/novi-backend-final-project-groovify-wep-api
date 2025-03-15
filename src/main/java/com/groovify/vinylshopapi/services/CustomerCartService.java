@@ -18,6 +18,8 @@ import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 
 @Service
 public class CustomerCartService {
@@ -45,6 +47,9 @@ public class CustomerCartService {
         this.cartItemMapper = cartItemMapper;
     }
 
+    public CartResponseDTO getCustomerCart(Long customerId) {
+        return cartMapper.toResponseDTO(findCart(customerId));
+    }
 
     public CartResponseDTO createCart(Long customerId) {
         if (cartRepository.existsByCustomerId(customerId)) {
@@ -53,6 +58,7 @@ public class CustomerCartService {
 
         Cart cart = new Cart();
         cart.setCustomer(findCustomer(customerId));
+        cart.setCreatedAt(LocalDateTime.now());
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);
@@ -62,6 +68,7 @@ public class CustomerCartService {
         Cart cart = findCart(customerId);
 
         cartItemRepository.deleteAll(cart.getCartItems());
+        cart.setUpdatedAt(LocalDateTime.now());
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);
@@ -81,6 +88,7 @@ public class CustomerCartService {
         CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
         cartItem.setVinylRecord(vinylRecord);
         cart.getCartItems().add(cartItem);
+        cart.setUpdatedAt(LocalDateTime.now());
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);
@@ -95,6 +103,7 @@ public class CustomerCartService {
         }
 
         cart.getCartItems().remove(cartItem);
+        cart.setUpdatedAt(LocalDateTime.now());
         cartItemRepository.delete(cartItem);
 
         Cart savedCart = cartRepository.save(cart);
@@ -110,6 +119,7 @@ public class CustomerCartService {
         }
 
         cartItem.setQuantity(cartItemQuantityDTO.getNewQuantity());
+        cart.setUpdatedAt(LocalDateTime.now());
 
         Cart savedCart = cartRepository.save(cart);
         return cartMapper.toResponseDTO(savedCart);

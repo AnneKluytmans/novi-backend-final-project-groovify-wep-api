@@ -22,6 +22,14 @@ public class CustomerCartController {
         this.customerCartService = customerCartService;
     }
 
+    @GetMapping()
+    public ResponseEntity<CartResponseDTO> getCart(
+            @PathVariable("id") Long customerId
+    ) {
+        CartResponseDTO cart = customerCartService.getCustomerCart(customerId);
+        return ResponseEntity.ok(cart);
+    }
+
     @PostMapping()
     public ResponseEntity<CartResponseDTO> createCart(
             @PathVariable("id") Long customerId

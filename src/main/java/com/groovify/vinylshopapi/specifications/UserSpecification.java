@@ -38,23 +38,8 @@ public class UserSpecification {
                 predicates.add(cb.equal(root.get("isDeleted"), isDeleted));
             }
 
-            if (deletedAfter != null && !deletedAfter.isBlank()) {
-                try {
-                    LocalDate deletedAfterDate = LocalDate.parse(deletedAfter, formatter);
-                    predicates.add(cb.greaterThanOrEqualTo(root.get("deletedAt").as(LocalDate.class), deletedAfterDate));
-                } catch (DateTimeParseException e) {
-                    throw new IllegalArgumentException("Invalid date format for deletedAfter. Use format: dd-MM-yyyy (e.g., 12-02-2025)");
-                }
-            }
-
-            if (deletedBefore != null && !deletedBefore.isBlank()) {
-                try {
-                    LocalDate deletedBeforeDate = LocalDate.parse(deletedBefore, formatter);
-                    predicates.add(cb.lessThanOrEqualTo(root.get("deletedAt").as(LocalDate.class), deletedBeforeDate));
-                } catch (DateTimeParseException e) {
-                    throw new IllegalArgumentException("Invalid date format for deletedBefore. Use format: dd-MM-yyyy (e.g., 12-02-2025)");
-                }
-            }
+            SpecificationUtils.addDatePredicate(predicates, cb, root.get("deletedAt"), deletedAfter, true);
+            SpecificationUtils.addDatePredicate(predicates, cb, root.get("deletedAt"), deletedBefore, false);
 
             return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));
         };
