@@ -1,7 +1,7 @@
 package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.CartItemRequestDTO;
-import com.groovify.vinylshopapi.dtos.CartItemUpdateQuantityDTO;
+import com.groovify.vinylshopapi.dtos.CartItemQuantityUpdateDTO;
 import com.groovify.vinylshopapi.dtos.CartResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.InsufficientStockException;
@@ -63,7 +63,7 @@ public class CustomerCartService {
         return cartMapper.toResponseDTO(savedCart);
     }
 
-    public CartResponseDTO updateCartItemQuantity(Long customerId, Long cartItemId, CartItemUpdateQuantityDTO cartItemQuantityDTO) {
+    public CartResponseDTO updateCartItemQuantity(Long customerId, Long cartItemId, CartItemQuantityUpdateDTO cartItemQuantityDTO) {
         Cart cart = findCart(customerId);
         CartItem cartItem = findCartItem(cart, cartItemId);
 

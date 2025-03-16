@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,7 @@ public class Order {
     private Long id;
 
     @NotNull(message = "Order date is required")
-    @ValidDate(min = "now-2M", message = "Order date must be between now and two months ago")
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
     @ValidDate(max = "now+9M", mustBeFuture = true, message = "Expected delivery date must be between now and nine months from now")
     private LocalDate expectedDeliveryDate;
@@ -52,11 +52,12 @@ public class Order {
 
     @Column(precision = 10, scale = 2)
     @DecimalMin(value = "0.00", message = "Discount amount must be positive")
+    @DecimalMax(value = "2000.00", message = "Discount amount cannot exceed 2000,-")
     private BigDecimal fixedDiscountAmount;
 
     @Column(precision = 10, scale = 2)
-    @DecimalMin(value = "0.00", message = "Discount must be at least 0%")
-    @DecimalMax(value = "100.00", message = "Discount cannot exceed 100%")
+    @DecimalMin(value = "0.00", message = "Discount percentage must be at least 0%")
+    @DecimalMax(value = "100.00", message = "Discount percentage cannot exceed 100%")
     private BigDecimal percentageDiscount;
 
     @Size(max = 200, message = "Note cannot be longer than 200 characters")

@@ -1,7 +1,7 @@
 package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.dtos.CartItemRequestDTO;
-import com.groovify.vinylshopapi.dtos.CartItemUpdateQuantityDTO;
+import com.groovify.vinylshopapi.dtos.CartItemQuantityUpdateDTO;
 import com.groovify.vinylshopapi.dtos.CartResponseDTO;
 import com.groovify.vinylshopapi.services.CustomerCartService;
 import jakarta.validation.Valid;
@@ -45,7 +45,7 @@ public class CustomerCartController {
     public ResponseEntity<?> updateCartItemQuantity(
             @PathVariable("id") Long customerId,
             @PathVariable("itemId") Long cartItemId,
-            @Valid @RequestBody CartItemUpdateQuantityDTO cartItemQuantityDTO,
+            @Valid @RequestBody CartItemQuantityUpdateDTO cartItemQuantityDTO,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
