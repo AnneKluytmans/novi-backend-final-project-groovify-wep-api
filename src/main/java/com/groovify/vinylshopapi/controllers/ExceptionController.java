@@ -60,6 +60,13 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler(value = InsufficientStockException.class)
+    public ResponseEntity<Object> handleInsufficientStockException(InsufficientStockException ex) {
+        return buildErrorResponse(
+                HttpStatus.CONFLICT, "Insufficient Stock", ex.getMessage(), null
+        );
+    }
+
     @ExceptionHandler(value = ForbiddenException.class)
     public ResponseEntity<Object> handleForbiddenException(ForbiddenException ex) {
         return buildErrorResponse(

@@ -8,9 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api/customers/{id}/cart")
@@ -30,26 +28,7 @@ public class CustomerCartController {
         return ResponseEntity.ok(cart);
     }
 
-    @PostMapping()
-    public ResponseEntity<CartResponseDTO> createCart(
-            @PathVariable("id") Long customerId
-    ) {
-        CartResponseDTO newCart = customerCartService.createCart(customerId);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .build()
-                .toUri();
-        return ResponseEntity.created(location).body(newCart);
-    }
-
-    @DeleteMapping()
-    public ResponseEntity<CartResponseDTO> clearCart(
-            @PathVariable("id") Long customerId
-    ) {
-        CartResponseDTO cart = customerCartService.clearCart(customerId);
-        return ResponseEntity.ok(cart);
-    }
-
-    @PostMapping("/cart-items")
+    @PostMapping("/items")
     public ResponseEntity<?> addCartItemToCart(
             @PathVariable("id") Long customerId,
             @Valid @RequestBody CartItemRequestDTO cartItemRequestDTO,
@@ -62,7 +41,7 @@ public class CustomerCartController {
         return ResponseEntity.ok(cart);
     }
 
-    @PutMapping("/cart-items/{itemId}")
+    @PutMapping("/items/{itemId}")
     public ResponseEntity<?> updateCartItemQuantity(
             @PathVariable("id") Long customerId,
             @PathVariable("itemId") Long cartItemId,
@@ -76,12 +55,20 @@ public class CustomerCartController {
         return ResponseEntity.ok(cart);
     }
 
-    @DeleteMapping("/cart-items/{itemId}")
+    @DeleteMapping("/items/{itemId}")
     public ResponseEntity<CartResponseDTO> removeCartItemFromCart(
             @PathVariable("id") Long customerId,
             @PathVariable("itemId") Long cartItemId
     ) {
         CartResponseDTO cart = customerCartService.removeCartItemFromCart(customerId, cartItemId);
+        return ResponseEntity.ok(cart);
+    }
+
+    @DeleteMapping("/items")
+    public ResponseEntity<CartResponseDTO> clearCart(
+            @PathVariable("id") Long customerId
+    ) {
+        CartResponseDTO cart = customerCartService.clearCart(customerId);
         return ResponseEntity.ok(cart);
     }
 }
