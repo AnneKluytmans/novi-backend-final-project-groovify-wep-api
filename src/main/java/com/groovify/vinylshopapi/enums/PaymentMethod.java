@@ -6,5 +6,6 @@ public enum PaymentMethod {
     APPLE_PAY,
     GOOGLE_PAY,
     IDEAL,
-    GIFT_CARD
+    GIFT_CARD,
+    AFTER_PAY
 }

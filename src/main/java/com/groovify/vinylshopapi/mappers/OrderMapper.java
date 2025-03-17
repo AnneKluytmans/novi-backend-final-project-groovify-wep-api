@@ -4,8 +4,7 @@ import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
 import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
 import com.groovify.vinylshopapi.dtos.OrderSummaryResponseDTO;
 import com.groovify.vinylshopapi.models.Order;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -26,4 +25,7 @@ public interface OrderMapper {
     OrderSummaryResponseDTO toOrderSummaryResponseDTO(Order order);
 
     List<OrderSummaryResponseDTO> toOrderSummaryResponseDTOs(List<Order> orders);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateOrder(OrderRequestDTO orderRequestDTO, @MappingTarget Order order);
 }

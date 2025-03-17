@@ -17,12 +17,7 @@ public class OrderRequestDTO {
     @ValidDate(max = "now+9M", mustBeFuture = true, message = "Expected delivery date must be between now and nine months from now")
     private LocalDate expectedDeliveryDate;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    private String email;
-
-    @NotBlank(message = "Recipient name is required")
-    @Size(max = 100, message = "Recipient name cannot exceed 100 characters")
+    @Size(min = 3, max = 100, message = "Recipient name cannot exceed 100 characters")
     private String recipientName;
 
     @NotNull(message = "Shipping cost is required")
@@ -37,7 +32,7 @@ public class OrderRequestDTO {
     @DecimalMax(value = "100.00", message = "Discount percentage cannot exceed 100%")
     private BigDecimal percentageDiscount;
 
-    @Size(max = 200, message = "Note cannot be longer than 200 characters")
+    @Size(min = 3, max = 200, message = "Note cannot be longer than 200 characters")
     private String note;
 
     @NotNull(message = "Payment method is required")

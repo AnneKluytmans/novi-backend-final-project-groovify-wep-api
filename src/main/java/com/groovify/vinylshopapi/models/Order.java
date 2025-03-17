@@ -32,10 +32,6 @@ public class Order {
     @ValidDate(max = "now+9M", mustBeFuture = true, message = "Expected delivery date must be between now and nine months from now")
     private LocalDate expectedDeliveryDate;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    private String email;
-
     @NotBlank(message = "Recipient name is required")
     @Size(max = 100, message = "Recipient name cannot exceed 100 characters")
     private String recipientName;
