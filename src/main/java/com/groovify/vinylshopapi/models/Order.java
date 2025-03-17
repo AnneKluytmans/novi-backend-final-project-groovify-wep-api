@@ -33,7 +33,7 @@ public class Order {
     private LocalDate expectedDeliveryDate;
 
     @NotBlank(message = "Recipient name is required")
-    @Size(max = 100, message = "Recipient name cannot exceed 100 characters")
+    @Size(max = 200, message = "Recipient name cannot exceed 200 characters")
     private String recipientName;
 
     @Column(precision = 10, scale = 2)
@@ -45,16 +45,6 @@ public class Order {
     @NotNull(message = "Shipping cost is required")
     @DecimalMin(value = "0.00", message = "Shipping cost must be positive")
     private BigDecimal shippingCost;
-
-    @Column(precision = 10, scale = 2)
-    @DecimalMin(value = "0.00", message = "Discount amount must be positive")
-    @DecimalMax(value = "2000.00", message = "Discount amount cannot exceed 2000,-")
-    private BigDecimal fixedDiscountAmount;
-
-    @Column(precision = 10, scale = 2)
-    @DecimalMin(value = "0.00", message = "Discount percentage must be at least 0%")
-    @DecimalMax(value = "100.00", message = "Discount percentage cannot exceed 100%")
-    private BigDecimal percentageDiscount;
 
     @Size(max = 200, message = "Note cannot be longer than 200 characters")
     private String note;

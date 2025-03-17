@@ -16,5 +16,5 @@ public class OrderSummaryResponseDTO {
     private LocalDateTime orderDate;
     private BigDecimal totalPrice;
     private OrderStatus orderStatus;
-    private String email;
+    private UserSummaryResponseDTO customer;
 }

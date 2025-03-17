@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.mappers;
 
+import com.groovify.vinylshopapi.dtos.OrderPatchDTO;
 import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
 import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
 import com.groovify.vinylshopapi.dtos.OrderSummaryResponseDTO;
@@ -22,10 +23,11 @@ public interface OrderMapper {
 
     List<OrderResponseDTO> toResponseDTOs(List<Order> orders);
 
+    @Mapping(target = "customer", source = "customer")
     OrderSummaryResponseDTO toOrderSummaryResponseDTO(Order order);
 
     List<OrderSummaryResponseDTO> toOrderSummaryResponseDTOs(List<Order> orders);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateOrder(OrderRequestDTO orderRequestDTO, @MappingTarget Order order);
+    void partialUpdateOrder(OrderPatchDTO orderPatchDTO, @MappingTarget Order order);
 }

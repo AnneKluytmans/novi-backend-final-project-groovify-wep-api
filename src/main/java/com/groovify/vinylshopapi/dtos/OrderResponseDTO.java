@@ -20,11 +20,8 @@ public class OrderResponseDTO {
     private LocalDate expectedDeliveryDate;
     private BigDecimal totalPrice;
     private BigDecimal shippingCost;
-    private BigDecimal fixedDiscountAmount;
-    private BigDecimal percentageDiscount;
     private OrderStatus orderStatus;
     private PaymentMethod paymentMethod;
-    private String email;
     private String recipientName;
     private String note;
     private AddressSummaryResponseDTO shippingAddress;

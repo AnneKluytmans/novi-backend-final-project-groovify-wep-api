@@ -4,7 +4,6 @@ import com.groovify.vinylshopapi.dtos.CartItemRequestDTO;
 import com.groovify.vinylshopapi.dtos.CartItemQuantityUpdateDTO;
 import com.groovify.vinylshopapi.dtos.CartResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.InsufficientStockException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CartItemMapper;
 import com.groovify.vinylshopapi.mappers.CartMapper;
@@ -15,6 +14,7 @@ import com.groovify.vinylshopapi.models.VinylRecord;
 import com.groovify.vinylshopapi.repositories.CartRepository;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
+import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -51,7 +51,7 @@ public class CustomerCartService {
         Cart cart = findOrCreateCart(customerId);
         VinylRecord vinylRecord = findVinylRecord(cartItemRequestDTO.getVinylRecordId());
         validateCartItemNotInCart(cart, vinylRecord);
-        validateVinylRecordStock(vinylRecord, cartItemRequestDTO.getQuantity());
+        ValidationUtils.validateVinylRecordStock(vinylRecord, cartItemRequestDTO.getQuantity());
 
         CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
         cartItem.setVinylRecord(vinylRecord);
@@ -67,7 +67,7 @@ public class CustomerCartService {
         Cart cart = findCart(customerId);
         CartItem cartItem = findCartItem(cart, cartItemId);
 
-        validateVinylRecordStock(cartItem.getVinylRecord(), cartItemQuantityDTO.getNewQuantity());
+        ValidationUtils.validateVinylRecordStock(cartItem.getVinylRecord(), cartItemQuantityDTO.getNewQuantity());
 
         cartItem.setQuantity(cartItemQuantityDTO.getNewQuantity());
         cart.setUpdatedAt(LocalDateTime.now());
@@ -137,18 +137,6 @@ public class CustomerCartService {
         if (alreadyInCart) {
             throw new ConflictException("The vinyl record '" + vinylRecord.getTitle() + "' is already in your cart." +
                     "You can update the quantity of this item." );
-        }
-    }
-
-    private void validateVinylRecordStock(VinylRecord vinylRecord, Integer quantity) {
-        Integer amountInStock = vinylRecord.getStock().getAmountInStock();
-
-        if (amountInStock == 0) {
-            throw new InsufficientStockException("Vinyl record " + vinylRecord.getTitle() + " is sold out");
-        }
-
-        if (amountInStock < quantity) {
-            throw new InsufficientStockException("Only " + amountInStock + " items left of '" + vinylRecord.getTitle() + "'");
         }
     }
 

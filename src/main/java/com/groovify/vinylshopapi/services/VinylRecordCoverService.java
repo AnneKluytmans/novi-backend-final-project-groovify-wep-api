@@ -26,22 +26,19 @@ public class VinylRecordCoverService {
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordCoverRepository vinylRecordCoverRepository;
     private final VinylRecordCoverMapper vinylRecordCoverMapper;
-    private final ValidationUtils validationUtils;
 
     public VinylRecordCoverService(
             VinylRecordRepository vinylRecordRepository,
             VinylRecordCoverRepository vinylRecordCoverRepository,
-            VinylRecordCoverMapper vinylRecordCoverMapper,
-            ValidationUtils validationUtils
+            VinylRecordCoverMapper vinylRecordCoverMapper
     ) {
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordCoverRepository = vinylRecordCoverRepository;
         this.vinylRecordCoverMapper = vinylRecordCoverMapper;
-        this.validationUtils = validationUtils;
     }
 
     public VinylRecordCoverResponseDTO uploadCover(Long vinylRecordId, MultipartFile file, String downloadUrl) throws IOException {
-        validationUtils.validateFile(file, allowedFileTypes);
+        ValidationUtils.validateFile(file, allowedFileTypes);
 
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
