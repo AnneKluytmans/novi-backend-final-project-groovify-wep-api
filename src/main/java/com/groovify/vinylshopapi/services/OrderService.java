@@ -25,25 +25,29 @@ public class OrderService {
     private final VinylRecordRepository vinylRecordRepository;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final CustomerCartService customerCartService;
 
     public OrderService(
             CustomerRepository customerRepository,
             AddressRepository addressRepository,
             VinylRecordRepository vinylRecordRepository,
             OrderRepository orderRepository,
-            OrderMapper orderMapper
+            OrderMapper orderMapper,
+            CustomerCartService customerCartService
     ) {
         this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
         this.vinylRecordRepository = vinylRecordRepository;
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.customerCartService = customerCartService;
     }
 
     public OrderResponseDTO placeOrder(OrderRequestDTO orderRequestDTO) {
         Customer customer = findCustomer(orderRequestDTO.getCustomerId());
-        Cart cart = customer.getCart();
+        validateNoPendingOrders(customer);
 
+        Cart cart = customer.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
             throw new TeapotException("Oops! Your cart is empty, so you can't place an order. Even a teapot needs water to brew any tea.");
         }
@@ -62,27 +66,10 @@ public class OrderService {
         order.setShippingAddress(shippingAddress);
         order.setBillingAddress(billingAddress);
 
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
-        for (CartItem cartItem : cart.getCartItems()) {
-            VinylRecord vinylRecord = cartItem.getVinylRecord();
-            Integer quantity = cartItem.getQuantity();
-
-            decreaseStockAndIncreaseSales(vinylRecord, quantity);
-
-            OrderItem orderItem = new OrderItem();
-            orderItem.setQuantity(quantity);
-            orderItem.setPriceAtPurchase(vinylRecord.getPrice());
-            orderItem.setVinylRecord(vinylRecord);
-            orderItem.setOrder(order);
-
-            order.getOrderItems().add(orderItem);
-
-            totalPrice = totalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(quantity)));
-        }
-
-        totalPrice = totalPrice.add(order.getShippingCost());
+        BigDecimal totalPrice = processOrderItems(order, cart).add(order.getShippingCost());
         order.setTotalPrice(totalPrice);
+
+        customerCartService.clearCart(customer.getId());
 
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toResponseDTO(savedOrder);
@@ -133,6 +120,16 @@ public class OrderService {
         return address;
     }
 
+    private void validateNoPendingOrders(Customer customer) {
+        boolean alreadyPendingOrder = customer.getOrders().stream()
+                .anyMatch(order -> order.getOrderStatus() == OrderStatus.PENDING);
+
+        if (alreadyPendingOrder) {
+            throw new ConflictException("Customer already has an order with the status PENDING. " +
+                    "You'll have to cancel or confirm that order first before placing a new order.");
+        }
+    }
+
     private void decreaseStockAndIncreaseSales(VinylRecord vinylRecord, Integer quantity) {
         ValidationUtils.validateVinylRecordStock(vinylRecord, quantity);
 
@@ -141,5 +138,28 @@ public class OrderService {
         stock.setAmountSold(stock.getAmountSold() + quantity);
 
         vinylRecordRepository.save(vinylRecord);
+    }
+
+    private BigDecimal processOrderItems(Order order, Cart cart) {
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        for (CartItem cartItem : cart.getCartItems()) {
+            VinylRecord vinylRecord = cartItem.getVinylRecord();
+            Integer quantity = cartItem.getQuantity();
+
+            decreaseStockAndIncreaseSales(vinylRecord, quantity);
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setQuantity(quantity);
+            orderItem.setPriceAtPurchase(vinylRecord.getPrice());
+            orderItem.setVinylRecord(vinylRecord);
+            orderItem.setOrder(order);
+
+            order.getOrderItems().add(orderItem);
+
+            totalPrice = totalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(quantity)));
+        }
+
+        return totalPrice;
     }
 }

@@ -3,7 +3,6 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.CartItemRequestDTO;
 import com.groovify.vinylshopapi.dtos.CartItemQuantityUpdateDTO;
 import com.groovify.vinylshopapi.dtos.CartResponseDTO;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CartItemMapper;
 import com.groovify.vinylshopapi.mappers.CartMapper;
@@ -50,13 +49,20 @@ public class CustomerCartService {
     public CartResponseDTO addCartItemToCart(Long customerId, CartItemRequestDTO cartItemRequestDTO) {
         Cart cart = findOrCreateCart(customerId);
         VinylRecord vinylRecord = findVinylRecord(cartItemRequestDTO.getVinylRecordId());
-        validateCartItemNotInCart(cart, vinylRecord);
-        ValidationUtils.validateVinylRecordStock(vinylRecord, cartItemRequestDTO.getQuantity());
+        CartItem existingCartItem = findExistingCartItem(cart, vinylRecord);
 
-        CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
-        cartItem.setVinylRecord(vinylRecord);
-        cartItem.setCart(cart);
-        cart.getCartItems().add(cartItem);
+        if (existingCartItem != null) {
+            int newQuantity = existingCartItem.getQuantity() + cartItemRequestDTO.getQuantity();
+            ValidationUtils.validateVinylRecordStock(vinylRecord, newQuantity);
+            existingCartItem.setQuantity(newQuantity);
+        } else {
+            ValidationUtils.validateVinylRecordStock(vinylRecord, cartItemRequestDTO.getQuantity());
+            CartItem cartItem = cartItemMapper.toEntity(cartItemRequestDTO);
+            cartItem.setVinylRecord(vinylRecord);
+            cartItem.setCart(cart);
+            cart.getCartItems().add(cartItem);
+        }
+
         cart.setUpdatedAt(LocalDateTime.now());
 
         Cart savedCart = cartRepository.save(cart);
@@ -130,14 +136,11 @@ public class CustomerCartService {
                 .orElseThrow(() -> new RecordNotFoundException("Cart item with id " + cartItemId + " not found in this cart"));
     }
 
-    private void validateCartItemNotInCart(Cart cart, VinylRecord vinylRecord) {
-        boolean alreadyInCart = cart.getCartItems().stream()
-                .anyMatch(item -> item.getVinylRecord().equals(vinylRecord));
-
-        if (alreadyInCart) {
-            throw new ConflictException("The vinyl record '" + vinylRecord.getTitle() + "' is already in your cart." +
-                    "You can update the quantity of this item." );
-        }
+    private CartItem findExistingCartItem(Cart cart, VinylRecord vinylRecord) {
+        return cart.getCartItems().stream()
+                .filter(item -> item.getVinylRecord().equals(vinylRecord))
+                .findFirst()
+                .orElse(null);
     }
 
 }
