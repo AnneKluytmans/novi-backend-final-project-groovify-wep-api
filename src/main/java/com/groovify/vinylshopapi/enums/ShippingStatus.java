@@ -1,17 +1,16 @@
 package com.groovify.vinylshopapi.enums;
 
-public enum OrderStatus {
-    PENDING,
-    CANCELLED,
-    FAILED,
-    CONFIRMED_UNPAID,
-    CONFIRMED_PAID,
+public enum ShippingStatus {
     PROCESSING,
     PROCESSED,
     SHIPPED,
     DELIVERED,
+    LOST,
+    DAMAGED,
     RETURN_REQUESTED,
+    RETURN_DECLINED,
+    IN_RETURN,
     RETURNED,
-    REFUNDED
+    CANCELLED,
+    NOT_APPLICABLE,
 }
-

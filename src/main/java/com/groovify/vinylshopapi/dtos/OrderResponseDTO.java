@@ -1,7 +1,9 @@
 package com.groovify.vinylshopapi.dtos;
 
-import com.groovify.vinylshopapi.enums.OrderStatus;
+import com.groovify.vinylshopapi.enums.ConfirmationStatus;
 import com.groovify.vinylshopapi.enums.PaymentMethod;
+import com.groovify.vinylshopapi.enums.PaymentStatus;
+import com.groovify.vinylshopapi.enums.ShippingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,9 @@ public class OrderResponseDTO {
     private LocalDate expectedDeliveryDate;
     private BigDecimal totalPrice;
     private BigDecimal shippingCost;
-    private OrderStatus orderStatus;
+    private ConfirmationStatus confirmationStatus;
+    private PaymentStatus paymentStatus;
+    private ShippingStatus shippingStatus;
     private PaymentMethod paymentMethod;
     private String recipientName;
     private String note;

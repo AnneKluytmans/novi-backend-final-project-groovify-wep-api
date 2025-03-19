@@ -81,6 +81,13 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler(value = InvalidOrderStatusException.class)
+    public ResponseEntity<Object> handleInvalidOrderStatusException(InvalidOrderStatusException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Invalid Order Status", ex.getMessage(), null
+        );
+    }
+
     @ExceptionHandler(value = IOException.class)
     public ResponseEntity<Object> handleIOException(IOException ex) {
         return buildErrorResponse(

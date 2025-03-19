@@ -3,8 +3,11 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.OrderPatchDTO;
 import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
 import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
-import com.groovify.vinylshopapi.enums.OrderStatus;
+import com.groovify.vinylshopapi.enums.ConfirmationStatus;
+import com.groovify.vinylshopapi.enums.PaymentStatus;
+import com.groovify.vinylshopapi.enums.ShippingStatus;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
+import com.groovify.vinylshopapi.exceptions.InvalidOrderStatusException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.exceptions.TeapotException;
 import com.groovify.vinylshopapi.mappers.OrderMapper;
@@ -17,6 +20,8 @@ import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class OrderService {
@@ -43,6 +48,29 @@ public class OrderService {
         this.customerCartService = customerCartService;
     }
 
+    private static final Map<ConfirmationStatus, Set<ConfirmationStatus>> VALID_CONFIRMATION_TRANSITIONS = Map.of(
+            ConfirmationStatus.PENDING, Set.of(ConfirmationStatus.CONFIRMED, ConfirmationStatus.CANCELLED, ConfirmationStatus.FAILED),
+            ConfirmationStatus.FAILED, Set.of(ConfirmationStatus.FAILED, ConfirmationStatus.CONFIRMED),
+            ConfirmationStatus.CONFIRMED, Set.of(ConfirmationStatus.FAILED)
+    );
+
+    private static final Map<PaymentStatus, Set<PaymentStatus>> VALID_PAYMENT_TRANSITIONS = Map.of(
+            PaymentStatus.NOT_APPLICABLE, Set.of(PaymentStatus.UNPAID, PaymentStatus.PAID, PaymentStatus.FAILED),
+            PaymentStatus.UNPAID, Set.of(PaymentStatus.FAILED, PaymentStatus.PAID),
+            PaymentStatus.PAID, Set.of(PaymentStatus.REFUNDED),
+            PaymentStatus.FAILED, Set.of(PaymentStatus.PAID, PaymentStatus.FAILED)
+    );
+
+    private static final Map<ShippingStatus, Set<ShippingStatus>> VALID_SHIPPING_TRANSITIONS = Map.of(
+            ShippingStatus.NOT_APPLICABLE, Set.of(ShippingStatus.PROCESSING, ShippingStatus.CANCELLED),
+            ShippingStatus.PROCESSING, Set.of(ShippingStatus.PROCESSED, ShippingStatus.CANCELLED),
+            ShippingStatus.PROCESSED, Set.of(ShippingStatus.SHIPPED, ShippingStatus.CANCELLED),
+            ShippingStatus.SHIPPED, Set.of(ShippingStatus.DELIVERED, ShippingStatus.LOST),
+            ShippingStatus.DELIVERED, Set.of(ShippingStatus.LOST, ShippingStatus.DAMAGED, ShippingStatus.RETURN_REQUESTED),
+            ShippingStatus.RETURN_REQUESTED, Set.of(ShippingStatus.RETURN_DECLINED, ShippingStatus.IN_RETURN),
+            ShippingStatus.IN_RETURN, Set.of(ShippingStatus.LOST, ShippingStatus.RETURN_DECLINED, ShippingStatus.RETURNED)
+    );
+
     public OrderResponseDTO placeOrder(OrderRequestDTO orderRequestDTO) {
         Customer customer = findCustomer(orderRequestDTO.getCustomerId());
         validateNoPendingOrders(customer);
@@ -56,15 +84,7 @@ public class OrderService {
         Address billingAddress = validateAddress(orderRequestDTO.getBillingAddressId(), customer);
 
         Order order = orderMapper.toEntity(orderRequestDTO);
-
-        if (orderRequestDTO.getRecipientName() == null) {
-            order.setRecipientName(customer.getFirstName() + " " + customer.getLastName());
-        }
-
-        order.setOrderStatus(OrderStatus.PENDING);
-        order.setCustomer(customer);
-        order.setShippingAddress(shippingAddress);
-        order.setBillingAddress(billingAddress);
+        setOrderDefaults(order, customer, orderRequestDTO.getRecipientName(), shippingAddress, billingAddress);
 
         BigDecimal totalPrice = processOrderItems(order, cart).add(order.getShippingCost());
         order.setTotalPrice(totalPrice);
@@ -78,8 +98,8 @@ public class OrderService {
     public OrderResponseDTO updatePendingOrder(Long orderId, OrderPatchDTO orderPatchDTO) {
         Order order = findOrder(orderId);
 
-        if (order.getOrderStatus() != OrderStatus.PENDING) {
-            throw new ConflictException("You can only update orders with a PENDING status.");
+        if (order.getConfirmationStatus() != ConfirmationStatus.PENDING) {
+            throw new ConflictException("You can only update orders with a PENDING confirmation status.");
         }
 
         if (orderPatchDTO.getShippingAddressId() != null) {
@@ -122,11 +142,20 @@ public class OrderService {
 
     private void validateNoPendingOrders(Customer customer) {
         boolean alreadyPendingOrder = customer.getOrders().stream()
-                .anyMatch(order -> order.getOrderStatus() == OrderStatus.PENDING);
+                .anyMatch(order -> order.getConfirmationStatus() == ConfirmationStatus.PENDING);
 
         if (alreadyPendingOrder) {
             throw new ConflictException("Customer already has an order with the status PENDING. " +
                     "You'll have to cancel or confirm that order first before placing a new order.");
+        }
+    }
+
+    private void validateTransition(Enum<?> currentStatus, Enum<?> newStatus, Map<?, Set<?>> validTransitions) {
+        Set<?> allowedTransitions = validTransitions.getOrDefault(currentStatus, Set.of());
+        if (!allowedTransitions.contains(newStatus)) {
+            throw new InvalidOrderStatusException("Cannot change status from " + currentStatus + " to " + newStatus +
+                    ". Allowed transitions from " + currentStatus + " are: " + allowedTransitions
+            );
         }
     }
 
@@ -138,6 +167,19 @@ public class OrderService {
         stock.setAmountSold(stock.getAmountSold() + quantity);
 
         vinylRecordRepository.save(vinylRecord);
+    }
+
+    private void setOrderDefaults(Order order, Customer customer, String recipientName, Address shippingAddress, Address billingAddress) {
+        if (recipientName == null) {
+            order.setRecipientName(customer.getFirstName() + " " + customer.getLastName());
+        }
+
+        order.setConfirmationStatus(ConfirmationStatus.PENDING);
+        order.setPaymentStatus(PaymentStatus.NOT_APPLICABLE);
+        order.setShippingStatus(ShippingStatus.NOT_APPLICABLE);
+        order.setCustomer(customer);
+        order.setShippingAddress(shippingAddress);
+        order.setBillingAddress(billingAddress);
     }
 
     private BigDecimal processOrderItems(Order order, Cart cart) {
@@ -154,7 +196,6 @@ public class OrderService {
             orderItem.setPriceAtPurchase(vinylRecord.getPrice());
             orderItem.setVinylRecord(vinylRecord);
             orderItem.setOrder(order);
-
             order.getOrderItems().add(orderItem);
 
             totalPrice = totalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(quantity)));

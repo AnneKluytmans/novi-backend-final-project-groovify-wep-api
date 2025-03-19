@@ -1,7 +1,9 @@
 package com.groovify.vinylshopapi.models;
 
-import com.groovify.vinylshopapi.enums.OrderStatus;
+import com.groovify.vinylshopapi.enums.ConfirmationStatus;
 import com.groovify.vinylshopapi.enums.PaymentMethod;
+import com.groovify.vinylshopapi.enums.PaymentStatus;
+import com.groovify.vinylshopapi.enums.ShippingStatus;
 import com.groovify.vinylshopapi.validation.ValidDate;
 import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.persistence.*;
@@ -55,9 +57,19 @@ public class Order {
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Order status is required")
-    @ValidEnum(enumClass = OrderStatus.class, message = "Invalid order status")
-    private OrderStatus orderStatus;
+    @NotNull(message = "Confirmation status is required")
+    @ValidEnum(enumClass = ConfirmationStatus.class, message = "Invalid confirmation status")
+    private ConfirmationStatus confirmationStatus;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Payment status is required")
+    @ValidEnum(enumClass = PaymentStatus.class, message = "Invalid payment status")
+    private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Shipping status is required")
+    @ValidEnum(enumClass = ShippingStatus.class, message = "Invalid shipping status")
+    private ShippingStatus shippingStatus;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "shipping_address_id", referencedColumnName = "id", nullable = false)
