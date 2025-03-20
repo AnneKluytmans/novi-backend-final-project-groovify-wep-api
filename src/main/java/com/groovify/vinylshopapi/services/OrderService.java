@@ -163,9 +163,21 @@ public class OrderService {
     }
 
     private void validateStatusUpdates(Order order, OrderStatusUpdateDTO statusDTO) {
-        validateStatusTransition(order.getConfirmationStatus(), statusDTO.getConfirmationStatus(), VALID_CONFIRMATION_TRANSITIONS);
-        validateStatusTransition(order.getPaymentStatus(), statusDTO.getPaymentStatus(), VALID_PAYMENT_TRANSITIONS);
-        validateStatusTransition(order.getShippingStatus(), statusDTO.getShippingStatus(), VALID_SHIPPING_TRANSITIONS);
+        boolean isNewConfirmStatus = statusDTO.getConfirmationStatus() != order.getConfirmationStatus();
+        boolean isNewPaymentStatus = statusDTO.getPaymentStatus() != order.getPaymentStatus();
+        boolean isNewShippingStatus = statusDTO.getShippingStatus() != order.getShippingStatus();
+
+        if (statusDTO.getConfirmationStatus() != null && isNewConfirmStatus) {
+            validateStatusTransition(order.getConfirmationStatus(), statusDTO.getConfirmationStatus(), VALID_CONFIRMATION_TRANSITIONS);
+        }
+
+        if (statusDTO.getPaymentStatus() != null && isNewPaymentStatus) {
+            validateStatusTransition(order.getPaymentStatus(), statusDTO.getPaymentStatus(), VALID_PAYMENT_TRANSITIONS);
+        }
+
+        if (statusDTO.getShippingStatus() != null && isNewShippingStatus) {
+            validateStatusTransition(order.getShippingStatus(), statusDTO.getShippingStatus(), VALID_SHIPPING_TRANSITIONS);
+        }
 
         boolean isNotConfirmed = order.getConfirmationStatus() != ConfirmationStatus.CONFIRMED &&
                                     statusDTO.getConfirmationStatus() != ConfirmationStatus.CONFIRMED;
@@ -180,20 +192,24 @@ public class OrderService {
     }
 
     private void applyStatusChanges(Order order, OrderStatusUpdateDTO statusDTO) {
-        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CANCELLED) {
+        boolean isNewConfirmStatus = statusDTO.getConfirmationStatus() != order.getConfirmationStatus();
+        boolean isNewPaymentStatus = statusDTO.getPaymentStatus() != order.getPaymentStatus();
+        boolean isNewShippingStatus = statusDTO.getShippingStatus() != order.getShippingStatus();
+
+        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CANCELLED && isNewConfirmStatus) {
             restoreStock(order);
         }
 
-        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CONFIRMED) {
+        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CONFIRMED && isNewConfirmStatus) {
             order.setOrderDate(LocalDateTime.now());
             increaseSales(order);
         }
 
-        if (statusDTO.getPaymentStatus() == PaymentStatus.PAID) {
+        if (statusDTO.getPaymentStatus() == PaymentStatus.PAID && isNewPaymentStatus) {
             String createInvoice = "Here comes a method that creates a new invoice.";
         }
 
-        if (statusDTO.getShippingStatus() != null) {
+        if (statusDTO.getShippingStatus() != null && isNewShippingStatus) {
             ShippingStatus newShipping = statusDTO.getShippingStatus();
 
             if (newShipping == ShippingStatus.LOST || newShipping == ShippingStatus.DAMAGED) {
@@ -216,13 +232,13 @@ public class OrderService {
             }
         }
 
-        if (statusDTO.getShippingStatus() != null) {
+        if (statusDTO.getConfirmationStatus() != null && isNewConfirmStatus) {
             order.setConfirmationStatus(statusDTO.getConfirmationStatus());
         }
-        if (statusDTO.getPaymentStatus() != null) {
+        if (statusDTO.getPaymentStatus() != null && isNewPaymentStatus) {
             order.setPaymentStatus(statusDTO.getPaymentStatus());
         }
-        if (statusDTO.getShippingStatus() != null) {
+        if (statusDTO.getShippingStatus() != null && isNewShippingStatus) {
             order.setShippingStatus(statusDTO.getShippingStatus());
         }
     }
