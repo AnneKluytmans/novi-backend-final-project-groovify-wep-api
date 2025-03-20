@@ -28,4 +28,22 @@ public class VinylRecordStock {
     @OneToOne
     @JoinColumn(name = "vinyl_record_id", referencedColumnName = "id", nullable = false, unique = true)
     private VinylRecord vinylRecord;
+
+
+    public void increaseStock(Integer quantity) {
+        amountInStock += quantity;
+    }
+
+    public void decreaseStock(Integer quantity) {
+        amountInStock -= quantity;
+    }
+
+    public void increaseSales(Integer quantity) {
+        amountSold += quantity;
+    }
+
+    public void decreaseSales(Integer quantity) {
+        amountSold -= quantity;
+    }
+
 }

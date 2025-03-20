@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.controllers;
 import com.groovify.vinylshopapi.dtos.OrderPatchDTO;
 import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
 import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
+import com.groovify.vinylshopapi.dtos.OrderStatusUpdateDTO;
 import com.groovify.vinylshopapi.services.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,19 @@ public class OrderController {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
         OrderResponseDTO order = orderService.updatePendingOrder(id, orderPatchDTO);
+        return ResponseEntity.ok(order);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatuses(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderStatusUpdateDTO orderStatusUpdateDTO,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        OrderResponseDTO order = orderService.updateOrderStatuses(id, orderStatusUpdateDTO);
         return ResponseEntity.ok(order);
     }
 

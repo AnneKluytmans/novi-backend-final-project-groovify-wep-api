@@ -16,11 +16,11 @@ import com.groovify.vinylshopapi.models.*;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.OrderRepository;
-import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +28,6 @@ import java.util.Set;
 public class OrderService {
     private final CustomerRepository customerRepository;
     private final AddressRepository addressRepository;
-    private final VinylRecordRepository vinylRecordRepository;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final CustomerCartService customerCartService;
@@ -36,29 +35,26 @@ public class OrderService {
     public OrderService(
             CustomerRepository customerRepository,
             AddressRepository addressRepository,
-            VinylRecordRepository vinylRecordRepository,
             OrderRepository orderRepository,
             OrderMapper orderMapper,
             CustomerCartService customerCartService
     ) {
         this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
-        this.vinylRecordRepository = vinylRecordRepository;
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.customerCartService = customerCartService;
     }
 
     private static final Map<ConfirmationStatus, Set<ConfirmationStatus>> VALID_CONFIRMATION_TRANSITIONS = Map.of(
-            ConfirmationStatus.PENDING, Set.of(ConfirmationStatus.CONFIRMED, ConfirmationStatus.CANCELLED, ConfirmationStatus.FAILED),
-            ConfirmationStatus.FAILED, Set.of(ConfirmationStatus.FAILED, ConfirmationStatus.CONFIRMED),
-            ConfirmationStatus.CONFIRMED, Set.of(ConfirmationStatus.FAILED)
+            ConfirmationStatus.PENDING, Set.of(ConfirmationStatus.CONFIRMED, ConfirmationStatus.CANCELLED)
     );
 
     private static final Map<PaymentStatus, Set<PaymentStatus>> VALID_PAYMENT_TRANSITIONS = Map.of(
             PaymentStatus.NOT_APPLICABLE, Set.of(PaymentStatus.AWAITING_PAYMENT, PaymentStatus.PAID, PaymentStatus.FAILED),
             PaymentStatus.AWAITING_PAYMENT, Set.of(PaymentStatus.FAILED, PaymentStatus.PAID),
             PaymentStatus.PAID, Set.of(PaymentStatus.AWAITING_REFUND, PaymentStatus.REFUNDED),
+            PaymentStatus.AWAITING_REFUND, Set.of(PaymentStatus.REFUNDED),
             PaymentStatus.FAILED, Set.of(PaymentStatus.PAID, PaymentStatus.FAILED)
     );
 
@@ -81,11 +77,10 @@ public class OrderService {
             throw new TeapotException("Oops! Your cart is empty, so you can't place an order. Even a teapot needs water to brew any tea.");
         }
 
-        Address shippingAddress = validateAddress(orderRequestDTO.getShippingAddressId(), customer);
-        Address billingAddress = validateAddress(orderRequestDTO.getBillingAddressId(), customer);
-
         Order order = orderMapper.toEntity(orderRequestDTO);
-        setOrderDefaults(order, customer, orderRequestDTO.getRecipientName(), shippingAddress, billingAddress);
+        setOrderDefaults(order, customer, orderRequestDTO.getRecipientName(),
+                validateAddress(orderRequestDTO.getShippingAddressId(), customer),
+                validateAddress(orderRequestDTO.getBillingAddressId(), customer));
 
         BigDecimal totalPrice = processOrderItems(order, cart).add(order.getShippingCost());
         order.setTotalPrice(totalPrice);
@@ -104,16 +99,24 @@ public class OrderService {
         }
 
         if (orderPatchDTO.getShippingAddressId() != null) {
-            Address shippingAddress = validateAddress(orderPatchDTO.getShippingAddressId(), order.getCustomer());
-            order.setShippingAddress(shippingAddress);
+            order.setShippingAddress(validateAddress(orderPatchDTO.getShippingAddressId(), order.getCustomer()));
         }
 
         if (orderPatchDTO.getBillingAddressId() != null) {
-            Address billingAddress = validateAddress(orderPatchDTO.getBillingAddressId(), order.getCustomer());
-            order.setBillingAddress(billingAddress);
+            order.setBillingAddress(validateAddress(orderPatchDTO.getBillingAddressId(), order.getCustomer()));
         }
 
         orderMapper.partialUpdateOrder(orderPatchDTO, order);
+
+        Order savedOrder = orderRepository.save(order);
+        return orderMapper.toResponseDTO(savedOrder);
+    }
+
+    public OrderResponseDTO updateOrderStatuses(Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO) {
+        Order order = findOrder(orderId);
+
+        validateStatusUpdates(order, orderStatusUpdateDTO);
+        applyStatusChanges(order, orderStatusUpdateDTO);
 
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toResponseDTO(savedOrder);
@@ -137,7 +140,6 @@ public class OrderService {
         if (address.getEmployee() != null || (address.getCustomer() != null && !address.getCustomer().equals(customer))) {
             throw new IllegalArgumentException("Address with id " + addressId + " doesn't belong to this customer");
         }
-
         return address;
     }
 
@@ -152,10 +154,6 @@ public class OrderService {
     }
 
     private <T extends Enum<T>> void validateStatusTransition(T currentStatus, T newStatus, Map<T, Set<T>> validTransitions) {
-        if (currentStatus == newStatus) {
-            return;
-        }
-
         Set<?> allowedTransitions = validTransitions.getOrDefault(currentStatus, Set.of());
         if (!allowedTransitions.contains(newStatus)) {
             throw new InvalidOrderStatusException("Cannot change status from " + currentStatus + " to " + newStatus +
@@ -164,64 +162,99 @@ public class OrderService {
         }
     }
 
-    private void validateAndApplyStatusUpdates(Order order, OrderStatusUpdateDTO orderStatusUpdateDTO) {
-        ConfirmationStatus currentConfirm = order.getConfirmationStatus();
-        PaymentStatus currentPayment = order.getPaymentStatus();
-        ShippingStatus currentShipping = order.getShippingStatus();
+    private void validateStatusUpdates(Order order, OrderStatusUpdateDTO statusDTO) {
+        validateStatusTransition(order.getConfirmationStatus(), statusDTO.getConfirmationStatus(), VALID_CONFIRMATION_TRANSITIONS);
+        validateStatusTransition(order.getPaymentStatus(), statusDTO.getPaymentStatus(), VALID_PAYMENT_TRANSITIONS);
+        validateStatusTransition(order.getShippingStatus(), statusDTO.getShippingStatus(), VALID_SHIPPING_TRANSITIONS);
 
-        ConfirmationStatus newConfirm = orderStatusUpdateDTO.getConfirmationStatus();
-        PaymentStatus newPayment = orderStatusUpdateDTO.getPaymentStatus();
-        ShippingStatus newShipping = orderStatusUpdateDTO.getShippingStatus();
+        boolean isNotConfirmed = order.getConfirmationStatus() != ConfirmationStatus.CONFIRMED &&
+                                    statusDTO.getConfirmationStatus() != ConfirmationStatus.CONFIRMED;
 
-        validateStatusTransition(currentConfirm, newConfirm, VALID_CONFIRMATION_TRANSITIONS);
-        validateStatusTransition(currentPayment, newPayment, VALID_PAYMENT_TRANSITIONS);
-        validateStatusTransition(currentShipping, newShipping, VALID_SHIPPING_TRANSITIONS);
+        boolean hasPaymentOrShippingUpdate = statusDTO.getPaymentStatus() != null ||
+                                                statusDTO.getShippingStatus() != null;
 
-        if (currentConfirm == ConfirmationStatus.CANCELLED ||
-            (currentConfirm == ConfirmationStatus.PENDING &&
-            (newConfirm == null || newConfirm == ConfirmationStatus.PENDING || newConfirm == ConfirmationStatus.CANCELLED)))
-        {
-            if ((newPayment != null && newPayment != PaymentStatus.NOT_APPLICABLE) ||
-                 (newShipping != null && newShipping != ShippingStatus.NOT_APPLICABLE))
-            {
-                throw new InvalidOrderStatusException("When order confirmation status is PENDING or CANCELLED, " +
-                        "payment and shipping statuses cannot be updated.");
-            }
-        }
-
-        if (newPayment == PaymentStatus.FAILED) {
-            if ((newConfirm != ConfirmationStatus.FAILED)) {
-                newConfirm = ConfirmationStatus.FAILED;
-            }
-        }
-
-        if (newShipping == ShippingStatus.LOST || newShipping == ShippingStatus.DAMAGED || newShipping == ShippingStatus.RETURNED) {
-            if (currentPayment == PaymentStatus.PAID || newPayment == PaymentStatus.PAID) {
-                newPayment = PaymentStatus.AWAITING_REFUND;
-            }
-        }
-
-        if (newConfirm != null) {
-            order.setConfirmationStatus(newConfirm);
-        }
-
-        if (newPayment != null) {
-            order.setPaymentStatus(newPayment);
-        }
-
-        if (newShipping != null) {
-            order.setShippingStatus(newShipping);
+        if (isNotConfirmed && hasPaymentOrShippingUpdate) {
+            throw new InvalidOrderStatusException("You can only update the payment and shipment status of orders" +
+                    " with a CONFIRMED confirmation status.");
         }
     }
 
-    private void decreaseStockAndIncreaseSales(VinylRecord vinylRecord, Integer quantity) {
+    private void applyStatusChanges(Order order, OrderStatusUpdateDTO statusDTO) {
+        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CANCELLED) {
+            restoreStock(order);
+        }
+
+        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CONFIRMED) {
+            order.setOrderDate(LocalDateTime.now());
+            increaseSales(order);
+        }
+
+        if (statusDTO.getPaymentStatus() == PaymentStatus.PAID) {
+            String createInvoice = "Here comes a method that creates a new invoice.";
+        }
+
+        if (statusDTO.getShippingStatus() != null) {
+            ShippingStatus newShipping = statusDTO.getShippingStatus();
+
+            if (newShipping == ShippingStatus.LOST || newShipping == ShippingStatus.DAMAGED) {
+                restoreSales(order);
+            }
+
+            if (newShipping == ShippingStatus.RETURNED) {
+                restoreStockAndSales(order);
+            }
+
+            boolean isPaid = order.getPaymentStatus() == PaymentStatus.PAID ||
+                                statusDTO.getPaymentStatus() == PaymentStatus.PAID;
+
+            boolean applicableForRefund = newShipping == ShippingStatus.LOST ||
+                                            newShipping == ShippingStatus.DAMAGED ||
+                                            newShipping == ShippingStatus.RETURNED;
+
+            if (isPaid && applicableForRefund) {
+                statusDTO.setPaymentStatus(PaymentStatus.AWAITING_REFUND);
+            }
+        }
+
+        if (statusDTO.getShippingStatus() != null) {
+            order.setConfirmationStatus(statusDTO.getConfirmationStatus());
+        }
+        if (statusDTO.getPaymentStatus() != null) {
+            order.setPaymentStatus(statusDTO.getPaymentStatus());
+        }
+        if (statusDTO.getShippingStatus() != null) {
+            order.setShippingStatus(statusDTO.getShippingStatus());
+        }
+    }
+
+    private void decreaseStock(VinylRecord vinylRecord, Integer quantity) {
         ValidationUtils.validateVinylRecordStock(vinylRecord, quantity);
+        vinylRecord.getStock().decreaseStock(quantity);
+    }
 
-        VinylRecordStock stock = vinylRecord.getStock();
-        stock.setAmountInStock(stock.getAmountInStock() - quantity);
-        stock.setAmountSold(stock.getAmountSold() + quantity);
+    private void increaseSales(Order order) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+            orderItem.getVinylRecord().getStock().increaseSales(orderItem.getQuantity());
+        }
+    }
 
-        vinylRecordRepository.save(vinylRecord);
+    private void restoreStock(Order order) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+           orderItem.getVinylRecord().getStock().increaseStock(orderItem.getQuantity());
+        }
+    }
+
+    private void restoreSales(Order order) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+            orderItem.getVinylRecord().getStock().decreaseSales(orderItem.getQuantity());
+        }
+    }
+
+    private void restoreStockAndSales(Order order) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+            orderItem.getVinylRecord().getStock().increaseStock(orderItem.getQuantity());
+            orderItem.getVinylRecord().getStock().decreaseSales(orderItem.getQuantity());
+        }
     }
 
     private void setOrderDefaults(Order order, Customer customer, String recipientName, Address shippingAddress, Address billingAddress) {
@@ -242,18 +275,16 @@ public class OrderService {
 
         for (CartItem cartItem : cart.getCartItems()) {
             VinylRecord vinylRecord = cartItem.getVinylRecord();
-            Integer quantity = cartItem.getQuantity();
-
-            decreaseStockAndIncreaseSales(vinylRecord, quantity);
+            decreaseStock(vinylRecord, cartItem.getQuantity());
 
             OrderItem orderItem = new OrderItem();
-            orderItem.setQuantity(quantity);
+            orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPriceAtPurchase(vinylRecord.getPrice());
             orderItem.setVinylRecord(vinylRecord);
             orderItem.setOrder(order);
-            order.getOrderItems().add(orderItem);
 
-            totalPrice = totalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(quantity)));
+            order.getOrderItems().add(orderItem);
+            totalPrice = totalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
         }
 
         return totalPrice;
