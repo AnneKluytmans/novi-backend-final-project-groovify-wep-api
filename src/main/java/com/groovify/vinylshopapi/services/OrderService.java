@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.OrderPatchDTO;
 import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
 import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
+import com.groovify.vinylshopapi.dtos.OrderStatusUpdateDTO;
 import com.groovify.vinylshopapi.enums.ConfirmationStatus;
 import com.groovify.vinylshopapi.enums.PaymentStatus;
 import com.groovify.vinylshopapi.enums.ShippingStatus;
@@ -55,16 +56,16 @@ public class OrderService {
     );
 
     private static final Map<PaymentStatus, Set<PaymentStatus>> VALID_PAYMENT_TRANSITIONS = Map.of(
-            PaymentStatus.NOT_APPLICABLE, Set.of(PaymentStatus.UNPAID, PaymentStatus.PAID, PaymentStatus.FAILED),
-            PaymentStatus.UNPAID, Set.of(PaymentStatus.FAILED, PaymentStatus.PAID),
-            PaymentStatus.PAID, Set.of(PaymentStatus.REFUNDED),
+            PaymentStatus.NOT_APPLICABLE, Set.of(PaymentStatus.AWAITING_PAYMENT, PaymentStatus.PAID, PaymentStatus.FAILED),
+            PaymentStatus.AWAITING_PAYMENT, Set.of(PaymentStatus.FAILED, PaymentStatus.PAID),
+            PaymentStatus.PAID, Set.of(PaymentStatus.AWAITING_REFUND, PaymentStatus.REFUNDED),
             PaymentStatus.FAILED, Set.of(PaymentStatus.PAID, PaymentStatus.FAILED)
     );
 
     private static final Map<ShippingStatus, Set<ShippingStatus>> VALID_SHIPPING_TRANSITIONS = Map.of(
-            ShippingStatus.NOT_APPLICABLE, Set.of(ShippingStatus.PROCESSING, ShippingStatus.CANCELLED),
-            ShippingStatus.PROCESSING, Set.of(ShippingStatus.PROCESSED, ShippingStatus.CANCELLED),
-            ShippingStatus.PROCESSED, Set.of(ShippingStatus.SHIPPED, ShippingStatus.CANCELLED),
+            ShippingStatus.NOT_APPLICABLE, Set.of(ShippingStatus.PROCESSING),
+            ShippingStatus.PROCESSING, Set.of(ShippingStatus.PROCESSED),
+            ShippingStatus.PROCESSED, Set.of(ShippingStatus.SHIPPED),
             ShippingStatus.SHIPPED, Set.of(ShippingStatus.DELIVERED, ShippingStatus.LOST),
             ShippingStatus.DELIVERED, Set.of(ShippingStatus.LOST, ShippingStatus.DAMAGED, ShippingStatus.RETURN_REQUESTED),
             ShippingStatus.RETURN_REQUESTED, Set.of(ShippingStatus.RETURN_DECLINED, ShippingStatus.IN_RETURN),
@@ -150,12 +151,66 @@ public class OrderService {
         }
     }
 
-    private void validateTransition(Enum<?> currentStatus, Enum<?> newStatus, Map<?, Set<?>> validTransitions) {
+    private <T extends Enum<T>> void validateStatusTransition(T currentStatus, T newStatus, Map<T, Set<T>> validTransitions) {
+        if (currentStatus == newStatus) {
+            return;
+        }
+
         Set<?> allowedTransitions = validTransitions.getOrDefault(currentStatus, Set.of());
         if (!allowedTransitions.contains(newStatus)) {
             throw new InvalidOrderStatusException("Cannot change status from " + currentStatus + " to " + newStatus +
                     ". Allowed transitions from " + currentStatus + " are: " + allowedTransitions
             );
+        }
+    }
+
+    private void validateAndApplyStatusUpdates(Order order, OrderStatusUpdateDTO orderStatusUpdateDTO) {
+        ConfirmationStatus currentConfirm = order.getConfirmationStatus();
+        PaymentStatus currentPayment = order.getPaymentStatus();
+        ShippingStatus currentShipping = order.getShippingStatus();
+
+        ConfirmationStatus newConfirm = orderStatusUpdateDTO.getConfirmationStatus();
+        PaymentStatus newPayment = orderStatusUpdateDTO.getPaymentStatus();
+        ShippingStatus newShipping = orderStatusUpdateDTO.getShippingStatus();
+
+        validateStatusTransition(currentConfirm, newConfirm, VALID_CONFIRMATION_TRANSITIONS);
+        validateStatusTransition(currentPayment, newPayment, VALID_PAYMENT_TRANSITIONS);
+        validateStatusTransition(currentShipping, newShipping, VALID_SHIPPING_TRANSITIONS);
+
+        if (currentConfirm == ConfirmationStatus.CANCELLED ||
+            (currentConfirm == ConfirmationStatus.PENDING &&
+            (newConfirm == null || newConfirm == ConfirmationStatus.PENDING || newConfirm == ConfirmationStatus.CANCELLED)))
+        {
+            if ((newPayment != null && newPayment != PaymentStatus.NOT_APPLICABLE) ||
+                 (newShipping != null && newShipping != ShippingStatus.NOT_APPLICABLE))
+            {
+                throw new InvalidOrderStatusException("When order confirmation status is PENDING or CANCELLED, " +
+                        "payment and shipping statuses cannot be updated.");
+            }
+        }
+
+        if (newPayment == PaymentStatus.FAILED) {
+            if ((newConfirm != ConfirmationStatus.FAILED)) {
+                newConfirm = ConfirmationStatus.FAILED;
+            }
+        }
+
+        if (newShipping == ShippingStatus.LOST || newShipping == ShippingStatus.DAMAGED || newShipping == ShippingStatus.RETURNED) {
+            if (currentPayment == PaymentStatus.PAID || newPayment == PaymentStatus.PAID) {
+                newPayment = PaymentStatus.AWAITING_REFUND;
+            }
+        }
+
+        if (newConfirm != null) {
+            order.setConfirmationStatus(newConfirm);
+        }
+
+        if (newPayment != null) {
+            order.setPaymentStatus(newPayment);
+        }
+
+        if (newShipping != null) {
+            order.setShippingStatus(newShipping);
         }
     }
 

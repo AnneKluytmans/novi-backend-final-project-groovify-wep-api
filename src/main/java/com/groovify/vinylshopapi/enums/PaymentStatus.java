@@ -2,7 +2,8 @@ package com.groovify.vinylshopapi.enums;
 
 public enum PaymentStatus {
     PAID,
-    UNPAID,
+    AWAITING_PAYMENT,
+    AWAITING_REFUND,
     REFUNDED,
     FAILED,
     NOT_APPLICABLE
