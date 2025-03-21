@@ -20,7 +20,7 @@ public class OrderResponseDTO {
     private Long id;
     private LocalDateTime orderDate;
     private LocalDate expectedDeliveryDate;
-    private BigDecimal totalPrice;
+    private BigDecimal subTotalPrice;
     private BigDecimal shippingCost;
     private ConfirmationStatus confirmationStatus;
     private PaymentStatus paymentStatus;

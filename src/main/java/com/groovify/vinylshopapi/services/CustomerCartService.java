@@ -122,9 +122,7 @@ public class CustomerCartService {
     private Cart findOrCreateCart(Long customerId) {
         return cartRepository.findByCustomerId(customerId)
                 .orElseGet(() -> {
-                    Cart newCart = new Cart();
-                    newCart.setCustomer(findCustomer(customerId));
-                    newCart.setCreatedAt(LocalDateTime.now());
+                    Cart newCart = new Cart(findCustomer(customerId));
                     return cartRepository.save(newCart);
                 });
     }

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class OrderSummaryResponseDTO {
     private Long id;
     private LocalDateTime orderDate;
-    private BigDecimal totalPrice;
+    private BigDecimal subTotalPrice;
     private ConfirmationStatus confirmationStatus;
     private PaymentStatus paymentStatus;
     private ShippingStatus shippingStatus;

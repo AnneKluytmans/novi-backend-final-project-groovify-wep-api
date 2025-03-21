@@ -46,18 +46,12 @@ public class VinylRecordCoverService {
             throw new ConflictException("Vinyl record with id " + vinylRecordId + " already has a cover");
         }
 
-        VinylRecordCover cover = new VinylRecordCover();
-        cover.setFilename(file.getOriginalFilename());
-        cover.setFileType(file.getContentType());
-        cover.setDownloadUrl(downloadUrl);
-        cover.setData(file.getBytes());
+        VinylRecordCover cover = new VinylRecordCover(file, downloadUrl);
 
-        VinylRecordCover savedCover = vinylRecordCoverRepository.save(cover);
-
-        vinylRecord.setCover(savedCover);
+        vinylRecord.setCover(cover);
         vinylRecordRepository.save(vinylRecord);
 
-        return vinylRecordCoverMapper.toResponseDTO(savedCover);
+        return vinylRecordCoverMapper.toResponseDTO(cover);
     }
 
     public VinylRecordCoverDownloadDTO downloadCover(Long vinylRecordId) {

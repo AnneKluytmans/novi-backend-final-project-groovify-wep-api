@@ -35,4 +35,12 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
     private Order order;
+
+
+    public OrderItem(Integer quantity, VinylRecord vinylRecord, Order order ) {
+        this.quantity = quantity;
+        this.priceAtPurchase = vinylRecord.getPrice();
+        this.vinylRecord = vinylRecord;
+        this.order = order;
+    }
 }

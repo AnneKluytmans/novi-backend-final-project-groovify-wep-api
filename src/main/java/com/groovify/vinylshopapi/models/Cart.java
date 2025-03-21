@@ -28,4 +28,10 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
+
+
+    public Cart(Customer customer) {
+        this.createdAt = LocalDateTime.now();
+        this.customer = customer;
+    }
 }

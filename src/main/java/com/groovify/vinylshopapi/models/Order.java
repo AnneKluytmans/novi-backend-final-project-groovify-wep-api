@@ -41,7 +41,7 @@ public class Order {
     @Column(precision = 10, scale = 2)
     @NotNull(message = "Total price is required")
     @DecimalMin(value = "0.00", message = "Price must be positive")
-    private BigDecimal totalPrice;
+    private BigDecimal subTotalPrice;
 
     @Column(precision = 10, scale = 2)
     @NotNull(message = "Shipping cost is required")
@@ -85,4 +85,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Invoice invoice;
 }

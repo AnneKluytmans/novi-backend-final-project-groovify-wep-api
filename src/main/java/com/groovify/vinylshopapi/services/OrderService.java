@@ -82,8 +82,7 @@ public class OrderService {
                 validateAddress(orderRequestDTO.getShippingAddressId(), customer),
                 validateAddress(orderRequestDTO.getBillingAddressId(), customer));
 
-        BigDecimal totalPrice = processOrderItems(order, cart).add(order.getShippingCost());
-        order.setTotalPrice(totalPrice);
+        order.setSubTotalPrice(processOrderItems(order, cart));
 
         customerCartService.clearCart(customer.getId());
 
@@ -206,7 +205,8 @@ public class OrderService {
         }
 
         if (statusDTO.getPaymentStatus() == PaymentStatus.PAID && isNewPaymentStatus) {
-            String createInvoice = "Here comes a method that creates a new invoice.";
+            Invoice invoice = new Invoice(order);
+            order.setInvoice(invoice);
         }
 
         if (statusDTO.getShippingStatus() != null && isNewShippingStatus) {
@@ -287,22 +287,18 @@ public class OrderService {
     }
 
     private BigDecimal processOrderItems(Order order, Cart cart) {
-        BigDecimal totalPrice = BigDecimal.ZERO;
+        BigDecimal subTotalPrice = BigDecimal.ZERO;
 
         for (CartItem cartItem : cart.getCartItems()) {
             VinylRecord vinylRecord = cartItem.getVinylRecord();
             decreaseStock(vinylRecord, cartItem.getQuantity());
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPriceAtPurchase(vinylRecord.getPrice());
-            orderItem.setVinylRecord(vinylRecord);
-            orderItem.setOrder(order);
-
+            OrderItem orderItem = new OrderItem(cartItem.getQuantity(), vinylRecord, order);
             order.getOrderItems().add(orderItem);
-            totalPrice = totalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
+
+            subTotalPrice = subTotalPrice.add(vinylRecord.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
         }
 
-        return totalPrice;
+        return subTotalPrice;
     }
 }
