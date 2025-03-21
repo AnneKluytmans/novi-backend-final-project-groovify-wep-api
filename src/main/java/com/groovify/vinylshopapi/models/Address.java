@@ -47,4 +47,15 @@ public class Address {
     @OneToOne
     @JoinColumn(name = "employee_id", unique = true)
     private Employee employee;
+
+    @OneToOne(mappedBy = "shippingAddress")
+    private Order shippingOrder;
+
+    @OneToOne(mappedBy = "billingAddress")
+    private Order billingOrder;
+
+
+    public boolean isStandAlone() {
+        return customer == null && employee == null && shippingOrder == null && billingOrder == null;
+    }
 }

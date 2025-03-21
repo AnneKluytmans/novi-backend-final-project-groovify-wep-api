@@ -28,8 +28,8 @@ public class OrderResponseDTO {
     private PaymentMethod paymentMethod;
     private String recipientName;
     private String note;
-    private AddressSummaryResponseDTO shippingAddress;
-    private AddressSummaryResponseDTO billingAddress;
+    private AddressResponseDTO shippingAddress;
+    private AddressResponseDTO billingAddress;
     private UserSummaryResponseDTO customer;
     private List<OrderItemResponseDTO> orderItems;
 }

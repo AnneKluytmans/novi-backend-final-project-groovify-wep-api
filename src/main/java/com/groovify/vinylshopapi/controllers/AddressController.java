@@ -1,10 +1,15 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
 import com.groovify.vinylshopapi.services.AddressService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 
@@ -52,6 +57,30 @@ public class AddressController {
                 country, city, postalCode, sortBy, sortOrder
         );
         return ResponseEntity.ok(addresses);
+    }
+
+    @PostMapping()
+    public ResponseEntity<?> createOrderAddress(
+            @Valid @RequestBody AddressRequestDTO addressRequestDTO,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        AddressResponseDTO newAddress = addressService.createOrderAddress(addressRequestDTO);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newAddress.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(newAddress);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrderAddress(
+            @PathVariable Long id
+    ) {
+        addressService.deleteOrderAddress(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

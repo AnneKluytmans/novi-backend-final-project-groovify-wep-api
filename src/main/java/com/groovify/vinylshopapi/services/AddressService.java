@@ -1,6 +1,9 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
+import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
+import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
 import com.groovify.vinylshopapi.models.Address;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
@@ -65,7 +68,29 @@ public class AddressService {
         return addressMapper.toResponseDTOs(addresses);
     }
 
+    public AddressResponseDTO createOrderAddress(AddressRequestDTO addressRequestDTO) {
+        Address address = addressMapper.toEntity(addressRequestDTO);
+        return addressMapper.toResponseDTO(addressRepository.save(address));
+    }
+
+    public void deleteOrderAddress(Long id) {
+        Address address = findAddress(id);
+        validateIsStandAloneAddress(address);
+        addressRepository.delete(address);
+    }
+
     private Sort getAddressesSort(String sortBy, String sortOrder) {
         return SortHelper.getSort(sortBy, sortOrder, List.of("id", "country", "city", "postalCode"));
+    }
+
+    private Address findAddress(Long addressId) {
+        return addressRepository.findById(addressId)
+                .orElseThrow(() -> new RecordNotFoundException("Address with id " + addressId + " not found"));
+    }
+
+    private void validateIsStandAloneAddress(Address address) {
+        if (!address.isStandAlone()) {
+            throw new DeleteOperationException("This address cannot be deleted as it is still in use by a user and/or order.");
+        }
     }
 }

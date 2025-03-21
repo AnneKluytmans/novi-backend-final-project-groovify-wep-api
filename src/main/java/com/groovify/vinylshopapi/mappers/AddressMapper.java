@@ -2,8 +2,8 @@ package com.groovify.vinylshopapi.mappers;
 
 import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
+import com.groovify.vinylshopapi.dtos.CustomerAddressResponseDTO;
 import com.groovify.vinylshopapi.dtos.CustomerAddressRequestDTO;
-import com.groovify.vinylshopapi.dtos.AddressSummaryResponseDTO;
 import com.groovify.vinylshopapi.models.Address;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,7 +22,9 @@ public interface AddressMapper {
 
     List<AddressResponseDTO> toResponseDTOs(List<Address> addresses);
 
-    AddressSummaryResponseDTO toSummaryResponseDTO(Address address);
+    CustomerAddressResponseDTO toCustomerResponseDTO(Address address);
+
+    List<CustomerAddressResponseDTO> toCustomerResponseDTOs(List<Address> addresses);
 
     void updateAddress(AddressRequestDTO addressRequestDTO, @MappingTarget Address address);
 }

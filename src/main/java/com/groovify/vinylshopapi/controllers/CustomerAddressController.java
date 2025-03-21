@@ -22,19 +22,19 @@ public class CustomerAddressController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AddressResponseDTO>> getCustomerAddresses(
+    public ResponseEntity<List<CustomerAddressResponseDTO>> getCustomerAddresses(
             @PathVariable("id") Long customerId
     ) {
-        List<AddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
+        List<CustomerAddressResponseDTO> addresses = customerAddressService.getCustomerAddresses(customerId);
         return ResponseEntity.ok(addresses);
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<AddressResponseDTO> getCustomerAddress(
+    public ResponseEntity<CustomerAddressResponseDTO> getCustomerAddress(
             @PathVariable("id") Long customerId,
             @PathVariable("addressId") Long addressId
     ) {
-        AddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
+        CustomerAddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
         return ResponseEntity.ok(address);
     }
 
@@ -56,7 +56,7 @@ public class CustomerAddressController {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        AddressResponseDTO newAddress = customerAddressService.createCustomerAddress(customerId, addressRequestDTO);
+        CustomerAddressResponseDTO newAddress = customerAddressService.createCustomerAddress(customerId, addressRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{addressId}")
                 .buildAndExpand(newAddress.getId())
@@ -74,7 +74,7 @@ public class CustomerAddressController {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        AddressResponseDTO updatedAddress = customerAddressService.updateCustomerAddress(customerId, addressId, addressRequestDTO);
+        CustomerAddressResponseDTO updatedAddress = customerAddressService.updateCustomerAddress(customerId, addressId, addressRequestDTO);
         return ResponseEntity.ok(updatedAddress);
     }
 
