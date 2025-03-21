@@ -55,7 +55,11 @@ public class Address {
     private Order billingOrder;
 
 
+    public boolean isOrderAddress() {
+        return shippingOrder != null || billingOrder != null;
+    }
+
     public boolean isStandAlone() {
-        return customer == null && employee == null && shippingOrder == null && billingOrder == null;
+        return customer == null && employee == null && !isOrderAddress();
     }
 }

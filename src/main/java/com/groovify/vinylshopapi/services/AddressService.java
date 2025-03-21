@@ -68,12 +68,12 @@ public class AddressService {
         return addressMapper.toResponseDTOs(addresses);
     }
 
-    public AddressResponseDTO createOrderAddress(AddressRequestDTO addressRequestDTO) {
+    public AddressResponseDTO createStandAloneAddress(AddressRequestDTO addressRequestDTO) {
         Address address = addressMapper.toEntity(addressRequestDTO);
         return addressMapper.toResponseDTO(addressRepository.save(address));
     }
 
-    public void deleteOrderAddress(Long id) {
+    public void deleteStandAloneAddress(Long id) {
         Address address = findAddress(id);
         validateIsStandAloneAddress(address);
         addressRepository.delete(address);

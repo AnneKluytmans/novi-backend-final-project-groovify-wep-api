@@ -60,14 +60,14 @@ public class AddressController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createOrderAddress(
+    public ResponseEntity<?> createStandAloneAddress(
             @Valid @RequestBody AddressRequestDTO addressRequestDTO,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        AddressResponseDTO newAddress = addressService.createOrderAddress(addressRequestDTO);
+        AddressResponseDTO newAddress = addressService.createStandAloneAddress(addressRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(newAddress.getId())
@@ -76,10 +76,10 @@ public class AddressController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrderAddress(
+    public ResponseEntity<Void> deleteStandAloneAddress(
             @PathVariable Long id
     ) {
-        addressService.deleteOrderAddress(id);
+        addressService.deleteStandAloneAddress(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -79,10 +79,15 @@ public class CustomerAddressService {
 
     public CustomerAddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {
         Address address = validateCustomerAndAddress(customerId, addressId);
+        Address savedAddress;
 
-        addressMapper.updateAddress(addressRequestDTO, address);
+        if (address.isOrderAddress()) {
+           savedAddress = updateOrderAddress(address, addressRequestDTO);
+        } else {
+            addressMapper.updateAddress(addressRequestDTO, address);
+            savedAddress = addressRepository.save(address);
+        }
 
-        Address savedAddress = addressRepository.save(address);
         return addressMapper.toCustomerResponseDTO(savedAddress);
     }
 
@@ -105,9 +110,13 @@ public class CustomerAddressService {
                 addressRepository.save(newDefaultAddress);
             }
         }
-        addressRepository.delete(address);
-    }
 
+        if (address.isOrderAddress()) {
+            customerAddresses.remove(address);
+        } else {
+            addressRepository.delete(address);
+        }
+    }
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
@@ -125,6 +134,16 @@ public class CustomerAddressService {
         }
 
         return address;
+    }
+
+    private Address updateOrderAddress(Address address, AddressRequestDTO addressRequestDTO) {
+        Address newAddress = addressMapper.toEntity(addressRequestDTO);
+        newAddress.setCustomer(address.getCustomer());
+
+        address.setCustomer(null);
+        addressRepository.save(address);
+
+        return addressRepository.save(newAddress);
     }
 
     private void updateDefaultAddress(List<Address> addresses, DefaultAddressesRequestDTO addressRequestDTO, Address newDefaultAddress) {
