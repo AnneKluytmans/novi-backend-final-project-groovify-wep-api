@@ -37,6 +37,7 @@ public class AddressService {
             Boolean inactiveUsers,
             Boolean isShipping,
             Boolean isBilling,
+            Boolean isStandAlone,
             String country,
             String city,
             String postalCode,
@@ -46,7 +47,7 @@ public class AddressService {
         Sort sort = getAddressesSort(sortBy, sortOrder);
         Specification<Address> specification = AddressSpecification.filterAddresses(
                 addressId, customerId, employeeId, userType, inactiveUsers, isShipping, isBilling,
-                country, city, postalCode
+                isStandAlone, country, city, postalCode
         );
         List<Address> addresses = addressRepository.findAll(specification, sort);
         return addressMapper.toResponseDTOs(addresses);
@@ -62,7 +63,7 @@ public class AddressService {
         Sort sort = getAddressesSort(sortBy, sortOrder);
         Specification<Address> specification = AddressSpecification.filterAddresses(
                 null, null, null, "customer", false,
-                true, null, country, city, postalCode
+                true, null, null, country, city, postalCode
         );
         List<Address> addresses = addressRepository.findAll(specification, sort);
         return addressMapper.toResponseDTOs(addresses);

@@ -32,6 +32,7 @@ public class AddressController {
             @RequestParam(defaultValue = "false") Boolean inactiveUsers,
             @RequestParam(required = false) Boolean isShipping,
             @RequestParam(required = false) Boolean isBilling,
+            @RequestParam(required = false) Boolean isStandAlone,
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String postalCode,
@@ -39,8 +40,8 @@ public class AddressController {
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<AddressResponseDTO> addresses = addressService.getAddresses(
-                addressId, customerId, employeeId, userType, inactiveUsers,
-                isShipping, isBilling, country, city, postalCode, sortBy, sortOrder
+                addressId, customerId, employeeId, userType, inactiveUsers, isShipping, isBilling,
+                isStandAlone, country, city, postalCode, sortBy, sortOrder
         );
         return ResponseEntity.ok(addresses);
     }
