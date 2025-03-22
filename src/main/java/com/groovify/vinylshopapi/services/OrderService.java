@@ -7,10 +7,7 @@ import com.groovify.vinylshopapi.dtos.OrderStatusUpdateDTO;
 import com.groovify.vinylshopapi.enums.ConfirmationStatus;
 import com.groovify.vinylshopapi.enums.PaymentStatus;
 import com.groovify.vinylshopapi.enums.ShippingStatus;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.InvalidOrderStatusException;
-import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
-import com.groovify.vinylshopapi.exceptions.TeapotException;
+import com.groovify.vinylshopapi.exceptions.*;
 import com.groovify.vinylshopapi.mappers.OrderMapper;
 import com.groovify.vinylshopapi.models.*;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
@@ -21,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +45,7 @@ public class OrderService {
     }
 
     private static final Map<ConfirmationStatus, Set<ConfirmationStatus>> VALID_CONFIRMATION_TRANSITIONS = Map.of(
-            ConfirmationStatus.PENDING, Set.of(ConfirmationStatus.CONFIRMED, ConfirmationStatus.CANCELLED)
+            ConfirmationStatus.PENDING, Set.of(ConfirmationStatus.CONFIRMED)
     );
 
     private static final Map<PaymentStatus, Set<PaymentStatus>> VALID_PAYMENT_TRANSITIONS = Map.of(
@@ -70,7 +68,7 @@ public class OrderService {
 
     public OrderResponseDTO placeOrder(OrderRequestDTO orderRequestDTO) {
         Customer customer = findCustomer(orderRequestDTO.getCustomerId());
-        validateNoPendingOrders(customer);
+        validateNoExistingPendingOrder(customer);
 
         Cart cart = customer.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
@@ -97,6 +95,9 @@ public class OrderService {
             throw new ConflictException("You can only update orders with a PENDING confirmation status.");
         }
 
+        Address oldShippingAddress = order.getShippingAddress();
+        Address oldBillingAddress = order.getBillingAddress();
+
         if (orderPatchDTO.getShippingAddressId() != null) {
             order.setShippingAddress(validateAddress(orderPatchDTO.getShippingAddressId(), order.getCustomer()));
         }
@@ -108,6 +109,8 @@ public class OrderService {
         orderMapper.partialUpdateOrder(orderPatchDTO, order);
 
         Order savedOrder = orderRepository.save(order);
+        deleteIfStandAloneAddress(oldShippingAddress, oldBillingAddress);
+
         return orderMapper.toResponseDTO(savedOrder);
     }
 
@@ -121,34 +124,72 @@ public class OrderService {
         return orderMapper.toResponseDTO(savedOrder);
     }
 
+    public void cancelOrder(Long orderId) {
+        Order order = findOrder(orderId);
+
+        if (order.getConfirmationStatus() != ConfirmationStatus.PENDING) {
+            throw new ConflictException("Only pending orders can be cancelled.");
+        }
+
+        Address shippingAddress = order.getShippingAddress();
+        Address billingAddress = order.getBillingAddress();
+
+        restoreStock(order);
+
+        orderRepository.delete(order);
+        deleteIfStandAloneAddress(shippingAddress, billingAddress);
+    }
+
+    public void deactivateOrder(Long orderId) {
+        Order order = findOrder(orderId);
+
+        if (order.getConfirmationStatus() != ConfirmationStatus.CONFIRMED) {
+            throw new DeleteOperationException("You can only deactivate orders with a CONFIRMED confirmation status.");
+        }
+        order.setIsDeleted(true);
+        order.setDeletedAt(LocalDateTime.now());
+
+        orderRepository.save(order);
+    }
+
+    public void reactivateOrder(Long orderId) {
+        Order order = orderRepository.findByIdAndIsDeletedTrue(orderId)
+                .orElseThrow(() -> new RecordNotFoundException("No deactivated order found with id: " + orderId));
+
+        order.setIsDeleted(false);
+        order.setDeletedAt(null);
+
+        orderRepository.save(order);
+    }
+
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with id: " + customerId));
     }
 
     private Order findOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RecordNotFoundException("Order with id " + orderId + " not found"));
+        return orderRepository.findByIdAndIsDeletedFalse(orderId)
+                .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId));
     }
 
     private Address validateAddress(Long addressId, Customer customer) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new RecordNotFoundException("Address with id " + addressId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No address found with id: " + addressId));
 
         if (address.getEmployee() != null || (address.getCustomer() != null && !address.getCustomer().equals(customer))) {
-            throw new IllegalArgumentException("Address with id " + addressId + " doesn't belong to this customer");
+            throw new IllegalArgumentException("Address with id: '" + addressId + "' doesn't belong to this customer");
         }
         return address;
     }
 
-    private void validateNoPendingOrders(Customer customer) {
-        boolean alreadyPendingOrder = customer.getOrders().stream()
+    private void validateNoExistingPendingOrder(Customer customer) {
+        boolean existingPendingOrder = customer.getOrders().stream()
                 .anyMatch(order -> order.getConfirmationStatus() == ConfirmationStatus.PENDING);
 
-        if (alreadyPendingOrder) {
+        if (existingPendingOrder) {
             throw new ConflictException("Customer already has an order with the status PENDING. " +
-                    "You'll have to cancel or confirm that order first before placing a new order.");
+                    "You'll have to cancel or confirm that order before placing a new order.");
         }
     }
 
@@ -194,10 +235,6 @@ public class OrderService {
         boolean isNewConfirmStatus = statusDTO.getConfirmationStatus() != order.getConfirmationStatus();
         boolean isNewPaymentStatus = statusDTO.getPaymentStatus() != order.getPaymentStatus();
         boolean isNewShippingStatus = statusDTO.getShippingStatus() != order.getShippingStatus();
-
-        if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CANCELLED && isNewConfirmStatus) {
-            restoreStock(order);
-        }
 
         if (statusDTO.getConfirmationStatus() == ConfirmationStatus.CONFIRMED && isNewConfirmStatus) {
             order.setOrderDate(LocalDateTime.now());
@@ -300,5 +337,13 @@ public class OrderService {
         }
 
         return subTotalPrice;
+    }
+
+    private void deleteIfStandAloneAddress(Address... addresses) {
+        for (Address address : addresses) {
+            if (address.isStandAlone()) {
+                addressRepository.delete(address);
+            }
+        }
     }
 }

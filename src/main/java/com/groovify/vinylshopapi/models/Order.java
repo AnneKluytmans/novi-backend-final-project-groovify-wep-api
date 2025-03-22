@@ -71,11 +71,11 @@ public class Order {
     @ValidEnum(enumClass = ShippingStatus.class, message = "Invalid shipping status")
     private ShippingStatus shippingStatus;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne()
     @JoinColumn(name = "shipping_address_id", referencedColumnName = "id", nullable = false)
     private Address shippingAddress;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne()
     @JoinColumn(name = "billing_address_id", referencedColumnName = "id", nullable = false)
     private Address billingAddress;
 
@@ -88,4 +88,8 @@ public class Order {
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Invoice invoice;
+
+    private Boolean isDeleted = false;
+
+    private LocalDateTime deletedAt = null;
 }

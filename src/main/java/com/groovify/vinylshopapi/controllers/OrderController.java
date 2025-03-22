@@ -65,4 +65,29 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable Long id
+    ) {
+        orderService.cancelOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivateOrder(
+            @PathVariable Long id
+    ) {
+        orderService.deactivateOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/{id}/reactivate")
+    public ResponseEntity<Void> reactivateOrder(
+            @PathVariable Long id
+    ) {
+        orderService.reactivateOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
