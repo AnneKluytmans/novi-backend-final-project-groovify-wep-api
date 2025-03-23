@@ -4,16 +4,17 @@ import com.groovify.vinylshopapi.enums.PaymentMethod;
 import com.groovify.vinylshopapi.validation.ValidDate;
 import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class OrderPatchDTO {
-    @ValidDate(max = "now+9M", mustBeFuture = true, message = "Expected delivery date must be between now and nine months from now")
-    private LocalDate expectedDeliveryDate;
+    @Future
+    private LocalDateTime expectedDeliveryDate;
 
     @Size(min = 3, max = 100, message = "Recipient name cannot exceed 100 characters")
     private String recipientName;

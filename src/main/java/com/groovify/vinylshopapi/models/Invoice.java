@@ -17,14 +17,14 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime paymentDate;
+    private LocalDateTime issuedAt;
 
     @OneToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false, unique = true)
     private Order order;
 
     public Invoice(Order order) {
-        this.paymentDate = LocalDateTime.now();
+        this.issuedAt = LocalDateTime.now();
         this.order = order;
     }
 }

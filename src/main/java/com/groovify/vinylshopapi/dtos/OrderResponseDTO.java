@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
 public class OrderResponseDTO {
     private Long id;
     private LocalDateTime orderDate;
-    private LocalDate expectedDeliveryDate;
+    private LocalDateTime expectedDeliveryDate;
     private BigDecimal subTotalPrice;
     private BigDecimal shippingCost;
     private ConfirmationStatus confirmationStatus;
