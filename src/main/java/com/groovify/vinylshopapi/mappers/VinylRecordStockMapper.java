@@ -8,7 +8,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface VinylRecordStockMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "vinylRecord", ignore = true)
     VinylRecordStock toEntity(VinylRecordStockRequestDTO stockRequestDTO);
 
     VinylRecordStockResponseDTO toResponseDTO(VinylRecordStock stock);

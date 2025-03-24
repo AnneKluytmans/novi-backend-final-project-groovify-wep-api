@@ -113,4 +113,22 @@ public class CustomerController {
         customerService.removeFavoriteRecordFromCustomer(customerId, vinylRecordId);
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/{id}/orders")
+    public ResponseEntity<List<OrderSummaryResponseDTO>> getOrdersByCustomer(
+            @PathVariable Long id
+    ) {
+        List<OrderSummaryResponseDTO> orders = customerService.getOrdersByCustomer(id);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{id}/orders/{orderId}")
+    public ResponseEntity<OrderResponseDTO> getOrderByCustomerAndId(
+            @PathVariable("id") Long customerId,
+            @PathVariable("orderId") Long orderId
+    ) {
+        OrderResponseDTO order = customerService.getOrderByCustomerAndId(customerId, orderId);
+        return ResponseEntity.ok(order);
+    }
 }

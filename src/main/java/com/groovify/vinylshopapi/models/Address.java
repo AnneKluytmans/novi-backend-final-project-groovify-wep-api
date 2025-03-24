@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "addresses")
 @Data
@@ -47,4 +50,19 @@ public class Address {
     @OneToOne
     @JoinColumn(name = "employee_id", unique = true)
     private Employee employee;
+
+    @OneToMany(mappedBy = "shippingAddress")
+    private List<Order> shippingOrders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "billingAddress")
+    private List<Order> billingOrders = new ArrayList<>();
+
+
+    public boolean isOrderAddress() {
+        return !shippingOrders.isEmpty() || !billingOrders.isEmpty();
+    }
+
+    public boolean isStandAlone() {
+        return customer == null && employee == null && !isOrderAddress();
+    }
 }

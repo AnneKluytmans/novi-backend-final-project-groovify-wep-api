@@ -47,26 +47,26 @@ VALUES
 --Vinyl Records Stock
 INSERT INTO vinyl_records_stock (amount_in_stock, amount_sold, vinyl_record_id)
 VALUES
-    (30, 45, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
-    (20, 30, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),
-    (15, 25, (SELECT id FROM vinyl_records WHERE title = '1989')),
-    (12, 15, (SELECT id FROM vinyl_records WHERE title = 'Lemonade')),
-    (18, 20, (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida')),
-    (15, 18, (SELECT id FROM vinyl_records WHERE title = '21')),
-    (10, 10, (SELECT id FROM vinyl_records WHERE title = 'The Joshua Tree')),
-    (15, 18, (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers')),
-    (20, 25, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue')),
-    (25, 35, (SELECT id FROM vinyl_records WHERE title = 'Rumours')),
-    (20, 22, (SELECT id FROM vinyl_records WHERE title = 'Arrival')),
-    (15, 20, (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?')),
-    (20, 22, (SELECT id FROM vinyl_records WHERE title = 'AM')),
-    (25, 30, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World')),
-    (12, 12, (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man')),
-    (10, 10, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution')),
-    (30, 40, (SELECT id FROM vinyl_records WHERE title = 'News of the World')),
-    (20, 25, (SELECT id FROM vinyl_records WHERE title = 'Revolver')),
-    (15, 20, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew')),
-    (10, 12, (SELECT id FROM vinyl_records WHERE title = 'Satchmo at Symphony Hall'));
+    (30, 0, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
+    (20, 2, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),
+    (15, 0, (SELECT id FROM vinyl_records WHERE title = '1989')),
+    (12, 5, (SELECT id FROM vinyl_records WHERE title = 'Lemonade')),
+    (18, 4, (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida')),
+    (15, 2, (SELECT id FROM vinyl_records WHERE title = '21')),
+    (10, 6, (SELECT id FROM vinyl_records WHERE title = 'The Joshua Tree')),
+    (15, 3, (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers')),
+    (20, 3, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue')),
+    (25, 1, (SELECT id FROM vinyl_records WHERE title = 'Rumours')),
+    (20, 0, (SELECT id FROM vinyl_records WHERE title = 'Arrival')),
+    (15, 1, (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?')),
+    (20, 7, (SELECT id FROM vinyl_records WHERE title = 'AM')),
+    (25, 1, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World')),
+    (12, 2, (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man')),
+    (10, 3, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution')),
+    (20, 0, (SELECT id FROM vinyl_records WHERE title = 'News of the World')),
+    (20, 1, (SELECT id FROM vinyl_records WHERE title = 'Revolver')),
+    (15, 1, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew')),
+    (10, 1, (SELECT id FROM vinyl_records WHERE title = 'Satchmo at Symphony Hall'));
 
 
 -- Authority roles
@@ -129,7 +129,7 @@ VALUES
 
 
 --Favorite Vinyl Records
-INSERT INTO favorite_vinyl_records (customer_id, vinyl_record_id)
+INSERT INTO customer_favorite_vinyl_records (customer_id, vinyl_record_id)
 VALUES
     (1, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera')),
     (1, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road')),
@@ -208,3 +208,175 @@ VALUES
     ('Meir', '78', 'Antwerpen', '2000', 'Belgium', NULL, NULL, 12),
     ('Hoogstraat', '15A', 'Rotterdam', '3011PN', 'Netherlands', NULL, NULL, 13),
     ('Veldstraat', '22', 'Gent', '9000', 'Belgium', NULL, NULL, 14);
+
+-- Addresses for orders (stand alone shipping addresses)
+INSERT INTO addresses (street, house_number, city, postal_code, country, is_shipping_address, is_billing_address)
+VALUES
+    ('Coolsingel', '20', 'Rotterdam', '3011AD', 'Netherlands', NULL, NULL),
+    ('Zuiderzijde', '39', 'Den Haag', '2543CV', 'Netherlands', NULL, NULL);
+
+
+-- Carts and items
+
+-- Carts
+INSERT INTO carts (customer_id, created_at, updated_at)
+VALUES
+    (1, '2025-01-12 17:10:00', '2025-03-19 19:20:00'),
+    (2, '2025-01-18 16:20:00', '2025-03-22 17:40:00'),
+    (3, '2025-01-20 15:30:00', '2025-02-28 18:00:00'),
+    (4, '2025-01-24 14:00:00', '2025-03-19 14:30:00'),
+    (5, '2025-02-12 12:45:00', '2025-03-22 14:25:00'),
+    (6, '2025-02-14 11:00:00', '2025-03-21 15:30:00'),
+    (7, '2025-03-05 19:50:00', '2025-03-20 21:45:00'),
+    (8, '2025-03-11 09:30:00', '2025-03-23 10:30:00'),
+    (9, '2025-03-19 18:40:00', '2025-03-22 20:30:00'),
+    (10, '2025-03-22 13:15:00', '2025-03-22 16:45:00');
+
+-- Cart Items
+INSERT INTO cart_items (cart_id, vinyl_record_id, quantity)
+VALUES
+    (1, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road'), 1),
+    (1, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera'), 1),
+    (1, (SELECT id FROM vinyl_records WHERE title = '1989'), 1),
+    (1, (SELECT id FROM vinyl_records WHERE title = '21'), 2),
+
+    (4, (SELECT id FROM vinyl_records WHERE title = 'Lemonade'), 1),
+    (4, (SELECT id FROM vinyl_records WHERE title = 'Arrival'), 3),
+
+    (5, (SELECT id FROM vinyl_records WHERE title = 'AM'), 2),
+    (5, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World'), 1),
+    (5, (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man'), 1),
+    (5, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue'), 1),
+
+    (6, (SELECT id FROM vinyl_records WHERE title = 'Rumours'), 1),
+    (6, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew'), 1),
+    (6, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 1),
+
+    (8, (SELECT id FROM vinyl_records WHERE title = 'A Night at the Opera'), 2),
+    (8, (SELECT id FROM vinyl_records WHERE title = 'Revolver'), 2),
+    (8, (SELECT id FROM vinyl_records WHERE title = 'The Joshua Tree'), 2),
+
+    (10, (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?'), 1),
+    (10, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 1),
+    (10, (SELECT id FROM vinyl_records WHERE title = 'News of the World'), 1);
+
+
+
+-- Orders
+
+-- Orders
+INSERT INTO orders (order_date, expected_delivery_date, recipient_name, sub_total_price, shipping_cost, note, payment_method, confirmation_status, payment_status, shipping_status, shipping_address_id, billing_address_id, customer_id, is_deleted)
+VALUES
+    ('2025-01-20 19:00:00', '2025-01-23 14:00:00', 'Max Stoop', 152.96, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 1, 1, 1, FALSE),
+    ('2025-02-08 10:00:00', '2025-02-12 11:00:00', 'Max Stoop', 67.97, 4.99, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 2, 2, 1, FALSE),
+
+    ('2025-01-23 13:20:00', '2025-01-26 15:00:00', 'Eva van Dongen', 115.96, 0.00, 'Urgent delivery', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 4, 5, 2, FALSE),
+    ('2025-02-18 12:00:00', '2025-02-21 10:30:00', 'Eva van Dongen', 72.97, 2.99, NULL, 'GIFT_CARD', 'CONFIRMED', 'PAID', 'DELIVERED', 33, 33, 2, FALSE),
+    ('2025-03-22 17:40:00', '2025-03-26 14:30:00', 'Eva van Dongen', 24.99, 2.99, NULL, 'IDEAL', 'PENDING', 'NOT_APPLICABLE', 'NOT_APPLICABLE', 33, 33, 2, FALSE),
+
+    ('2025-02-28 18:00:00', '2025-03-04 16:00:00', 'Niels Verhoeven', 113.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'RETURNED', 6, 6, 3, FALSE),
+
+    ('2025-01-26 18:00:00', '2025-01-29 12:00:00', 'Sophie Maes', 74.97, 4.99, 'First time ordering — So excited!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
+    ('2025-02-13 14:00:00', '2025-02-16 11:30:00', 'Sophie Maes', 84.97, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
+    ('2025-03-20 14:00:00', '2025-03-25 10:00:00', 'Sophie Maes', 96.96, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'AWAITING_PAYMENT', 'PROCESSING', 10, 10, 4, FALSE),
+
+    ('2025-02-15 10:35:00', '2025-02-19 14:00:00', 'Jasper van Rooij', 154.96, 0.00, NULL, 'CREDIT_CARD', 'CONFIRMED', 'PAID', 'DELIVERED', 12, 13, 5, FALSE),
+
+    ('2025-02-17 21:00:00', '2025-02-21 16:00:00', 'Lisa van Acker', 92.97, 0.00, 'No invoice needed.', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 16, 17, 6, FALSE),
+    ('2025-03-12 19:10:00', '2025-03-15 15:30:00', 'Lisa van Acker', 74.97, 4.99, NULL, 'APPLE_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 18, 17, 6, FALSE),
+
+    ('2025-03-06 09:10:00', '2025-03-10 12:00:00', 'Arne Smit', 59.98, 4.99, 'Gift wrap, please!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 34, 20, 7, FALSE),
+    ('2025-03-20 21:45:00', '2025-03-24 10:30:00', 'Thomas Dekker', 107.96, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'SHIPPED', 21, 20, 7, FALSE),
+
+    ('2025-03-12 09:30:00', '2025-03-15 13:00:00', 'Anne van Beek', 62.98, 4.99, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'LOST', 22, 23, 8, FALSE),
+    ('2025-03-21 09:30:00', '2025-03-26 11:00:00', 'Anne van Beek', 121.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'PROCESSING', 24, 23, 8, FALSE),
+
+    ('2025-03-22 20:30:00', '2025-03-26 15:00:00', 'Stefan van der Linden', 87.97, 0.00, NULL, 'IDEAL', 'PENDING', 'NOT_APPLICABLE', 'NOT_APPLICABLE', 25, 25, 9, FALSE);
+
+-- Order Items
+INSERT INTO order_items (order_id, vinyl_record_id, quantity, price_at_purchase)
+VALUES
+    (1, (SELECT id FROM vinyl_records WHERE title = 'The Joshua Tree'), 2, 49.99),
+    (1, (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida'), 1, 21.99),
+    (1, (SELECT id FROM vinyl_records WHERE title = 'Revolver'), 1, 30.99),
+
+    (2, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 1, 24.99),
+    (2, (SELECT id FROM vinyl_records WHERE title = 'Satchmo at Symphony Hall'), 1, 17.99),
+    (2, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1, 24.99),
+
+    (3, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road'), 1, 29.99),
+    (3, (SELECT id FROM vinyl_records WHERE title = '21'), 2, 27.99),
+    (3, (SELECT id FROM vinyl_records WHERE title = 'When We All Fall Asleep, Where Do We Go?'), 1, 29.99),
+
+    (4, (SELECT id FROM vinyl_records WHERE title = 'Lemonade'), 1, 19.99),
+    (4, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1, 24.99),
+    (4, (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man'), 1, 27.99),
+
+    (5, (SELECT id FROM vinyl_records WHERE title = 'Rumours'), 1, 24.99),
+
+    (6, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World'), 3, 37.99),
+
+    (7, (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers'), 1, 34.99),
+    (7, (SELECT id FROM vinyl_records WHERE title = 'Lemonade'), 2, 19.99),
+
+    (8, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue'), 2, 29.99),
+    (8, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1, 24.99),
+
+    (9, (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida'), 2, 21.99),
+    (9, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew'), 1, 32.99),
+    (9, (SELECT id FROM vinyl_records WHERE title = 'Lemonade'), 1, 19.99),
+
+    (10, (SELECT id FROM vinyl_records WHERE title = 'The Joshua Tree'), 2, 49.99),
+    (10, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 1, 24.99),
+    (10, (SELECT id FROM vinyl_records WHERE title = 'Abbey Road'), 1, 29.99),
+
+    (11, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 1, 24.99),
+    (11, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue'), 1, 29.99),
+    (11, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World'), 1, 37.99),
+
+    (12, (SELECT id FROM vinyl_records WHERE title = 'Rumours'), 1, 24.99),
+    (12, (SELECT id FROM vinyl_records WHERE title = 'AM'), 2, 24.99),
+
+    (13, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1, 24.99),
+    (13, (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers'), 1, 34.99),
+
+    (14, (SELECT id FROM vinyl_records WHERE title = 'Lemonade'), 1, 19.99),
+    (14, (SELECT id FROM vinyl_records WHERE title = 'I Never Loved a Man'), 1, 27.99),
+    (14, (SELECT id FROM vinyl_records WHERE title = 'The Marshall Mathers'), 1, 34.99),
+    (14, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1, 24.99),
+
+    (15, (SELECT id FROM vinyl_records WHERE title = 'Kind of Blue'), 1, 29.99),
+    (15, (SELECT id FROM vinyl_records WHERE title = 'Bitches Brew'), 1, 32.99),
+
+    (16, (SELECT id FROM vinyl_records WHERE title = 'Viva la Vida'), 1, 21.99),
+    (16, (SELECT id FROM vinyl_records WHERE title = 'The Joshua Tree'), 2, 49.99),
+
+    (17, (SELECT id FROM vinyl_records WHERE title = 'Soul Revolution'), 1, 24.99),
+    (17, (SELECT id FROM vinyl_records WHERE title = 'What a Wonderful World'), 1, 37.99),
+    (17, (SELECT id FROM vinyl_records WHERE title = 'AM'), 1, 24.99);
+
+
+-- Invoices
+INSERT INTO invoices (invoice_date, order_id)
+VALUES
+    ('2025-01-20 19:03:00', 1),
+    ('2025-02-08 10:05:00', 2),
+
+    ('2025-01-23 13:24:00', 3),
+    ('2025-02-18 12:02:00', 4),
+
+    ('2025-02-28 18:04:00', 6),
+
+    ('2025-01-26 18:05:00', 7),
+    ('2025-02-18 11:30:00', 8),
+
+    ('2025-02-15 10:40:00', 10),
+
+    ('2025-02-17 21:06:00', 11),
+    ('2025-03-12 19:14:00', 12),
+
+    ('2025-03-06 09:15:00', 13),
+    ('2025-03-20 21:49:00', 14),
+
+    ('2025-03-12 9:32:00', 15),
+    ('2025-03-21 9:35:00', 16);

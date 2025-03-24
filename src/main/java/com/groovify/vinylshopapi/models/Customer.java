@@ -18,11 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 public class Customer extends User {
     @NotNull(message = "Subscribe status is required")
-    private boolean newsletterSubscribed = true;
+    private Boolean newsletterSubscribed = true;
 
     @ManyToMany
     @JoinTable(
-            name = "favorite_vinyl_records",
+            name = "customer_favorite_vinyl_records",
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "vinyl_record_id")
     )
@@ -30,4 +30,10 @@ public class Customer extends User {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
 }

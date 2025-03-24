@@ -1,7 +1,7 @@
 package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
-import com.groovify.vinylshopapi.dtos.AddressSummaryResponseDTO;
+import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
@@ -29,12 +29,12 @@ public class EmployeeAddressService {
         this.employeeRepository = employeeRepository;
     }
 
-    public AddressSummaryResponseDTO getEmployeeAddressById(Long employeeId) {
+    public AddressResponseDTO getEmployeeAddressById(Long employeeId) {
         Address address = validateEmployeeAndAddress(employeeId);
-        return addressMapper.toSummaryResponseDTO(address);
+        return addressMapper.toResponseDTO(address);
     }
 
-    public AddressSummaryResponseDTO createEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
+    public AddressResponseDTO createEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
 
         if (addressRepository.existsByEmployeeId(employeeId)) {
             throw new ConflictException("Employee already has an address");
@@ -44,16 +44,16 @@ public class EmployeeAddressService {
         address.setEmployee(findEmployee(employeeId));
 
         Address savedAddress = addressRepository.save(address);
-        return addressMapper.toSummaryResponseDTO(savedAddress);
+        return addressMapper.toResponseDTO(savedAddress);
     }
 
-    public AddressSummaryResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
+    public AddressResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
         Address address = validateEmployeeAndAddress(employeeId);
 
         addressMapper.updateAddress(addressRequestDTO, address);
 
         Address savedAddress = addressRepository.save(address);
-        return addressMapper.toSummaryResponseDTO(savedAddress);
+        return addressMapper.toResponseDTO(savedAddress);
     }
 
 

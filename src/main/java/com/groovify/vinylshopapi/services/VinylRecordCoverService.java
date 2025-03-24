@@ -26,22 +26,19 @@ public class VinylRecordCoverService {
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordCoverRepository vinylRecordCoverRepository;
     private final VinylRecordCoverMapper vinylRecordCoverMapper;
-    private final ValidationUtils validationUtils;
 
     public VinylRecordCoverService(
             VinylRecordRepository vinylRecordRepository,
             VinylRecordCoverRepository vinylRecordCoverRepository,
-            VinylRecordCoverMapper vinylRecordCoverMapper,
-            ValidationUtils validationUtils
+            VinylRecordCoverMapper vinylRecordCoverMapper
     ) {
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordCoverRepository = vinylRecordCoverRepository;
         this.vinylRecordCoverMapper = vinylRecordCoverMapper;
-        this.validationUtils = validationUtils;
     }
 
     public VinylRecordCoverResponseDTO uploadCover(Long vinylRecordId, MultipartFile file, String downloadUrl) throws IOException {
-        validationUtils.validateFile(file, allowedFileTypes);
+        ValidationUtils.validateFile(file, allowedFileTypes);
 
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
@@ -49,18 +46,12 @@ public class VinylRecordCoverService {
             throw new ConflictException("Vinyl record with id " + vinylRecordId + " already has a cover");
         }
 
-        VinylRecordCover cover = new VinylRecordCover();
-        cover.setFilename(file.getOriginalFilename());
-        cover.setFileType(file.getContentType());
-        cover.setDownloadUrl(downloadUrl);
-        cover.setData(file.getBytes());
+        VinylRecordCover cover = new VinylRecordCover(file, downloadUrl);
 
-        VinylRecordCover savedCover = vinylRecordCoverRepository.save(cover);
-
-        vinylRecord.setCover(savedCover);
+        vinylRecord.setCover(cover);
         vinylRecordRepository.save(vinylRecord);
 
-        return vinylRecordCoverMapper.toResponseDTO(savedCover);
+        return vinylRecordCoverMapper.toResponseDTO(cover);
     }
 
     public VinylRecordCoverDownloadDTO downloadCover(Long vinylRecordId) {

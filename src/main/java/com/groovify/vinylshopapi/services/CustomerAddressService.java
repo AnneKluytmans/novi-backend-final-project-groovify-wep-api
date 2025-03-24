@@ -31,14 +31,14 @@ public class CustomerAddressService {
         this.customerRepository = customerRepository;
     }
 
-    public List<AddressResponseDTO> getCustomerAddresses(Long customerId) {
+    public List<CustomerAddressResponseDTO> getCustomerAddresses(Long customerId) {
         Customer customer = findCustomer(customerId);
-        return addressMapper.toResponseDTOs(customer.getAddresses());
+        return addressMapper.toCustomerResponseDTOs(customer.getAddresses());
     }
 
-    public AddressResponseDTO getCustomerAddressById(Long customerId, Long addressId) {
+    public CustomerAddressResponseDTO getCustomerAddressById(Long customerId, Long addressId) {
         Address address = validateCustomerAndAddress(customerId, addressId);
-        return addressMapper.toResponseDTO(address);
+        return addressMapper.toCustomerResponseDTO(address);
     }
 
     public DefaultAddressesResponseDTO getDefaultCustomerAddresses(Long customerId) {
@@ -46,12 +46,12 @@ public class CustomerAddressService {
         List<Address> customerAddresses = customer.getAddresses();
 
         return new DefaultAddressesResponseDTO(
-                addressMapper.toSummaryResponseDTO(findShippingAddress(customerAddresses)),
-                addressMapper.toSummaryResponseDTO(findBillingAddress(customerAddresses))
+                addressMapper.toResponseDTO(findShippingAddress(customerAddresses)),
+                addressMapper.toResponseDTO(findBillingAddress(customerAddresses))
         );
     }
 
-    public AddressResponseDTO createCustomerAddress(Long customerId, CustomerAddressRequestDTO addressRequestDTO) {
+    public CustomerAddressResponseDTO createCustomerAddress(Long customerId, CustomerAddressRequestDTO addressRequestDTO) {
         Customer customer = findCustomer(customerId);
         List<Address> existingAddresses = customer.getAddresses();
 
@@ -74,16 +74,21 @@ public class CustomerAddressService {
         }
 
         Address savedAddress = addressRepository.save(newAddress);
-        return addressMapper.toResponseDTO(savedAddress);
+        return addressMapper.toCustomerResponseDTO(savedAddress);
     }
 
-    public AddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {
+    public CustomerAddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {
         Address address = validateCustomerAndAddress(customerId, addressId);
+        Address savedAddress;
 
-        addressMapper.updateAddress(addressRequestDTO, address);
+        if (address.isOrderAddress()) {
+           savedAddress = updateOrderAddress(address, addressRequestDTO);
+        } else {
+            addressMapper.updateAddress(addressRequestDTO, address);
+            savedAddress = addressRepository.save(address);
+        }
 
-        Address savedAddress = addressRepository.save(address);
-        return addressMapper.toResponseDTO(savedAddress);
+        return addressMapper.toCustomerResponseDTO(savedAddress);
     }
 
     public void setDefaultAddresses(Long customerId, Long addressId, DefaultAddressesRequestDTO defaultAddressesRequestDTO) {
@@ -105,9 +110,13 @@ public class CustomerAddressService {
                 addressRepository.save(newDefaultAddress);
             }
         }
-        addressRepository.delete(address);
-    }
 
+        if (address.isOrderAddress()) {
+            customerAddresses.remove(address);
+        } else {
+            addressRepository.delete(address);
+        }
+    }
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
@@ -125,6 +134,16 @@ public class CustomerAddressService {
         }
 
         return address;
+    }
+
+    private Address updateOrderAddress(Address address, AddressRequestDTO addressRequestDTO) {
+        Address newAddress = addressMapper.toEntity(addressRequestDTO);
+        newAddress.setCustomer(address.getCustomer());
+
+        address.setCustomer(null);
+        addressRepository.save(address);
+
+        return addressRepository.save(newAddress);
     }
 
     private void updateDefaultAddress(List<Address> addresses, DefaultAddressesRequestDTO addressRequestDTO, Address newDefaultAddress) {

@@ -1,6 +1,9 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
+import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
+import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
 import com.groovify.vinylshopapi.models.Address;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
@@ -34,6 +37,7 @@ public class AddressService {
             Boolean inactiveUsers,
             Boolean isShipping,
             Boolean isBilling,
+            Boolean isStandAlone,
             String country,
             String city,
             String postalCode,
@@ -43,7 +47,7 @@ public class AddressService {
         Sort sort = getAddressesSort(sortBy, sortOrder);
         Specification<Address> specification = AddressSpecification.filterAddresses(
                 addressId, customerId, employeeId, userType, inactiveUsers, isShipping, isBilling,
-                country, city, postalCode
+                isStandAlone, country, city, postalCode
         );
         List<Address> addresses = addressRepository.findAll(specification, sort);
         return addressMapper.toResponseDTOs(addresses);
@@ -59,13 +63,35 @@ public class AddressService {
         Sort sort = getAddressesSort(sortBy, sortOrder);
         Specification<Address> specification = AddressSpecification.filterAddresses(
                 null, null, null, "customer", false,
-                true, null, country, city, postalCode
+                true, null, null, country, city, postalCode
         );
         List<Address> addresses = addressRepository.findAll(specification, sort);
         return addressMapper.toResponseDTOs(addresses);
     }
 
+    public AddressResponseDTO createStandAloneAddress(AddressRequestDTO addressRequestDTO) {
+        Address address = addressMapper.toEntity(addressRequestDTO);
+        return addressMapper.toResponseDTO(addressRepository.save(address));
+    }
+
+    public void deleteStandAloneAddress(Long id) {
+        Address address = findAddress(id);
+        validateIsStandAloneAddress(address);
+        addressRepository.delete(address);
+    }
+
     private Sort getAddressesSort(String sortBy, String sortOrder) {
         return SortHelper.getSort(sortBy, sortOrder, List.of("id", "country", "city", "postalCode"));
+    }
+
+    private Address findAddress(Long addressId) {
+        return addressRepository.findById(addressId)
+                .orElseThrow(() -> new RecordNotFoundException("Address with id " + addressId + " not found"));
+    }
+
+    private void validateIsStandAloneAddress(Address address) {
+        if (!address.isStandAlone()) {
+            throw new DeleteOperationException("This address cannot be deleted as it is still in use by a user and/or order.");
+        }
     }
 }

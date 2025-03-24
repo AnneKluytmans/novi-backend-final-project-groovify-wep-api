@@ -60,6 +60,13 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler(value = InsufficientStockException.class)
+    public ResponseEntity<Object> handleInsufficientStockException(InsufficientStockException ex) {
+        return buildErrorResponse(
+                HttpStatus.CONFLICT, "Insufficient Stock", ex.getMessage(), null
+        );
+    }
+
     @ExceptionHandler(value = ForbiddenException.class)
     public ResponseEntity<Object> handleForbiddenException(ForbiddenException ex) {
         return buildErrorResponse(
@@ -71,6 +78,13 @@ public class ExceptionController {
     public ResponseEntity<Object> handleDeleteOperationException(DeleteOperationException ex) {
         return buildErrorResponse(
                 HttpStatus.CONFLICT, "Delete Operation Conflict", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = InvalidOrderStatusException.class)
+    public ResponseEntity<Object> handleInvalidOrderStatusException(InvalidOrderStatusException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Invalid Order Status", ex.getMessage(), null
         );
     }
 

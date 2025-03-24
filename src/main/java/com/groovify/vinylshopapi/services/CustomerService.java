@@ -5,11 +5,14 @@ import com.groovify.vinylshopapi.enums.RoleType;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
+import com.groovify.vinylshopapi.mappers.OrderMapper;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
 import com.groovify.vinylshopapi.models.Customer;
+import com.groovify.vinylshopapi.models.Order;
 import com.groovify.vinylshopapi.models.Role;
 import com.groovify.vinylshopapi.models.VinylRecord;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
+import com.groovify.vinylshopapi.repositories.OrderRepository;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
 import com.groovify.vinylshopapi.repositories.VinylRecordRepository;
 import com.groovify.vinylshopapi.specifications.CustomerSpecification;
@@ -32,6 +35,8 @@ public class CustomerService {
     private final ValidationUtils validationUtils;
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordMapper vinylRecordMapper;
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
 
     public CustomerService(
             CustomerRepository customerRepository,
@@ -39,7 +44,9 @@ public class CustomerService {
             RoleRepository roleRepository,
             ValidationUtils validationUtils,
             VinylRecordRepository vinylRecordRepository,
-            VinylRecordMapper vinylRecordMapper
+            VinylRecordMapper vinylRecordMapper,
+            OrderRepository orderRepository,
+            OrderMapper orderMapper
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
@@ -47,6 +54,8 @@ public class CustomerService {
         this.validationUtils = validationUtils;
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordMapper = vinylRecordMapper;
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
     }
 
     public List<UserSummaryResponseDTO> getCustomers(
@@ -137,14 +146,27 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
+    public List<OrderSummaryResponseDTO> getOrdersByCustomer(Long customerId) {
+        Customer customer = findCustomer(customerId);
+        return orderMapper.toOrderSummaryResponseDTOs(customer.getOrders());
+    }
+
+    public OrderResponseDTO getOrderByCustomerAndId(Long customerId, Long orderId) {
+        return orderMapper.toResponseDTO(findOrder(orderId, customerId));
+    }
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with id: " + customerId));
     }
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
+    }
+
+    private Order findOrder(Long orderId, Long customerId) {
+        return orderRepository.findByIdAndCustomerId(orderId, customerId)
+                .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId + " for customer with id: " + customerId));
     }
 }

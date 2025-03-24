@@ -77,7 +77,7 @@ public class UserController {
     @PostMapping("/{id}/roles")
     public ResponseEntity<Void> addRolesToUser(
             @PathVariable("id") Long userId,
-            @RequestBody List<String> roles
+            @RequestBody List<RoleType> roles
     ) {
         userService.addRolesToUser(userId, roles);
         return ResponseEntity.noContent().build();
@@ -86,7 +86,7 @@ public class UserController {
     @DeleteMapping("/{id}/roles")
     public ResponseEntity<Void> removeRolesFromUser(
             @PathVariable("id") Long userId,
-            @RequestBody List<String> roles
+            @RequestBody List<RoleType> roles
     ) {
         userService.removeRolesFromUser(userId, roles);
         return ResponseEntity.noContent().build();

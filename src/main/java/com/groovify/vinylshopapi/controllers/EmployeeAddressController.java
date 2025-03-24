@@ -30,7 +30,7 @@ public class EmployeeAddressController {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        AddressSummaryResponseDTO newAddress = employeeAddressService.createEmployeeAddress(employeeId, addressRequestDTO);
+        AddressResponseDTO newAddress = employeeAddressService.createEmployeeAddress(employeeId, addressRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
         return ResponseEntity.created(location).body(newAddress);
@@ -45,15 +45,15 @@ public class EmployeeAddressController {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        AddressSummaryResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressRequestDTO);
+        AddressResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressRequestDTO);
         return ResponseEntity.ok(updatedAddress);
     }
 
     @GetMapping()
-    public ResponseEntity<AddressSummaryResponseDTO> getEmployeeAddress(
+    public ResponseEntity<AddressResponseDTO> getEmployeeAddress(
             @PathVariable("id") Long employeeId
     ) {
-        AddressSummaryResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
+        AddressResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
         return ResponseEntity.ok(address);
     }
 

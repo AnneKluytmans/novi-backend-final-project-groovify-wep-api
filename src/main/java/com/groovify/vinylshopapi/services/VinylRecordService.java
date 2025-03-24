@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.VinylRecordPatchDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordRequestDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordResponseDTO;
+import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
 import com.groovify.vinylshopapi.models.Artist;
@@ -101,6 +102,10 @@ public class VinylRecordService {
 
     public void deleteVinylRecord(Long id) {
         VinylRecord vinylRecord = findVinylRecord(id);
+
+        if (!vinylRecord.getOrderItems().isEmpty()) {
+            throw new DeleteOperationException("This vinyl record cannot be deleted because it is linked to one or more orders");
+        }
 
         for (Customer customer : vinylRecord.getCustomers()) {
             customer.getFavoriteVinylRecords().remove(vinylRecord);

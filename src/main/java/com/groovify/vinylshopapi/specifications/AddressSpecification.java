@@ -19,6 +19,7 @@ public class AddressSpecification {
             Boolean inactiveUsers,
             Boolean isShipping,
             Boolean isBilling,
+            Boolean isStandAlone,
             String country,
             String city,
             String postalCode
@@ -41,6 +42,18 @@ public class AddressSpecification {
 
           if (isBilling != null) {
               predicates.add(cb.and(cb.isNotNull(root.get("customer")), cb.equal(root.get("isBillingAddress"), isBilling)));
+          }
+
+          if (isStandAlone != null) {
+              Predicate noLinkedUser = cb.and(cb.isNull(root.get("customer")), cb.isNull(root.get("employee")));
+              Predicate noLinkedOrder = cb.and(cb.isEmpty(root.get("shippingOrders")), cb.isEmpty(root.get("billingOrders")));
+              Predicate standAloneCondition = cb.and(noLinkedUser, noLinkedOrder);
+
+              if (isStandAlone) {
+                  predicates.add(standAloneCondition);
+              } else {
+                  predicates.add(cb.not(standAloneCondition));
+              }
           }
 
           SpecificationUtils.addStringPredicate(predicates, cb, root.get("country"), country, false);
@@ -88,6 +101,11 @@ public class AddressSpecification {
                 cb.equal(employeeJoin.get("isDeleted"), inactiveUserCondition)
             );
 
-        predicates.add(cb.or(customerCondition, employeeCondition));
+        Predicate standAloneCondition = cb.and(
+                cb.isNull(root.get("customer")),
+                cb.isNull(root.get("employee"))
+            );
+
+        predicates.add(cb.or(customerCondition, employeeCondition, standAloneCondition));
     }
 }
