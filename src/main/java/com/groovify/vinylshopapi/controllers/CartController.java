@@ -5,6 +5,7 @@ import com.groovify.vinylshopapi.services.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,10 +21,10 @@ public class CartController {
 
     @GetMapping()
     public ResponseEntity<List<CartResponseDTO>> getAllCarts(
-            @RequestParam(required = false) String createdBefore,
-            @RequestParam(required = false) String createdAfter,
-            @RequestParam(required = false) String updatedBefore,
-            @RequestParam(required = false) String updatedAfter,
+            @RequestParam(required = false) LocalDate createdBefore,
+            @RequestParam(required = false) LocalDate createdAfter,
+            @RequestParam(required = false) LocalDate updatedBefore,
+            @RequestParam(required = false) LocalDate updatedAfter,
             @RequestParam(required = false) Long customerId,
             @RequestParam(required = false) Boolean isEmpty,
             @RequestParam(defaultValue = "id") String sortBy,

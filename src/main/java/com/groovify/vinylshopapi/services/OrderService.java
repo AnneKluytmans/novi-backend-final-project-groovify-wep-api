@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -75,13 +76,13 @@ public class OrderService {
             String confirmationStatus,
             String paymentStatus,
             String shippingStatus,
-            String orderedBefore,
-            String orderedAfter,
+            LocalDate orderedBefore,
+            LocalDate orderedAfter,
             BigDecimal minTotalPrice,
             BigDecimal maxTotalPrice,
             Boolean isDeleted,
-            String deletedAfter,
-            String deletedBefore,
+            LocalDate deletedAfter,
+            LocalDate deletedBefore,
             String sortBy,
             String sortOrder
     ) {

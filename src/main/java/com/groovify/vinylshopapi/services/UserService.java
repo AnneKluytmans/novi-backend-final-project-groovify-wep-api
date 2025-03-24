@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,8 @@ public class UserService {
             String firstName,
             String lastName,
             Boolean isDeleted,
-            String deletedAfter,
-            String deletedBefore,
+            LocalDate deletedAfter,
+            LocalDate deletedBefore,
             String sortBy,
             String sortOrder
     ) {

@@ -9,8 +9,6 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class SpecificationUtils {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
     public static void addStringPredicate(
             List<Predicate> predicates,
             CriteriaBuilder cb,
@@ -28,19 +26,14 @@ public class SpecificationUtils {
             List<Predicate> predicates,
             CriteriaBuilder cb,
             Path<LocalDateTime> field,
-            String dateValue,
+            LocalDate dateValue,
             Boolean isAfter
     ) {
-        if (dateValue != null && !dateValue.isBlank()) {
-            try {
-                LocalDate parsedDate = LocalDate.parse(dateValue, DATE_FORMATTER);
-                if (isAfter) {
-                    predicates.add(cb.greaterThanOrEqualTo(field.as(LocalDate.class), parsedDate));
-                } else {
-                    predicates.add(cb.lessThanOrEqualTo(field.as(LocalDate.class), parsedDate));
-                }
-            } catch (DateTimeParseException ex) {
-                throw new IllegalArgumentException("Invalid date format: " + dateValue + ". Use format: dd-MM-yyyy (e.g., 12-02-2025)");
+        if (dateValue != null) {
+            if (isAfter) {
+                predicates.add(cb.greaterThanOrEqualTo(field.as(LocalDate.class), dateValue));
+            } else {
+                predicates.add(cb.lessThanOrEqualTo(field.as(LocalDate.class), dateValue));
             }
         }
     }
@@ -52,8 +45,8 @@ public class SpecificationUtils {
             Path<Boolean> isDeletedField,
             Boolean isDeleted,
             Path<LocalDateTime> deletedAtField,
-            String deletedBefore,
-            String deletedAfter
+            LocalDate deletedBefore,
+            LocalDate deletedAfter
     ) {
        if (isDeleted != null) {
            predicates.add(cb.equal(isDeletedField, isDeleted));

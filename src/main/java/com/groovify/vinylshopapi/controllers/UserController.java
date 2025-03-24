@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,8 +29,8 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Boolean isDeleted,
-            @RequestParam(required = false) String deletedAfter,
-            @RequestParam(required = false) String deletedBefore,
+            @RequestParam(required = false) LocalDate deletedAfter,
+            @RequestParam(required = false) LocalDate deletedBefore,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {

@@ -7,6 +7,7 @@ import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,8 @@ public class UserSpecification {
             String firstName,
             String lastName,
             Boolean isDeleted,
-            String deletedAfter,
-            String deletedBefore
+            LocalDate deletedAfter,
+            LocalDate deletedBefore
     ) {
         return (Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();

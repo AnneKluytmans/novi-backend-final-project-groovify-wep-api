@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +15,13 @@ public class OrderSpecification {
             String confirmationStatus,
             String paymentStatus,
             String shippingStatus,
-            String orderedBefore,
-            String orderedAfter,
+            LocalDate orderedBefore,
+            LocalDate orderedAfter,
             BigDecimal minTotalPrice,
             BigDecimal maxTotalPrice,
             Boolean isDeleted,
-            String deletedAfter,
-            String deletedBefore
+            LocalDate deletedAfter,
+            LocalDate deletedBefore
     ) {
         return (Root<Order> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();

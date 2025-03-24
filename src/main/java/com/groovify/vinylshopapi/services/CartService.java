@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -32,10 +33,10 @@ public class CartService {
     }
 
     public List<CartResponseDTO> getAllCarts(
-            String createdBefore,
-            String createdAfter,
-            String updatedBefore,
-            String updatedAfter,
+            LocalDate createdBefore,
+            LocalDate createdAfter,
+            LocalDate updatedBefore,
+            LocalDate updatedAfter,
             Long customerId,
             Boolean isEmpty,
             String sortBy,

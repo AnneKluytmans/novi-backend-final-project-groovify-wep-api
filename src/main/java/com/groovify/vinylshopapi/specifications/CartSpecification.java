@@ -5,15 +5,16 @@ import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CartSpecification {
     public static Specification<Cart> filterCarts(
-            String createdBefore,
-            String createdAfter,
-            String updatedBefore,
-            String updatedAfter,
+            LocalDate createdBefore,
+            LocalDate createdAfter,
+            LocalDate updatedBefore,
+            LocalDate updatedAfter,
             Long customerId,
             Boolean isEmpty
     ) {
