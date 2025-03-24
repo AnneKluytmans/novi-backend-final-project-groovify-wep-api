@@ -44,4 +44,22 @@ public class SpecificationUtils {
             }
         }
     }
+
+
+    public static void addDeletePredicates(
+            List<Predicate> predicates,
+            CriteriaBuilder cb,
+            Path<Boolean> isDeletedField,
+            Boolean isDeleted,
+            Path<LocalDateTime> deletedAtField,
+            String deletedBefore,
+            String deletedAfter
+    ) {
+       if (isDeleted != null) {
+           predicates.add(cb.equal(isDeletedField, isDeleted));
+       }
+
+       addDatePredicate(predicates, cb, deletedAtField, deletedBefore, false);
+       addDatePredicate(predicates, cb, deletedAtField, deletedAfter, true);
+    }
 }

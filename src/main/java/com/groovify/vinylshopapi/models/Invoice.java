@@ -1,6 +1,7 @@
 package com.groovify.vinylshopapi.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,14 +18,15 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime issuedAt;
+    @PastOrPresent
+    private LocalDateTime invoiceDate;
 
     @OneToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false, unique = true)
     private Order order;
 
     public Invoice(Order order) {
-        this.issuedAt = LocalDateTime.now();
+        this.invoiceDate = LocalDateTime.now();
         this.order = order;
     }
 }

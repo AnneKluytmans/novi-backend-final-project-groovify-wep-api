@@ -1,23 +1,26 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.OrderPatchDTO;
-import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
-import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
-import com.groovify.vinylshopapi.dtos.OrderStatusUpdateDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.enums.ConfirmationStatus;
 import com.groovify.vinylshopapi.enums.PaymentStatus;
 import com.groovify.vinylshopapi.enums.ShippingStatus;
 import com.groovify.vinylshopapi.exceptions.*;
+import com.groovify.vinylshopapi.mappers.InvoiceMapper;
 import com.groovify.vinylshopapi.mappers.OrderMapper;
 import com.groovify.vinylshopapi.models.*;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.OrderRepository;
+import com.groovify.vinylshopapi.specifications.OrderSpecification;
+import com.groovify.vinylshopapi.utils.SortHelper;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,19 +31,22 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final CustomerCartService customerCartService;
+    private final InvoiceMapper invoiceMapper;
 
     public OrderService(
             CustomerRepository customerRepository,
             AddressRepository addressRepository,
             OrderRepository orderRepository,
             OrderMapper orderMapper,
-            CustomerCartService customerCartService
+            CustomerCartService customerCartService,
+            InvoiceMapper invoiceMapper
     ) {
         this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.customerCartService = customerCartService;
+        this.invoiceMapper = invoiceMapper;
     }
 
     private static final Map<ConfirmationStatus, Set<ConfirmationStatus>> VALID_CONFIRMATION_TRANSITIONS = Map.of(
@@ -65,6 +71,33 @@ public class OrderService {
             ShippingStatus.IN_RETURN, Set.of(ShippingStatus.LOST, ShippingStatus.RETURN_DECLINED, ShippingStatus.RETURNED)
     );
 
+    public List<OrderSummaryResponseDTO> getOrders(
+            String confirmationStatus,
+            String paymentStatus,
+            String shippingStatus,
+            String orderedBefore,
+            String orderedAfter,
+            BigDecimal minTotalPrice,
+            BigDecimal maxTotalPrice,
+            Boolean isDeleted,
+            String deletedAfter,
+            String deletedBefore,
+            String sortBy,
+            String sortOrder
+    ) {
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "subTotalPrice", "orderDate"));
+        Specification<Order> specification = OrderSpecification.filterOrders(
+                confirmationStatus, paymentStatus, shippingStatus, orderedBefore, orderedAfter,
+                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore
+        );
+        List<Order> orders = orderRepository.findAll(specification, sort);
+        return orderMapper.toOrderSummaryResponseDTOs(orders);
+    }
+
+    public OrderResponseDTO getOrderById(Long orderId) {
+        return orderMapper.toResponseDTO(findOrder(orderId, null));
+    }
+
     public OrderResponseDTO placeOrder(OrderRequestDTO orderRequestDTO) {
         Customer customer = findCustomer(orderRequestDTO.getCustomerId());
         validateNoExistingPendingOrder(customer);
@@ -88,7 +121,7 @@ public class OrderService {
     }
 
     public OrderResponseDTO updatePendingOrder(Long orderId, OrderPatchDTO orderPatchDTO) {
-        Order order = findOrder(orderId);
+        Order order = findOrder(orderId, false);
 
         if (order.getConfirmationStatus() != ConfirmationStatus.PENDING) {
             throw new ConflictException("You can only update orders with a PENDING confirmation status.");
@@ -114,7 +147,7 @@ public class OrderService {
     }
 
     public OrderResponseDTO updateOrderStatuses(Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO) {
-        Order order = findOrder(orderId);
+        Order order = findOrder(orderId, false);
 
         validateStatusUpdates(order, orderStatusUpdateDTO);
         applyStatusChanges(order, orderStatusUpdateDTO);
@@ -124,7 +157,7 @@ public class OrderService {
     }
 
     public void cancelOrder(Long orderId) {
-        Order order = findOrder(orderId);
+        Order order = findOrder(orderId, false);
 
         if (order.getConfirmationStatus() != ConfirmationStatus.PENDING) {
             throw new ConflictException("Only pending orders can be cancelled.");
@@ -140,7 +173,7 @@ public class OrderService {
     }
 
     public void deactivateOrder(Long orderId) {
-        Order order = findOrder(orderId);
+        Order order = findOrder(orderId, false);
 
         if (order.getConfirmationStatus() != ConfirmationStatus.CONFIRMED) {
             throw new DeleteOperationException("You can only deactivate orders with a CONFIRMED confirmation status.");
@@ -152,13 +185,20 @@ public class OrderService {
     }
 
     public void reactivateOrder(Long orderId) {
-        Order order = orderRepository.findByIdAndIsDeletedTrue(orderId)
-                .orElseThrow(() -> new RecordNotFoundException("No deactivated order found with id: " + orderId));
+        Order order = findOrder(orderId, true);
 
         order.setIsDeleted(false);
         order.setDeletedAt(null);
 
         orderRepository.save(order);
+    }
+
+    public InvoiceResponseDTO getInvoiceByOrder(Long orderId) {
+        Order order = findOrder(orderId, false);
+        if (order.getInvoice() == null) {
+            throw new RecordNotFoundException("No invoice found for order with id: " + orderId);
+        }
+        return invoiceMapper.toResponseDTO(order.getInvoice());
     }
 
 
@@ -167,8 +207,18 @@ public class OrderService {
                 .orElseThrow(() -> new RecordNotFoundException("No customer found with id: " + customerId));
     }
 
-    private Order findOrder(Long orderId) {
-        return orderRepository.findByIdAndIsDeletedFalse(orderId)
+    private Order findOrder(Long orderId, Boolean isDeleted) {
+        if (isDeleted != null) {
+            if (isDeleted) {
+                return orderRepository.findByIdAndIsDeletedTrue(orderId)
+                        .orElseThrow(() -> new RecordNotFoundException("No deactivated order found with id: " + orderId));
+            } else {
+                return orderRepository.findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId));
+            }
+        }
+
+        return orderRepository.findById(orderId)
                 .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId));
     }
 

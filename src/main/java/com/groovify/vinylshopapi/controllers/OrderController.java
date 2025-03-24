@@ -1,9 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.OrderPatchDTO;
-import com.groovify.vinylshopapi.dtos.OrderRequestDTO;
-import com.groovify.vinylshopapi.dtos.OrderResponseDTO;
-import com.groovify.vinylshopapi.dtos.OrderStatusUpdateDTO;
+import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.services.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +8,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -21,6 +20,36 @@ public class OrderController {
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<OrderSummaryResponseDTO>> getOrders(
+            @RequestParam(required = false) String confirmationStatus,
+            @RequestParam(required = false) String paymentStatus,
+            @RequestParam(required = false) String shippingStatus,
+            @RequestParam(required = false) String orderedBefore,
+            @RequestParam(required = false) String orderedAfter,
+            @RequestParam(required = false) BigDecimal minTotalPrice,
+            @RequestParam(required = false) BigDecimal maxTotalPrice,
+            @RequestParam(required = false) Boolean isDeleted,
+            @RequestParam(required = false) String deletedAfter,
+            @RequestParam(required = false) String deletedBefore,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
+    ) {
+        List<OrderSummaryResponseDTO> orders = orderService.getOrders(
+                confirmationStatus, paymentStatus, shippingStatus, orderedBefore, orderedAfter,
+                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore, sortBy, sortOrder
+        );
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponseDTO> getOrderById(
+            @PathVariable Long id
+    ) {
+        OrderResponseDTO order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
     }
 
     @PostMapping()
@@ -73,6 +102,7 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+
     @DeleteMapping("/{id}/deactivate")
     public ResponseEntity<Void> deactivateOrder(
             @PathVariable Long id
@@ -88,6 +118,15 @@ public class OrderController {
     ) {
         orderService.reactivateOrder(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{id}/invoice")
+    public ResponseEntity<InvoiceResponseDTO> getInvoiceByOrder(
+            @PathVariable Long id
+    ) {
+        InvoiceResponseDTO invoice = orderService.getInvoiceByOrder(id);
+        return ResponseEntity.ok(invoice);
     }
 
 }
