@@ -76,6 +76,7 @@ public class OrderService {
             String confirmationStatus,
             String paymentStatus,
             String shippingStatus,
+            List<String> excludedShippingStatuses,
             LocalDate orderedBefore,
             LocalDate orderedAfter,
             BigDecimal minTotalPrice,
@@ -88,8 +89,8 @@ public class OrderService {
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "subTotalPrice", "orderDate"));
         Specification<Order> specification = OrderSpecification.filterOrders(
-                confirmationStatus, paymentStatus, shippingStatus, orderedBefore, orderedAfter,
-                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore
+                confirmationStatus, paymentStatus, shippingStatus, excludedShippingStatuses, orderedBefore,
+                orderedAfter, minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore
         );
         List<Order> orders = orderRepository.findAll(specification, sort);
         return orderMapper.toOrderSummaryResponseDTOs(orders);

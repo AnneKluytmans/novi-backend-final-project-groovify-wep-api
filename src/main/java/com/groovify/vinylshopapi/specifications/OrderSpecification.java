@@ -15,6 +15,7 @@ public class OrderSpecification {
             String confirmationStatus,
             String paymentStatus,
             String shippingStatus,
+            List<String> excludedShippingStatuses,
             LocalDate orderedBefore,
             LocalDate orderedAfter,
             BigDecimal minTotalPrice,
@@ -29,6 +30,10 @@ public class OrderSpecification {
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("confirmationStatus"), confirmationStatus, false);
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("paymentStatus"), paymentStatus, false);
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("shippingStatus"), shippingStatus, false);
+
+            if (excludedShippingStatuses != null && !excludedShippingStatuses.isEmpty()) {
+                predicates.add(root.get("shippingStatus").in(excludedShippingStatuses).not());
+            }
 
             SpecificationUtils.addDatePredicate(predicates, cb, root.get("orderDate"), orderedBefore, false);
             SpecificationUtils.addDatePredicate(predicates, cb, root.get("orderDate"), orderedAfter, true);

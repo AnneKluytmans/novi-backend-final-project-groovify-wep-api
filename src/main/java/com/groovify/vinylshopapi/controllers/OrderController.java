@@ -28,6 +28,7 @@ public class OrderController {
             @RequestParam(required = false) String confirmationStatus,
             @RequestParam(required = false) String paymentStatus,
             @RequestParam(required = false) String shippingStatus,
+            @RequestParam(required = false) List<String> excludedShippingStatuses,
             @RequestParam(required = false) LocalDate orderedBefore,
             @RequestParam(required = false) LocalDate orderedAfter,
             @RequestParam(required = false) BigDecimal minTotalPrice,
@@ -39,7 +40,7 @@ public class OrderController {
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {
         List<OrderSummaryResponseDTO> orders = orderService.getOrders(
-                confirmationStatus, paymentStatus, shippingStatus, orderedBefore, orderedAfter,
+                confirmationStatus, paymentStatus, shippingStatus, excludedShippingStatuses, orderedBefore, orderedAfter,
                 minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore, sortBy, sortOrder
         );
         return ResponseEntity.ok(orders);
