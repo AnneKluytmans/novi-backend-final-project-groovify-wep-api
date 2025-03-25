@@ -31,7 +31,9 @@ public class DashboardService {
         this.vinylRecordMapper = vinylRecordMapper;
     }
 
-    public DashboardResponseDTO getDashboard() {
+    public DashboardResponseDTO getDashboard(
+            Integer topN
+    ) {
         LocalDate startOfLastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
         LocalDate endOfLastMonth = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
 
@@ -50,7 +52,7 @@ public class DashboardService {
         List<Order> ordersThisYear = findOrders(startOfThisYear, endOfThisYear);
 
         return new DashboardResponseDTO(
-                findBestSellers(ordersThisMonth, 3),
+                findBestSellers(ordersThisMonth, topN),
                 calculateTotalRevenue(ordersLastMonth),
                 calculateTotalRevenue(ordersThisMonth),
                 calculateTotalRevenue(ordersLastYear),

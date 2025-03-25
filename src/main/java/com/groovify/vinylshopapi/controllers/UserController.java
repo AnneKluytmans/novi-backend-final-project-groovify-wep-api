@@ -1,11 +1,9 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
 import com.groovify.vinylshopapi.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,11 +56,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/reactivate")
+    @PostMapping("/{id}/reactivate")
     public ResponseEntity<Void> reactivateUser(
-            @Valid @RequestBody ReactivateUserDTO reactivateUserDTO
+            @PathVariable Long id
     ) {
-        userService.reactivateUser(reactivateUserDTO);
+        userService.reactivateUser(id);
         return ResponseEntity.noContent().build();
     }
 

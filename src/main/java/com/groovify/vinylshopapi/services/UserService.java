@@ -1,11 +1,8 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.InvalidVerificationException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
@@ -75,29 +72,19 @@ public class UserService {
     }
 
     public UserResponseDTO getUserById(Long id) {
-        return mapToUserResponseDTO(findUser(id));
+        return mapToUserResponseDTO(findUser(id, null));
     }
 
     public void deactivateUser(Long id) {
-        User user = findUser(id);
+        User user = findUser(id, false);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
 
         userRepository.save(user);
     }
 
-    public void reactivateUser(ReactivateUserDTO reactivateUserDTO) {
-        User user = userRepository.findByEmail(reactivateUserDTO.getEmail())
-                .orElseThrow(() -> new RecordNotFoundException("No user found with email: " + reactivateUserDTO.getEmail()));
-
-        if (!user.getIsDeleted()) {
-            throw new ConflictException("User with email '" + reactivateUserDTO.getEmail() + "' still exists");
-        }
-
-        if (!"123456".equals(reactivateUserDTO.getVerificationCode())) {
-            throw new InvalidVerificationException();
-        }
-
+    public void reactivateUser(Long id) {
+        User user = findUser(id, true);
         user.setIsDeleted(false);
         user.setDeletedAt(null);
 
@@ -106,7 +93,7 @@ public class UserService {
 
 
     public List<RoleType> getUserRoles(Long userId) {
-        Set<Role> userRoles = findUser(userId).getRoles();
+        Set<Role> userRoles = findUser(userId, null).getRoles();
 
         List<RoleType> roles = new ArrayList<>();
         for (Role role : userRoles) {
@@ -117,7 +104,7 @@ public class UserService {
     }
 
     public void addRolesToUser(Long userId, List<RoleType> roles) {
-        User user = findUser(userId);
+        User user = findUser(userId, false);
         validateRolesForUserType(user, roles, true);
 
         for (RoleType role : roles) {
@@ -128,7 +115,7 @@ public class UserService {
     }
 
     public void removeRolesFromUser(Long userId, List<RoleType> roles) {
-        User user = findUser(userId);
+        User user = findUser(userId, null);
         validateRolesForUserType(user, roles, false);
 
         for (RoleType role : roles) {
@@ -139,7 +126,17 @@ public class UserService {
     }
 
 
-    private User findUser(Long userId) {
+    private User findUser(Long userId, Boolean isDeleted) {
+        if (isDeleted != null) {
+            if (isDeleted) {
+                return userRepository.findByIdAndIsDeletedTrue(userId)
+                        .orElseThrow(() -> new RecordNotFoundException("No deactivated user found with id" + userId));
+            } else {
+                return userRepository.findByIdAndIsDeletedFalse(userId)
+                        .orElseThrow(() -> new RecordNotFoundException("No user found with id" + userId));
+            }
+        }
+
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RecordNotFoundException("No user found with id: " + userId));
     }

@@ -5,6 +5,7 @@ import com.groovify.vinylshopapi.services.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,8 +21,10 @@ public class DashboardController {
     }
 
     @GetMapping()
-    public ResponseEntity<DashboardResponseDTO> getDashboard() {
-        DashboardResponseDTO dashboard = dashboardService.getDashboard();
+    public ResponseEntity<DashboardResponseDTO> getDashboard(
+            @RequestParam(defaultValue = "3") Integer topN
+    ) {
+        DashboardResponseDTO dashboard = dashboardService.getDashboard(topN);
         return ResponseEntity.ok(dashboard);
     }
 }

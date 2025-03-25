@@ -41,7 +41,7 @@ public class CustomerCartController {
         return ResponseEntity.ok(cart);
     }
 
-    @PutMapping("/items/{itemId}")
+    @PatchMapping("/items/{itemId}")
     public ResponseEntity<?> updateCartItemQuantity(
             @PathVariable("id") Long customerId,
             @PathVariable("itemId") Long cartItemId,
