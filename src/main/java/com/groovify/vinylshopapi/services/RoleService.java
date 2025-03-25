@@ -1,6 +1,7 @@
 package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.enums.RoleType;
+import com.groovify.vinylshopapi.models.Role;
 import com.groovify.vinylshopapi.repositories.RoleRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,9 @@ public class RoleService {
 
     public Set<RoleType> getRoles() {
         Set<RoleType> roles = new HashSet<>();
-        roleRepository.findAll().forEach(role -> roles.add(role.getRoleType()));
+        for (Role role : roleRepository.findAll()) {
+            roles.add(role.getRoleType());
+        }
 
         return roles;
     }

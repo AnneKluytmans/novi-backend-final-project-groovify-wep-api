@@ -128,17 +128,21 @@ public class CustomerCartService {
     }
 
     private CartItem findCartItem(Cart cart, Long cartItemId) {
-        return cart.getCartItems().stream()
-                .filter(item -> item.getId().equals(cartItemId))
-                .findFirst()
-                .orElseThrow(() -> new RecordNotFoundException("No cart item found with id: " + cartItemId + " for cart with id: " + cart.getId()));
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getId().equals(cartItemId)) {
+                return cartItem;
+            }
+        }
+        throw new RecordNotFoundException("No cart item found with id: " + cartItemId + " for cart with id: " + cart.getId());
     }
 
     private CartItem findExistingCartItem(Cart cart, VinylRecord vinylRecord) {
-        return cart.getCartItems().stream()
-                .filter(item -> item.getVinylRecord().equals(vinylRecord))
-                .findFirst()
-                .orElse(null);
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getVinylRecord().equals(vinylRecord)) {
+                return cartItem;
+            }
+        }
+        return null;
     }
 
 }

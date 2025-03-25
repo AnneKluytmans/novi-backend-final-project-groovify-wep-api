@@ -71,7 +71,7 @@ public class VinylRecord {
     @ManyToMany(mappedBy = "favoriteVinylRecords")
     private List<Customer> customers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "vinylRecord")
+    @OneToMany(mappedBy = "vinylRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "vinylRecord")

@@ -235,12 +235,11 @@ public class OrderService {
     }
 
     private void validateNoExistingPendingOrder(Customer customer) {
-        boolean existingPendingOrder = customer.getOrders().stream()
-                .anyMatch(order -> order.getConfirmationStatus() == ConfirmationStatus.PENDING);
-
-        if (existingPendingOrder) {
-            throw new ConflictException("Customer already has an order with the status PENDING. " +
-                    "You'll have to cancel or confirm that order before placing a new order.");
+        for (Order order : customer.getOrders()) {
+            if (order.getConfirmationStatus() == ConfirmationStatus.PENDING) {
+                throw new ConflictException("Customer already has an order with the status PENDING. " +
+                        "You'll have to cancel or confirm that order before placing a new order.");
+            }
         }
     }
 
