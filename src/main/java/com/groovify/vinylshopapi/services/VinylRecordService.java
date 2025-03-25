@@ -70,7 +70,7 @@ public class VinylRecordService {
 
     public VinylRecordResponseDTO getVinylRecordByTitle(String title) {
         VinylRecord vinylRecord = vinylRecordRepository.findByTitleIgnoreCase(title)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with title " + title + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with title: " + title));
 
         return vinylRecordMapper.toResponseDTO(vinylRecord);
     }
@@ -104,7 +104,8 @@ public class VinylRecordService {
         VinylRecord vinylRecord = findVinylRecord(id);
 
         if (!vinylRecord.getOrderItems().isEmpty()) {
-            throw new DeleteOperationException("This vinyl record cannot be deleted because it is linked to one or more orders");
+            throw new DeleteOperationException("Vinyl record " + vinylRecord.getTitle() + " cannot be deleted because " +
+                    "it is linked to one or more orders");
         }
 
         for (Customer customer : vinylRecord.getCustomers()) {
@@ -119,7 +120,7 @@ public class VinylRecordService {
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + artistId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No artist found with id: " + artistId));
 
         vinylRecord.setArtist(artist);
         vinylRecordRepository.save(vinylRecord);
@@ -146,6 +147,6 @@ public class VinylRecordService {
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
     }
 }

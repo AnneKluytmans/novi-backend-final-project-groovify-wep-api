@@ -124,10 +124,10 @@ public class OrderController {
 
 
     @GetMapping("/{id}/invoice")
-    public ResponseEntity<InvoiceResponseDTO> getInvoiceByOrder(
+    public ResponseEntity<InvoiceResponseDTO> getOrderInvoice(
             @PathVariable Long id
     ) {
-        InvoiceResponseDTO invoice = orderService.getInvoiceByOrder(id);
+        InvoiceResponseDTO invoice = orderService.getOrderInvoice(id);
         return ResponseEntity.ok(invoice);
     }
 

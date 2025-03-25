@@ -43,7 +43,7 @@ public class VinylRecordCoverService {
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         if (vinylRecord.getCover() != null) {
-            throw new ConflictException("Vinyl record with id " + vinylRecordId + " already has a cover");
+            throw new ConflictException("Cover already exists for vinyl record with id: '" + vinylRecordId);
         }
 
         VinylRecordCover cover = new VinylRecordCover(file, downloadUrl);
@@ -73,12 +73,12 @@ public class VinylRecordCoverService {
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
     }
 
     private VinylRecordCover findVinylRecordCover(VinylRecord vinylRecord) {
         return Optional.ofNullable(vinylRecord.getCover())
-                .orElseThrow(() -> new RecordNotFoundException("Cover of vinyl record " + vinylRecord.getTitle() + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No cover found for vinyl record: " + vinylRecord.getTitle()));
     }
 }
 

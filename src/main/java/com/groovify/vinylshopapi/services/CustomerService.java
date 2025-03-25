@@ -84,7 +84,7 @@ public class CustomerService {
 
     public CustomerResponseDTO getCustomerByUsername(String username) {
         Customer customer = customerRepository.findByUsernameIgnoreCaseAndIsDeletedFalse(username)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with username " + username + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with username: " + username));
 
         return customerMapper.toResponseDTO(customer);
     }
@@ -117,7 +117,7 @@ public class CustomerService {
     }
 
 
-    public List<VinylRecordSummaryResponseDTO> getFavoriteRecords(Long customerId) {
+    public List<VinylRecordSummaryResponseDTO> getCustomerFavoriteRecords(Long customerId) {
         List<VinylRecord> favoriteRecords = findCustomer(customerId).getFavoriteVinylRecords();
         return vinylRecordMapper.toSummaryResponseDTOs(favoriteRecords);
     }
@@ -127,7 +127,7 @@ public class CustomerService {
         VinylRecord favoriteRecord = findVinylRecord(vinylRecordId);
 
         if (customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
-            throw new ConflictException("Vinyl record with id " + vinylRecordId + " is already a favorite record of this customer.");
+            throw new ConflictException("Vinyl record with id: '" + vinylRecordId + "' is already in customer's favorite list.");
         }
 
         customer.getFavoriteVinylRecords().add(favoriteRecord);
@@ -139,19 +139,19 @@ public class CustomerService {
         VinylRecord favoriteRecord = findVinylRecord(vinylRecordId);
 
         if (!customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
-            throw new ConflictException("Vinyl record with id " + vinylRecordId + " is not a favorite record of this customer.");
+            throw new ConflictException("No vinyl record found in the customer's favorite list with id: " + vinylRecordId);
         }
 
         customer.getFavoriteVinylRecords().remove(favoriteRecord);
         customerRepository.save(customer);
     }
 
-    public List<OrderSummaryResponseDTO> getOrdersByCustomer(Long customerId) {
+    public List<OrderSummaryResponseDTO> getCustomerOrders(Long customerId) {
         Customer customer = findCustomer(customerId);
         return orderMapper.toOrderSummaryResponseDTOs(customer.getOrders());
     }
 
-    public OrderResponseDTO getOrderByCustomerAndId(Long customerId, Long orderId) {
+    public OrderResponseDTO getCustomerOrder(Long customerId, Long orderId) {
         return orderMapper.toResponseDTO(findOrder(orderId, customerId));
     }
 
@@ -166,7 +166,7 @@ public class CustomerService {
     }
 
     private Order findOrder(Long orderId, Long customerId) {
-        return orderRepository.findByIdAndCustomerId(orderId, customerId)
+        return orderRepository.findByIdAndIsDeletedFalseAndCustomerId(orderId, customerId)
                 .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId + " for customer with id: " + customerId));
     }
 }

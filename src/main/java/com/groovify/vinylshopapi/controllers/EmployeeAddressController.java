@@ -20,6 +20,14 @@ public class EmployeeAddressController {
         this.employeeAddressService = employeeAddressService;
     }
 
+    @GetMapping()
+    public ResponseEntity<AddressResponseDTO> getEmployeeAddress(
+            @PathVariable("id") Long employeeId
+    ) {
+        AddressResponseDTO address = employeeAddressService.getEmployeeAddress(employeeId);
+        return ResponseEntity.ok(address);
+    }
+
     @PostMapping()
     public ResponseEntity<?> createEmployeeAddress(
             @PathVariable("id") Long employeeId,
@@ -47,14 +55,6 @@ public class EmployeeAddressController {
         }
         AddressResponseDTO updatedAddress = employeeAddressService.updateEmployeeAddress(employeeId, addressRequestDTO);
         return ResponseEntity.ok(updatedAddress);
-    }
-
-    @GetMapping()
-    public ResponseEntity<AddressResponseDTO> getEmployeeAddress(
-            @PathVariable("id") Long employeeId
-    ) {
-        AddressResponseDTO address = employeeAddressService.getEmployeeAddressById(employeeId);
-        return ResponseEntity.ok(address);
     }
 
 }

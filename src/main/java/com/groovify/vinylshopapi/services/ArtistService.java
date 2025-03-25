@@ -62,7 +62,7 @@ public class ArtistService {
 
     public ArtistResponseDTO getArtistByName(String name) {
         Artist artist = artistRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with name " + name + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No artist found with name: " + name));
 
         return artistMapper.toResponseDTO(artist);
     }
@@ -102,7 +102,8 @@ public class ArtistService {
         Artist artist = findArtist(id);
 
         if (!artist.getVinylRecords().isEmpty()) {
-            throw new DeleteOperationException("Artist " + artist.getName() + " cannot be deleted while linked to vinyl records");
+            throw new DeleteOperationException("Artist " + artist.getName() + " cannot be deleted because it is still " +
+                    "linked to one or more vinyl records.");
         }
 
         artistRepository.deleteById(id);
@@ -112,13 +113,13 @@ public class ArtistService {
         Optional<Artist> existingArtist = artistRepository.findByNameIgnoreCase(name);
 
         if (existingArtist.isPresent() && !existingArtist.get().getId().equals(currentArtistId)) {
-            throw new ConflictException("Artist with name " + name + " already exists");
+            throw new ConflictException("Artist name must be unique. There is already an artist with the name: " + name);
         }
     }
 
     private Artist findArtist(Long id) {
         return artistRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No artist found with id: " + id));
     }
 }
 

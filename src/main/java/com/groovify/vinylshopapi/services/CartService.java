@@ -32,7 +32,7 @@ public class CartService {
         this.customerRepository = customerRepository;
     }
 
-    public List<CartResponseDTO> getAllCarts(
+    public List<CartResponseDTO> getCarts(
             LocalDate createdBefore,
             LocalDate createdAfter,
             LocalDate updatedBefore,
@@ -69,6 +69,6 @@ public class CartService {
 
     private Cart findCart(Long cartId) {
         return cartRepository.findById(cartId)
-                .orElseThrow(() -> new RecordNotFoundException("Cart with id " + cartId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No cart found with id: " + cartId));
     }
 }

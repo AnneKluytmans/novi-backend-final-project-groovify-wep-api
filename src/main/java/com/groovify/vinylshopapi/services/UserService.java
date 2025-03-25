@@ -78,7 +78,7 @@ public class UserService {
         return mapToUserResponseDTO(findUser(id));
     }
 
-    public void softDeleteUser(Long id) {
+    public void deactivateUser(Long id) {
         User user = findUser(id);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
@@ -88,7 +88,7 @@ public class UserService {
 
     public void reactivateUser(ReactivateUserDTO reactivateUserDTO) {
         User user = userRepository.findByEmail(reactivateUserDTO.getEmail())
-                .orElseThrow(() -> new RecordNotFoundException("User with email '" + reactivateUserDTO.getEmail() + "' not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No user found with email: " + reactivateUserDTO.getEmail()));
 
         if (!user.getIsDeleted()) {
             throw new ConflictException("User with email '" + reactivateUserDTO.getEmail() + "' still exists");
@@ -141,12 +141,12 @@ public class UserService {
 
     private User findUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No user found with id: " + userId));
     }
 
     private Role findRoleByType(RoleType role) {
         return roleRepository.findByRoleType(role)
-                .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found."));
     }
 
     private void validateRolesForUserType(User user, List<RoleType> roles, Boolean isNewRole) {

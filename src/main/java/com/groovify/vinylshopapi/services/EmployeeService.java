@@ -65,7 +65,7 @@ public class EmployeeService {
 
     public EmployeeResponseDTO getEmployeeByUsername(String username) {
         Employee employee = employeeRepository.findByUsernameIgnoreCaseAndIsDeletedFalse(username)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with username " + username + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No employee found with username: " + username));
 
         return employeeMapper.toResponseDTO(employee);
     }
@@ -110,7 +110,7 @@ public class EmployeeService {
 
     private Employee findEmployee(Long id) {
         return employeeRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No employee found with id: " + id));
     }
 
     private Role findRoleByRoleType(RoleType roleType) {

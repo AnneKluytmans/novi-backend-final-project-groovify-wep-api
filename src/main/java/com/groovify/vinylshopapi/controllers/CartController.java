@@ -20,7 +20,7 @@ public class CartController {
 
 
     @GetMapping()
-    public ResponseEntity<List<CartResponseDTO>> getAllCarts(
+    public ResponseEntity<List<CartResponseDTO>> getCarts(
             @RequestParam(required = false) LocalDate createdBefore,
             @RequestParam(required = false) LocalDate createdAfter,
             @RequestParam(required = false) LocalDate updatedBefore,
@@ -30,7 +30,7 @@ public class CartController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder
     ) {
-        List<CartResponseDTO> carts = cartService.getAllCarts(
+        List<CartResponseDTO> carts = cartService.getCarts(
                 createdBefore, createdAfter, updatedBefore, updatedAfter, customerId,
                 isEmpty, sortBy, sortOrder
         );

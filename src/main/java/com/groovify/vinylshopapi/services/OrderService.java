@@ -195,7 +195,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public InvoiceResponseDTO getInvoiceByOrder(Long orderId) {
+    public InvoiceResponseDTO getOrderInvoice(Long orderId) {
         Order order = findOrder(orderId, false);
         if (order.getInvoice() == null) {
             throw new RecordNotFoundException("No invoice found for order with id: " + orderId);

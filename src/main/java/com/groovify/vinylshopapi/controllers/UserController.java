@@ -51,10 +51,10 @@ public class UserController {
 
 
     @DeleteMapping("/{id}/deactivate")
-    public ResponseEntity<Void> softDeleteUser(
+    public ResponseEntity<Void> deactivateUser(
             @PathVariable Long id
     ) {
-        userService.softDeleteUser(id);
+        userService.deactivateUser(id);
         return ResponseEntity.noContent().build();
     }
 

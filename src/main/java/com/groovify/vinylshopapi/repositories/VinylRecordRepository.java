@@ -11,5 +11,4 @@ import java.util.Optional;
 @Repository
 public interface VinylRecordRepository extends JpaRepository<VinylRecord, Long>, JpaSpecificationExecutor<VinylRecord> {
     Optional<VinylRecord> findByTitleIgnoreCase(String title);
-    Boolean existsByTitleIgnoreCaseAndReleaseDate(String title, LocalDate releaseDate);
 }

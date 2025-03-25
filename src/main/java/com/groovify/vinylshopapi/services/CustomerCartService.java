@@ -106,21 +106,21 @@ public class CustomerCartService {
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with id: " + customerId));
     }
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
     }
 
     private Cart findCart(Long customerId) {
-        return cartRepository.findByCustomerId(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Cart of customer with id " + customerId + " not found"));
+        return cartRepository.findByCustomerIdAndCustomerIsDeletedFalse(customerId)
+                .orElseThrow(() -> new RecordNotFoundException("No cart found for customer with id: " + customerId));
     }
 
     private Cart findOrCreateCart(Long customerId) {
-        return cartRepository.findByCustomerId(customerId)
+        return cartRepository.findByCustomerIdAndCustomerIsDeletedFalse(customerId)
                 .orElseGet(() -> {
                     Cart newCart = new Cart(findCustomer(customerId));
                     return cartRepository.save(newCart);
@@ -131,7 +131,7 @@ public class CustomerCartService {
         return cart.getCartItems().stream()
                 .filter(item -> item.getId().equals(cartItemId))
                 .findFirst()
-                .orElseThrow(() -> new RecordNotFoundException("Cart item with id " + cartItemId + " not found in this cart"));
+                .orElseThrow(() -> new RecordNotFoundException("No cart item found with id: " + cartItemId + " for cart with id: " + cart.getId()));
     }
 
     private CartItem findExistingCartItem(Cart cart, VinylRecord vinylRecord) {

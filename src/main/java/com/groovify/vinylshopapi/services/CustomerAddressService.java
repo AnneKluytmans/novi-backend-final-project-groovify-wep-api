@@ -2,7 +2,6 @@ package com.groovify.vinylshopapi.services;
 
 import com.groovify.vinylshopapi.dtos.*;
 import com.groovify.vinylshopapi.exceptions.BadRequestException;
-import com.groovify.vinylshopapi.exceptions.ForbiddenException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
 import com.groovify.vinylshopapi.models.Address;
@@ -36,8 +35,8 @@ public class CustomerAddressService {
         return addressMapper.toCustomerResponseDTOs(customer.getAddresses());
     }
 
-    public CustomerAddressResponseDTO getCustomerAddressById(Long customerId, Long addressId) {
-        Address address = validateCustomerAndAddress(customerId, addressId);
+    public CustomerAddressResponseDTO getCustomerAddress(Long customerId, Long addressId) {
+        Address address = findAddress(customerId, addressId);
         return addressMapper.toCustomerResponseDTO(address);
     }
 
@@ -56,7 +55,7 @@ public class CustomerAddressService {
         List<Address> existingAddresses = customer.getAddresses();
 
         if (existingAddresses.size() >= 6) {
-            throw new BadRequestException("Maximum number of addresses reached. Please remove at least one address before creating a new one.");
+            throw new BadRequestException("Maximum number of addresses reached. Remove at least one address before creating a new one.");
         }
 
         Address newAddress = addressMapper.toCustomerAddressEntity(addressRequestDTO);
@@ -78,7 +77,7 @@ public class CustomerAddressService {
     }
 
     public CustomerAddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {
-        Address address = validateCustomerAndAddress(customerId, addressId);
+        Address address = findAddress(customerId, addressId);
         Address savedAddress;
 
         if (address.isOrderAddress()) {
@@ -92,14 +91,14 @@ public class CustomerAddressService {
     }
 
     public void setDefaultAddresses(Long customerId, Long addressId, DefaultAddressesRequestDTO defaultAddressesRequestDTO) {
-        Address address = validateCustomerAndAddress(customerId, addressId);
+        Address address = findAddress(customerId, addressId);
 
         updateDefaultAddress(address.getCustomer().getAddresses(), defaultAddressesRequestDTO, address);
         addressRepository.save(address);
     }
 
     public void deleteCustomerAddress(Long customerId, Long addressId) {
-        Address address = validateCustomerAndAddress(customerId, addressId);
+        Address address = findAddress(customerId, addressId);
         List<Address> customerAddresses = address.getCustomer().getAddresses();
 
         if (address.getIsBillingAddress() || address.getIsShippingAddress()) {
@@ -120,20 +119,12 @@ public class CustomerAddressService {
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with id: " + customerId));
     }
 
-    private Address validateCustomerAndAddress(Long customerId, Long addressId) {
-        Customer customer = findCustomer(customerId);
-
-        Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new RecordNotFoundException("Address with id " + addressId + " not found"));
-
-        if (!address.getCustomer().equals(customer)) {
-            throw new ForbiddenException("This address doesn't belong to the specified customer");
-        }
-
-        return address;
+    private Address findAddress(Long customerId, Long addressId) {
+        return addressRepository.findByIdAndCustomerIdAndCustomerIsDeletedFalse(addressId, customerId)
+                .orElseThrow(() -> new RecordNotFoundException("No address found with id: " + addressId + " for customer with id: " + customerId));
     }
 
     private Address updateOrderAddress(Address address, AddressRequestDTO addressRequestDTO) {

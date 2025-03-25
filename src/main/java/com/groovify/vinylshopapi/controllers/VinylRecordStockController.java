@@ -22,10 +22,10 @@ public class VinylRecordStockController {
     }
 
     @GetMapping()
-    public ResponseEntity<VinylRecordStockResponseDTO> getStockByVinylRecord(
+    public ResponseEntity<VinylRecordStockResponseDTO> getStock(
             @PathVariable("id") Long vinylRecordId
     ) {
-        VinylRecordStockResponseDTO stock = vinylRecordStockService.getStockByVinylRecord(vinylRecordId);
+        VinylRecordStockResponseDTO stock = vinylRecordStockService.getStock(vinylRecordId);
         return ResponseEntity.ok(stock);
     }
 

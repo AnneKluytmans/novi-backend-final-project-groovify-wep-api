@@ -29,7 +29,7 @@ public class VinylRecordStockService {
     }
 
 
-    public VinylRecordStockResponseDTO getStockByVinylRecord(Long vinylRecordId) {
+    public VinylRecordStockResponseDTO getStock(Long vinylRecordId) {
         VinylRecordStock stock = findStock(vinylRecordId);
         return vinylRecordStockMapper.toResponseDTO(stock);
     }
@@ -38,7 +38,7 @@ public class VinylRecordStockService {
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         if (vinylRecord.getStock() != null) {
-            throw new ConflictException("Stock already exists for vinyl record with id " + vinylRecordId);
+            throw new ConflictException("Stock already exists for vinyl record with id: " + vinylRecordId);
         }
 
         VinylRecordStock stock = vinylRecordStockMapper.toEntity(stockRequestDTO);
@@ -70,13 +70,13 @@ public class VinylRecordStockService {
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
     }
 
     private VinylRecordStock findStock(Long vinylRecordId) {
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
         return vinylRecordStockRepository.findByVinylRecord(vinylRecord)
-                .orElseThrow(() -> new RecordNotFoundException("Stock of vinyl record " + vinylRecord.getTitle() + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No stock found for vinyl record: " + vinylRecord.getTitle()));
     }
 
 }

@@ -31,7 +31,7 @@ public class ValidationUtils {
             if (existingUser.get().getIsDeleted()) {
                 throw new DeactivatedException("This username is linked to a deleted account. Do you want to reactivate it?");
             } else {
-                throw new ConflictException("Username " + username + " is already taken by another user. Please choose another username.");
+                throw new ConflictException("Username '" + username + "' is already taken by another user. Please choose another username.");
             }
         }
     }
@@ -43,7 +43,7 @@ public class ValidationUtils {
             if (existingUser.get().getIsDeleted()) {
                 throw new DeactivatedException("This email is linked to a deleted account. Do you want to reactivate it?", email);
             } else {
-                throw new ConflictException("Email " + email + " is already in use by another user. Please choose another email.");
+                throw new ConflictException("Email: '" + email + "' is already in use by another user. Please choose another email.");
             }
         }
     }
@@ -52,7 +52,7 @@ public class ValidationUtils {
         Integer amountInStock = vinylRecord.getStock().getAmountInStock();
 
         if (amountInStock == 0) {
-            throw new InsufficientStockException("Vinyl record " + vinylRecord.getTitle() + " is sold out");
+            throw new InsufficientStockException("Vinyl record '" + vinylRecord.getTitle() + "' is sold out");
         }
 
         if (amountInStock < quantity) {

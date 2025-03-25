@@ -29,15 +29,14 @@ public class EmployeeAddressService {
         this.employeeRepository = employeeRepository;
     }
 
-    public AddressResponseDTO getEmployeeAddressById(Long employeeId) {
-        Address address = validateEmployeeAndAddress(employeeId);
-        return addressMapper.toResponseDTO(address);
+    public AddressResponseDTO getEmployeeAddress(Long employeeId) {
+        return addressMapper.toResponseDTO(findAddress(employeeId));
     }
 
     public AddressResponseDTO createEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
 
         if (addressRepository.existsByEmployeeId(employeeId)) {
-            throw new ConflictException("Employee already has an address");
+            throw new ConflictException("Address already exists for employee with id: '" + employeeId);
         }
 
         Address address = addressMapper.toEntity(addressRequestDTO);
@@ -48,7 +47,7 @@ public class EmployeeAddressService {
     }
 
     public AddressResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
-        Address address = validateEmployeeAndAddress(employeeId);
+        Address address = findAddress(employeeId);
 
         addressMapper.updateAddress(addressRequestDTO, address);
 
@@ -57,17 +56,13 @@ public class EmployeeAddressService {
     }
 
 
-    private Address validateEmployeeAndAddress(Long employeeId) {
-        if (!employeeRepository.existsByIdAndIsDeletedFalse(employeeId)) {
-            throw new RecordNotFoundException("Employee with id " + employeeId + " not found");
-        }
-
-        return addressRepository.findByEmployeeId(employeeId)
-                .orElseThrow(() -> new RecordNotFoundException("Address of employee with id " + employeeId + " not found"));
+    private Address findAddress(Long employeeId) {
+        return addressRepository.findByEmployeeIdAndEmployeeIsDeletedFalse(employeeId)
+                .orElseThrow(() -> new RecordNotFoundException("No address found for employee with id: " + employeeId));
     }
 
     private Employee findEmployee(Long employeeId) {
         return employeeRepository.findByIdAndIsDeletedFalse(employeeId)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + employeeId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No employee found with id: " + employeeId));
     }
 }
