@@ -6,6 +6,7 @@ import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class EmployeeSpecification {
             String firstName,
             String lastName,
             String jobTitle,
-            Double minSalary,
-            Double maxSalary,
+            BigDecimal minSalary,
+            BigDecimal maxSalary,
             String country,
             String city
     ) {

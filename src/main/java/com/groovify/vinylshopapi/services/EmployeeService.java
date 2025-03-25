@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -43,8 +44,8 @@ public class EmployeeService {
             String firstName,
             String lastName,
             String jobTitle,
-            Double minSalary,
-            Double maxSalary,
+            BigDecimal minSalary,
+            BigDecimal maxSalary,
             String country,
             String city,
             String sortBy,

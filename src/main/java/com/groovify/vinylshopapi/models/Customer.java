@@ -2,10 +2,8 @@ package com.groovify.vinylshopapi.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +12,6 @@ import java.util.List;
 @DiscriminatorValue("CUSTOMER")
 @EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Customer extends User {
     @NotNull(message = "Subscribe status is required")
     private Boolean newsletterSubscribed = true;

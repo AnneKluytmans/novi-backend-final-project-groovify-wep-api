@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class EmployeeRegisterDTO extends UserRegisterDTO {
@@ -13,7 +15,7 @@ public class EmployeeRegisterDTO extends UserRegisterDTO {
 
     @NotNull(message = "Salary is required")
     @Positive(message = "Salary must be a positive value")
-    private Double salary;
+    private BigDecimal salary;
 
     @NotNull(message = "Work hours are required")
     @Positive(message = "Work hours must be a positive value")

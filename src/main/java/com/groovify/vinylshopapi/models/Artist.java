@@ -3,9 +3,7 @@ package com.groovify.vinylshopapi.models;
 import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,8 +13,6 @@ import java.util.List;
 @Entity
 @Table(name = "artists")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Artist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
