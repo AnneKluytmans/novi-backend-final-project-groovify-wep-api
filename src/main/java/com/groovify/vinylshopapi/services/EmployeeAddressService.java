@@ -42,17 +42,14 @@ public class EmployeeAddressService {
         Address address = addressMapper.toEntity(addressRequestDTO);
         address.setEmployee(findEmployee(employeeId));
 
-        Address savedAddress = addressRepository.save(address);
-        return addressMapper.toResponseDTO(savedAddress);
+        return addressMapper.toResponseDTO(addressRepository.save(address));
     }
 
     public AddressResponseDTO updateEmployeeAddress(Long employeeId, AddressRequestDTO addressRequestDTO) {
         Address address = findAddress(employeeId);
-
         addressMapper.updateAddress(addressRequestDTO, address);
 
-        Address savedAddress = addressRepository.save(address);
-        return addressMapper.toResponseDTO(savedAddress);
+        return addressMapper.toResponseDTO(addressRepository.save(address));
     }
 
 

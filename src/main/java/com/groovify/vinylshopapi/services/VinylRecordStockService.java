@@ -14,24 +14,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class VinylRecordStockService {
 
-    private final VinylRecordStockRepository vinylRecordStockRepository;
     private final VinylRecordRepository vinylRecordRepository;
+    private final VinylRecordStockRepository vinylRecordStockRepository;
     private final VinylRecordStockMapper vinylRecordStockMapper;
 
     public VinylRecordStockService(
-            VinylRecordStockRepository vinylRecordStockRepository,
             VinylRecordRepository vinylRecordRepository,
+            VinylRecordStockRepository vinylRecordStockRepository,
             VinylRecordStockMapper vinylRecordStockMapper
     ) {
-        this.vinylRecordStockRepository = vinylRecordStockRepository;
         this.vinylRecordRepository = vinylRecordRepository;
+        this.vinylRecordStockRepository = vinylRecordStockRepository;
         this.vinylRecordStockMapper = vinylRecordStockMapper;
     }
 
 
     public VinylRecordStockResponseDTO getStock(Long vinylRecordId) {
-        VinylRecordStock stock = findStock(vinylRecordId);
-        return vinylRecordStockMapper.toResponseDTO(stock);
+        return vinylRecordStockMapper.toResponseDTO(findStock(vinylRecordId));
     }
 
     public VinylRecordStockResponseDTO createStock(Long vinylRecordId, VinylRecordStockRequestDTO stockRequestDTO) {
@@ -44,17 +43,14 @@ public class VinylRecordStockService {
         VinylRecordStock stock = vinylRecordStockMapper.toEntity(stockRequestDTO);
         stock.setVinylRecord(vinylRecord);
 
-        VinylRecordStock savedStock = vinylRecordStockRepository.save(stock);
-        return vinylRecordStockMapper.toResponseDTO(savedStock);
+        return vinylRecordStockMapper.toResponseDTO(vinylRecordStockRepository.save(stock));
     }
 
     public VinylRecordStockResponseDTO updateStock(Long vinylRecordId, VinylRecordStockRequestDTO stockRequestDTO) {
         VinylRecordStock stock = findStock(vinylRecordId);
 
         vinylRecordStockMapper.updateVinylRecordStock(stockRequestDTO, stock);
-
-        VinylRecordStock savedStock = vinylRecordStockRepository.save(stock);
-        return vinylRecordStockMapper.toResponseDTO(savedStock);
+        return vinylRecordStockMapper.toResponseDTO(vinylRecordStockRepository.save(stock));
     }
 
     public void deleteStock(Long vinylRecordId) {
@@ -63,7 +59,6 @@ public class VinylRecordStockService {
 
         vinylRecord.setStock(null);
         vinylRecordRepository.save(vinylRecord);
-
         vinylRecordStockRepository.delete(stock);
     }
 

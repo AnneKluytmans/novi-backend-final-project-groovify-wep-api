@@ -31,31 +31,31 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
-    private final RoleRepository roleRepository;
-    private final ValidationUtils validationUtils;
-    private final VinylRecordRepository vinylRecordRepository;
-    private final VinylRecordMapper vinylRecordMapper;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final RoleRepository roleRepository;
+    private final VinylRecordRepository vinylRecordRepository;
+    private final VinylRecordMapper vinylRecordMapper;
+    private final ValidationUtils validationUtils;
 
     public CustomerService(
             CustomerRepository customerRepository,
             CustomerMapper customerMapper,
+            OrderRepository orderRepository,
+            OrderMapper orderMapper,
             RoleRepository roleRepository,
-            ValidationUtils validationUtils,
             VinylRecordRepository vinylRecordRepository,
             VinylRecordMapper vinylRecordMapper,
-            OrderRepository orderRepository,
-            OrderMapper orderMapper
+            ValidationUtils validationUtils
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
-        this.roleRepository = roleRepository;
-        this.validationUtils = validationUtils;
-        this.vinylRecordRepository = vinylRecordRepository;
-        this.vinylRecordMapper = vinylRecordMapper;
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.roleRepository = roleRepository;
+        this.vinylRecordRepository = vinylRecordRepository;
+        this.vinylRecordMapper = vinylRecordMapper;
+        this.validationUtils = validationUtils;
     }
 
     public List<UserSummaryResponseDTO> getCustomers(
@@ -100,8 +100,7 @@ public class CustomerService {
 
         customer.getRoles().add(userRole);
 
-        Customer savedCustomer = customerRepository.save(customer);
-        return customerMapper.toResponseDTO(savedCustomer);
+        return customerMapper.toResponseDTO(customerRepository.save(customer));
     }
 
     public CustomerResponseDTO updateCustomer(Long id, CustomerUpdateDTO customerUpdateDTO) {
@@ -111,9 +110,7 @@ public class CustomerService {
         validationUtils.validateUniqueEmail(customerUpdateDTO.getEmail(), id);
 
         customerMapper.updateCustomer(customerUpdateDTO, customer);
-
-        Customer savedCustomer = customerRepository.save(customer);
-        return customerMapper.toResponseDTO(savedCustomer);
+        return customerMapper.toResponseDTO(customerRepository.save(customer));
     }
 
 
@@ -147,8 +144,7 @@ public class CustomerService {
     }
 
     public List<OrderSummaryResponseDTO> getCustomerOrders(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        return orderMapper.toOrderSummaryResponseDTOs(customer.getOrders());
+        return orderMapper.toOrderSummaryResponseDTOs(findCustomer(customerId).getOrders());
     }
 
     public OrderResponseDTO getCustomerOrder(Long customerId, Long orderId) {

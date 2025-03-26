@@ -1,7 +1,7 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.VinylRecordCoverDownloadDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordCoverResponseDTO;
+import com.groovify.vinylshopapi.dtos.VinylRecordCoverSummaryResponseDTO;
 import com.groovify.vinylshopapi.exceptions.ConflictException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.VinylRecordCoverMapper;
@@ -37,7 +37,7 @@ public class VinylRecordCoverService {
         this.vinylRecordCoverMapper = vinylRecordCoverMapper;
     }
 
-    public VinylRecordCoverResponseDTO uploadCover(Long vinylRecordId, MultipartFile file, String downloadUrl) throws IOException {
+    public VinylRecordCoverSummaryResponseDTO uploadCover(Long vinylRecordId, MultipartFile file, String downloadUrl) throws IOException {
         ValidationUtils.validateFile(file, allowedFileTypes);
 
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
@@ -51,14 +51,11 @@ public class VinylRecordCoverService {
         vinylRecord.setCover(cover);
         vinylRecordRepository.save(vinylRecord);
 
-        return vinylRecordCoverMapper.toResponseDTO(cover);
+        return vinylRecordCoverMapper.toSummaryResponseDTO(cover);
     }
 
-    public VinylRecordCoverDownloadDTO downloadCover(Long vinylRecordId) {
-        VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
-        VinylRecordCover cover = findVinylRecordCover(vinylRecord);
-
-        return vinylRecordCoverMapper.toDownloadDTO(cover);
+    public VinylRecordCoverResponseDTO downloadCover(Long vinylRecordId) {
+        return vinylRecordCoverMapper.toResponseDTO(findVinylRecordCover(findVinylRecord(vinylRecordId)));
     }
 
     public void deleteCover(Long vinylRecordId) {
@@ -66,7 +63,6 @@ public class VinylRecordCoverService {
         VinylRecordCover cover = findVinylRecordCover(vinylRecord);
 
         vinylRecord.setCover(null);
-
         vinylRecordCoverRepository.delete(cover);
     }
 

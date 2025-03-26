@@ -31,18 +31,15 @@ public class CustomerAddressService {
     }
 
     public List<CustomerAddressResponseDTO> getCustomerAddresses(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        return addressMapper.toCustomerResponseDTOs(customer.getAddresses());
+        return addressMapper.toCustomerResponseDTOs(findCustomer(customerId).getAddresses());
     }
 
     public CustomerAddressResponseDTO getCustomerAddress(Long customerId, Long addressId) {
-        Address address = findAddress(customerId, addressId);
-        return addressMapper.toCustomerResponseDTO(address);
+        return addressMapper.toCustomerResponseDTO(findAddress(customerId, addressId));
     }
 
     public DefaultAddressesResponseDTO getDefaultCustomerAddresses(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        List<Address> customerAddresses = customer.getAddresses();
+        List<Address> customerAddresses = findCustomer(customerId).getAddresses();
 
         return new DefaultAddressesResponseDTO(
                 addressMapper.toResponseDTO(findShippingAddress(customerAddresses)),
@@ -72,8 +69,7 @@ public class CustomerAddressService {
             updateDefaultAddress(existingAddresses, defaultAddressesRequestDTO, newAddress);
         }
 
-        Address savedAddress = addressRepository.save(newAddress);
-        return addressMapper.toCustomerResponseDTO(savedAddress);
+        return addressMapper.toCustomerResponseDTO(addressRepository.save(newAddress));
     }
 
     public CustomerAddressResponseDTO updateCustomerAddress(Long customerId, Long addressId, AddressRequestDTO addressRequestDTO) {

@@ -6,7 +6,6 @@ import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CartMapper;
 import com.groovify.vinylshopapi.models.Cart;
 import com.groovify.vinylshopapi.repositories.CartRepository;
-import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.specifications.CartSpecification;
 import com.groovify.vinylshopapi.utils.SortHelper;
 import org.springframework.data.domain.Sort;
@@ -21,15 +20,13 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
-    private final CustomerRepository customerRepository;
 
     public CartService(
             CartRepository cartRepository,
-            CartMapper cartMapper,
-            CustomerRepository customerRepository) {
+            CartMapper cartMapper
+    ) {
         this.cartRepository = cartRepository;
         this.cartMapper = cartMapper;
-        this.customerRepository = customerRepository;
     }
 
     public List<CartResponseDTO> getCarts(
@@ -63,7 +60,7 @@ public class CartService {
         }
 
         cart.getCustomer().setCart(null);
-        customerRepository.save(cart.getCustomer());
+        cartRepository.save(cart);
         cartRepository.delete(cart);
     }
 

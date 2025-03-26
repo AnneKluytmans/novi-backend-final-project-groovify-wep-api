@@ -23,23 +23,23 @@ import java.time.LocalDateTime;
 public class CustomerCartService {
 
     private final CartRepository cartRepository;
-    private final CustomerRepository customerRepository;
-    private final VinylRecordRepository vinylRecordRepository;
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
+    private final CustomerRepository customerRepository;
+    private final VinylRecordRepository vinylRecordRepository;
 
     public CustomerCartService(
             CartRepository cartRepository,
-            CustomerRepository customerRepository,
-            VinylRecordRepository vinylRecordRepository,
             CartMapper cartMapper,
-            CartItemMapper cartItemMapper
+            CartItemMapper cartItemMapper,
+            CustomerRepository customerRepository,
+            VinylRecordRepository vinylRecordRepository
     ) {
         this.cartRepository = cartRepository;
-        this.customerRepository = customerRepository;
-        this.vinylRecordRepository = vinylRecordRepository;
         this.cartMapper = cartMapper;
         this.cartItemMapper = cartItemMapper;
+        this.customerRepository = customerRepository;
+        this.vinylRecordRepository = vinylRecordRepository;
     }
 
     public CartResponseDTO getCustomerCart(Long customerId) {
@@ -65,8 +65,7 @@ public class CustomerCartService {
 
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
     public CartResponseDTO updateCartItemQuantity(Long customerId, Long cartItemId, CartItemQuantityUpdateDTO cartItemQuantityDTO) {
@@ -78,19 +77,16 @@ public class CustomerCartService {
         cartItem.setQuantity(cartItemQuantityDTO.getNewQuantity());
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
     public CartResponseDTO removeCartItemFromCart(Long customerId, Long cartItemId) {
         Cart cart = findCart(customerId);
-        CartItem cartItem = findCartItem(cart, cartItemId);
 
-        cart.getCartItems().remove(cartItem);
+        cart.getCartItems().remove(findCartItem(cart, cartItemId));
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
     public CartResponseDTO clearCart(Long customerId) {
@@ -99,8 +95,7 @@ public class CustomerCartService {
         cart.getCartItems().clear();
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
 

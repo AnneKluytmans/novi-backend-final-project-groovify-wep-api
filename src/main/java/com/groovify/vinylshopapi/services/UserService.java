@@ -28,21 +28,21 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final CustomerMapper customerMapper;
     private final EmployeeMapper employeeMapper;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     public UserService(
-            UserRepository userRepository,
-            RoleRepository roleRepository,
             CustomerMapper customerMapper,
-            EmployeeMapper employeeMapper
+            EmployeeMapper employeeMapper,
+            RoleRepository roleRepository,
+            UserRepository userRepository
     ) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.customerMapper = customerMapper;
         this.employeeMapper = employeeMapper;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -62,13 +62,13 @@ public class UserService {
         );
         List<User> users = userRepository.findAll(specification, sort);
 
-        List<UserSummaryResponseDTO> userSummaryResponseDTOS = new ArrayList<>();
+        List<UserSummaryResponseDTO> userSummaryResponseDTOs = new ArrayList<>();
 
         for (User user : users) {
-            userSummaryResponseDTOS.add(mapToUserSummaryDTO(user));
+            userSummaryResponseDTOs.add(mapToUserSummaryDTO(user));
         }
 
-        return userSummaryResponseDTOS;
+        return userSummaryResponseDTOs;
     }
 
     public UserResponseDTO getUserById(Long id) {

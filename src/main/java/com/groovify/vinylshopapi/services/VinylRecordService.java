@@ -64,8 +64,7 @@ public class VinylRecordService {
     }
 
     public VinylRecordResponseDTO getVinylRecordById(Long id) {
-        VinylRecord vinylRecord = findVinylRecord(id);
-        return vinylRecordMapper.toResponseDTO(vinylRecord);
+        return vinylRecordMapper.toResponseDTO(findVinylRecord(id));
     }
 
     public VinylRecordResponseDTO getVinylRecordByTitle(String title) {
@@ -77,27 +76,21 @@ public class VinylRecordService {
 
     public VinylRecordResponseDTO createVinylRecord(VinylRecordRequestDTO vinylRecordRequestDTO) {
         VinylRecord vinylRecord = vinylRecordMapper.toEntity(vinylRecordRequestDTO);
-
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        return vinylRecordMapper.toResponseDTO(vinylRecordRepository.save(vinylRecord));
     }
 
     public VinylRecordResponseDTO updateVinylRecord(Long id, VinylRecordRequestDTO vinylRecordRequestDTO) {
         VinylRecord vinylRecord = findVinylRecord(id);
 
         vinylRecordMapper.updateVinylRecord(vinylRecordRequestDTO, vinylRecord);
-
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        return vinylRecordMapper.toResponseDTO(vinylRecordRepository.save(vinylRecord));
     }
 
     public VinylRecordResponseDTO partialUpdateVinylRecord(Long id, VinylRecordPatchDTO vinylRecordPatchDTO) {
         VinylRecord vinylRecord = findVinylRecord(id);
 
         vinylRecordMapper.partialUpdateVinylRecord(vinylRecordPatchDTO, vinylRecord);
-
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        return vinylRecordMapper.toResponseDTO(vinylRecordRepository.save(vinylRecord));
     }
 
     public void deleteVinylRecord(Long id) {

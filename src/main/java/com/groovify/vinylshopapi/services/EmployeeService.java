@@ -83,8 +83,7 @@ public class EmployeeService {
             employee.getRoles().add(findRoleByRoleType(RoleType.ADMIN));
         }
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponseDTO(savedEmployee);
+        return employeeMapper.toResponseDTO(employeeRepository.save(employee));
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, UserUpdateDTO employeeUpdateDTO) {
@@ -94,18 +93,14 @@ public class EmployeeService {
         validationUtils.validateUniqueEmail(employeeUpdateDTO.getEmail(), id);
 
         employeeMapper.updateEmployee(employeeUpdateDTO, employee);
-
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponseDTO(savedEmployee);
+        return employeeMapper.toResponseDTO(employeeRepository.save(employee));
     }
 
     public EmployeeResponseDTO updateEmployeeByAdmin(Long id, EmployeeAdminUpdateDTO employeeUpdateDTO) {
         Employee employee = findEmployee(id);
-
         employeeMapper.updateEmployeeByAdmin(employeeUpdateDTO, employee);
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponseDTO(savedEmployee);
+        return employeeMapper.toResponseDTO(employeeRepository.save(employee));
     }
 
 

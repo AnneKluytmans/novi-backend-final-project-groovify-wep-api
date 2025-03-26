@@ -1,7 +1,6 @@
 package com.groovify.vinylshopapi.mappers;
 
 import com.groovify.vinylshopapi.dtos.*;
-import com.groovify.vinylshopapi.enums.Genre;
 import com.groovify.vinylshopapi.models.VinylRecord;
 
 import org.mapstruct.*;

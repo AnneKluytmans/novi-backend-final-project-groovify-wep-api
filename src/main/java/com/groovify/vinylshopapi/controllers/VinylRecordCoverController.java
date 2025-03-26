@@ -1,7 +1,7 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.VinylRecordCoverDownloadDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordCoverResponseDTO;
+import com.groovify.vinylshopapi.dtos.VinylRecordCoverSummaryResponseDTO;
 import com.groovify.vinylshopapi.services.VinylRecordCoverService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.InvalidMediaTypeException;
@@ -25,14 +25,14 @@ public class VinylRecordCoverController {
     }
 
     @PostMapping()
-    public ResponseEntity<VinylRecordCoverResponseDTO> uploadCover(
+    public ResponseEntity<VinylRecordCoverSummaryResponseDTO> uploadCover(
             @PathVariable("id") Long vinylRecordId,
             @RequestParam("file") MultipartFile file)
             throws IOException {
 
         String downloadUrl = ServletUriComponentsBuilder.fromCurrentRequest()
                 .toUriString();
-        VinylRecordCoverResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file, downloadUrl);
+        VinylRecordCoverSummaryResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file, downloadUrl);
         URI location = URI.create(downloadUrl);
         return ResponseEntity.created(location).body(newCover);
     }
@@ -41,7 +41,7 @@ public class VinylRecordCoverController {
     public ResponseEntity<byte[]> downloadCover(
             @PathVariable("id") Long vinylRecordId
     ) {
-        VinylRecordCoverDownloadDTO cover = vinylRecordCoverService.downloadCover(vinylRecordId);
+        VinylRecordCoverResponseDTO cover = vinylRecordCoverService.downloadCover(vinylRecordId);
 
         MediaType mediaType;
         try {
