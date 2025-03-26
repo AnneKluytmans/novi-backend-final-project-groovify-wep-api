@@ -31,31 +31,31 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
-    private final RoleRepository roleRepository;
-    private final ValidationUtils validationUtils;
-    private final VinylRecordRepository vinylRecordRepository;
-    private final VinylRecordMapper vinylRecordMapper;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final RoleRepository roleRepository;
+    private final VinylRecordRepository vinylRecordRepository;
+    private final VinylRecordMapper vinylRecordMapper;
+    private final ValidationUtils validationUtils;
 
     public CustomerService(
             CustomerRepository customerRepository,
             CustomerMapper customerMapper,
+            OrderRepository orderRepository,
+            OrderMapper orderMapper,
             RoleRepository roleRepository,
-            ValidationUtils validationUtils,
             VinylRecordRepository vinylRecordRepository,
             VinylRecordMapper vinylRecordMapper,
-            OrderRepository orderRepository,
-            OrderMapper orderMapper
+            ValidationUtils validationUtils
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
-        this.roleRepository = roleRepository;
-        this.validationUtils = validationUtils;
-        this.vinylRecordRepository = vinylRecordRepository;
-        this.vinylRecordMapper = vinylRecordMapper;
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.roleRepository = roleRepository;
+        this.vinylRecordRepository = vinylRecordRepository;
+        this.vinylRecordMapper = vinylRecordMapper;
+        this.validationUtils = validationUtils;
     }
 
     public List<UserSummaryResponseDTO> getCustomers(
@@ -73,9 +73,7 @@ public class CustomerService {
         Specification<Customer> specification = CustomerSpecification.filterCustomers(
                 firstName, lastName, newsletterSubscribed, country, city, postalCode, houseNumber
         );
-        List<Customer> customers = customerRepository.findAll(specification, sort);
-
-        return customerMapper.toUserSummaryResponseDTOs(customers);
+        return customerMapper.toUserSummaryResponseDTOs(customerRepository.findAll(specification, sort));
     }
 
     public CustomerResponseDTO getCustomerById(Long id) {
@@ -84,7 +82,7 @@ public class CustomerService {
 
     public CustomerResponseDTO getCustomerByUsername(String username) {
         Customer customer = customerRepository.findByUsernameIgnoreCaseAndIsDeletedFalse(username)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with username " + username + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with username: " + username));
 
         return customerMapper.toResponseDTO(customer);
     }
@@ -100,8 +98,7 @@ public class CustomerService {
 
         customer.getRoles().add(userRole);
 
-        Customer savedCustomer = customerRepository.save(customer);
-        return customerMapper.toResponseDTO(savedCustomer);
+        return customerMapper.toResponseDTO(customerRepository.save(customer));
     }
 
     public CustomerResponseDTO updateCustomer(Long id, CustomerUpdateDTO customerUpdateDTO) {
@@ -111,13 +108,11 @@ public class CustomerService {
         validationUtils.validateUniqueEmail(customerUpdateDTO.getEmail(), id);
 
         customerMapper.updateCustomer(customerUpdateDTO, customer);
-
-        Customer savedCustomer = customerRepository.save(customer);
-        return customerMapper.toResponseDTO(savedCustomer);
+        return customerMapper.toResponseDTO(customerRepository.save(customer));
     }
 
 
-    public List<VinylRecordSummaryResponseDTO> getFavoriteRecords(Long customerId) {
+    public List<VinylRecordSummaryResponseDTO> getCustomerFavoriteRecords(Long customerId) {
         List<VinylRecord> favoriteRecords = findCustomer(customerId).getFavoriteVinylRecords();
         return vinylRecordMapper.toSummaryResponseDTOs(favoriteRecords);
     }
@@ -127,7 +122,7 @@ public class CustomerService {
         VinylRecord favoriteRecord = findVinylRecord(vinylRecordId);
 
         if (customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
-            throw new ConflictException("Vinyl record with id " + vinylRecordId + " is already a favorite record of this customer.");
+            throw new ConflictException("Vinyl record with id: '" + vinylRecordId + "' is already in customer's favorite list.");
         }
 
         customer.getFavoriteVinylRecords().add(favoriteRecord);
@@ -139,19 +134,18 @@ public class CustomerService {
         VinylRecord favoriteRecord = findVinylRecord(vinylRecordId);
 
         if (!customer.getFavoriteVinylRecords().contains(favoriteRecord)) {
-            throw new ConflictException("Vinyl record with id " + vinylRecordId + " is not a favorite record of this customer.");
+            throw new ConflictException("No vinyl record found in the customer's favorite list with id: " + vinylRecordId);
         }
 
         customer.getFavoriteVinylRecords().remove(favoriteRecord);
         customerRepository.save(customer);
     }
 
-    public List<OrderSummaryResponseDTO> getOrdersByCustomer(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        return orderMapper.toOrderSummaryResponseDTOs(customer.getOrders());
+    public List<OrderSummaryResponseDTO> getCustomerOrders(Long customerId) {
+        return orderMapper.toOrderSummaryResponseDTOs(findCustomer(customerId).getOrders());
     }
 
-    public OrderResponseDTO getOrderByCustomerAndId(Long customerId, Long orderId) {
+    public OrderResponseDTO getCustomerOrder(Long customerId, Long orderId) {
         return orderMapper.toResponseDTO(findOrder(orderId, customerId));
     }
 
@@ -166,7 +160,7 @@ public class CustomerService {
     }
 
     private Order findOrder(Long orderId, Long customerId) {
-        return orderRepository.findByIdAndCustomerId(orderId, customerId)
+        return orderRepository.findByIdAndIsDeletedFalseAndCustomerId(orderId, customerId)
                 .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId + " for customer with id: " + customerId));
     }
 }

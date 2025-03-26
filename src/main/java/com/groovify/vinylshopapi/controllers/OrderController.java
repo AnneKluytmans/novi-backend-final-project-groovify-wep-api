@@ -10,6 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -27,19 +28,21 @@ public class OrderController {
             @RequestParam(required = false) String confirmationStatus,
             @RequestParam(required = false) String paymentStatus,
             @RequestParam(required = false) String shippingStatus,
-            @RequestParam(required = false) String orderedBefore,
-            @RequestParam(required = false) String orderedAfter,
+            @RequestParam(required = false) List<String> excludedShippingStatuses,
+            @RequestParam(required = false) LocalDate orderedBefore,
+            @RequestParam(required = false) LocalDate orderedAfter,
             @RequestParam(required = false) BigDecimal minTotalPrice,
             @RequestParam(required = false) BigDecimal maxTotalPrice,
             @RequestParam(required = false) Boolean isDeleted,
-            @RequestParam(required = false) String deletedAfter,
-            @RequestParam(required = false) String deletedBefore,
+            @RequestParam(required = false) LocalDate deletedAfter,
+            @RequestParam(required = false) LocalDate deletedBefore,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) Integer limit
     ) {
         List<OrderSummaryResponseDTO> orders = orderService.getOrders(
-                confirmationStatus, paymentStatus, shippingStatus, orderedBefore, orderedAfter,
-                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore, sortBy, sortOrder
+                confirmationStatus, paymentStatus, shippingStatus, excludedShippingStatuses, orderedBefore, orderedAfter,
+                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore, sortBy, sortOrder, limit
         );
         return ResponseEntity.ok(orders);
     }
@@ -122,10 +125,10 @@ public class OrderController {
 
 
     @GetMapping("/{id}/invoice")
-    public ResponseEntity<InvoiceResponseDTO> getInvoiceByOrder(
+    public ResponseEntity<InvoiceResponseDTO> getOrderInvoice(
             @PathVariable Long id
     ) {
-        InvoiceResponseDTO invoice = orderService.getInvoiceByOrder(id);
+        InvoiceResponseDTO invoice = orderService.getOrderInvoice(id);
         return ResponseEntity.ok(invoice);
     }
 

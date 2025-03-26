@@ -6,9 +6,7 @@ import com.groovify.vinylshopapi.validation.ValidDate;
 import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,8 +16,6 @@ import java.util.List;
 @Entity
 @Table(name = "vinyl_records")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class VinylRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,7 +71,7 @@ public class VinylRecord {
     @ManyToMany(mappedBy = "favoriteVinylRecords")
     private List<Customer> customers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "vinylRecord")
+    @OneToMany(mappedBy = "vinylRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "vinylRecord")

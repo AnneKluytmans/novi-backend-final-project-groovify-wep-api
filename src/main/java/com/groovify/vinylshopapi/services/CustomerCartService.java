@@ -23,23 +23,23 @@ import java.time.LocalDateTime;
 public class CustomerCartService {
 
     private final CartRepository cartRepository;
-    private final CustomerRepository customerRepository;
-    private final VinylRecordRepository vinylRecordRepository;
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
+    private final CustomerRepository customerRepository;
+    private final VinylRecordRepository vinylRecordRepository;
 
     public CustomerCartService(
             CartRepository cartRepository,
-            CustomerRepository customerRepository,
-            VinylRecordRepository vinylRecordRepository,
             CartMapper cartMapper,
-            CartItemMapper cartItemMapper
+            CartItemMapper cartItemMapper,
+            CustomerRepository customerRepository,
+            VinylRecordRepository vinylRecordRepository
     ) {
         this.cartRepository = cartRepository;
-        this.customerRepository = customerRepository;
-        this.vinylRecordRepository = vinylRecordRepository;
         this.cartMapper = cartMapper;
         this.cartItemMapper = cartItemMapper;
+        this.customerRepository = customerRepository;
+        this.vinylRecordRepository = vinylRecordRepository;
     }
 
     public CartResponseDTO getCustomerCart(Long customerId) {
@@ -65,8 +65,7 @@ public class CustomerCartService {
 
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
     public CartResponseDTO updateCartItemQuantity(Long customerId, Long cartItemId, CartItemQuantityUpdateDTO cartItemQuantityDTO) {
@@ -78,19 +77,16 @@ public class CustomerCartService {
         cartItem.setQuantity(cartItemQuantityDTO.getNewQuantity());
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
     public CartResponseDTO removeCartItemFromCart(Long customerId, Long cartItemId) {
         Cart cart = findCart(customerId);
-        CartItem cartItem = findCartItem(cart, cartItemId);
 
-        cart.getCartItems().remove(cartItem);
+        cart.getCartItems().remove(findCartItem(cart, cartItemId));
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
     public CartResponseDTO clearCart(Long customerId) {
@@ -99,28 +95,27 @@ public class CustomerCartService {
         cart.getCartItems().clear();
         cart.setUpdatedAt(LocalDateTime.now());
 
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.toResponseDTO(savedCart);
+        return cartMapper.toResponseDTO(cartRepository.save(cart));
     }
 
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findByIdAndIsDeletedFalse(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Customer with id " + customerId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No customer found with id: " + customerId));
     }
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
     }
 
     private Cart findCart(Long customerId) {
-        return cartRepository.findByCustomerId(customerId)
-                .orElseThrow(() -> new RecordNotFoundException("Cart of customer with id " + customerId + " not found"));
+        return cartRepository.findByCustomerIdAndCustomerIsDeletedFalse(customerId)
+                .orElseThrow(() -> new RecordNotFoundException("No cart found for customer with id: " + customerId));
     }
 
     private Cart findOrCreateCart(Long customerId) {
-        return cartRepository.findByCustomerId(customerId)
+        return cartRepository.findByCustomerIdAndCustomerIsDeletedFalse(customerId)
                 .orElseGet(() -> {
                     Cart newCart = new Cart(findCustomer(customerId));
                     return cartRepository.save(newCart);
@@ -128,17 +123,21 @@ public class CustomerCartService {
     }
 
     private CartItem findCartItem(Cart cart, Long cartItemId) {
-        return cart.getCartItems().stream()
-                .filter(item -> item.getId().equals(cartItemId))
-                .findFirst()
-                .orElseThrow(() -> new RecordNotFoundException("Cart item with id " + cartItemId + " not found in this cart"));
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getId().equals(cartItemId)) {
+                return cartItem;
+            }
+        }
+        throw new RecordNotFoundException("No cart item found with id: " + cartItemId + " for cart with id: " + cart.getId());
     }
 
     private CartItem findExistingCartItem(Cart cart, VinylRecord vinylRecord) {
-        return cart.getCartItems().stream()
-                .filter(item -> item.getVinylRecord().equals(vinylRecord))
-                .findFirst()
-                .orElse(null);
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getVinylRecord().equals(vinylRecord)) {
+                return cartItem;
+            }
+        }
+        return null;
     }
 
 }

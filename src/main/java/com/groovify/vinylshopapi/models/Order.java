@@ -4,13 +4,10 @@ import com.groovify.vinylshopapi.enums.ConfirmationStatus;
 import com.groovify.vinylshopapi.enums.PaymentMethod;
 import com.groovify.vinylshopapi.enums.PaymentStatus;
 import com.groovify.vinylshopapi.enums.ShippingStatus;
-import com.groovify.vinylshopapi.validation.ValidDate;
 import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,8 +17,6 @@ import java.util.List;
 @Entity
 @Table(name = "orders")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

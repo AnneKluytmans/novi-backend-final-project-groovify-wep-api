@@ -110,13 +110,6 @@ public class ExceptionController {
         );
     }
 
-    @ExceptionHandler(value = InvalidVerificationException.class)
-    public ResponseEntity<Object> handleInvalidVerificationException(InvalidVerificationException ex) {
-        return buildErrorResponse(
-                HttpStatus.UNAUTHORIZED, "Invalid Verification", ex.getMessage(), null
-        );
-    }
-
     @ExceptionHandler(value = DeactivatedException.class)
     public ResponseEntity<Object> handleDeactivatedException(DeactivatedException ex) {
         Map<String, Object> extraFields = new HashMap<>();

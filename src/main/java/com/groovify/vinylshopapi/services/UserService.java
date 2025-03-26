@@ -1,11 +1,8 @@
 package com.groovify.vinylshopapi.services;
 
-import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
-import com.groovify.vinylshopapi.exceptions.ConflictException;
-import com.groovify.vinylshopapi.exceptions.InvalidVerificationException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
@@ -22,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,21 +28,21 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final CustomerMapper customerMapper;
     private final EmployeeMapper employeeMapper;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     public UserService(
-            UserRepository userRepository,
-            RoleRepository roleRepository,
             CustomerMapper customerMapper,
-            EmployeeMapper employeeMapper
+            EmployeeMapper employeeMapper,
+            RoleRepository roleRepository,
+            UserRepository userRepository
     ) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.customerMapper = customerMapper;
         this.employeeMapper = employeeMapper;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -53,50 +51,44 @@ public class UserService {
             String firstName,
             String lastName,
             Boolean isDeleted,
-            String deletedAfter,
-            String deletedBefore,
+            LocalDate deletedAfter,
+            LocalDate deletedBefore,
             String sortBy,
-            String sortOrder
+            String sortOrder,
+            Integer limit
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "lastName", "email"));
         Specification<User> specification = UserSpecification.filterUsers(
                 userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore
         );
         List<User> users = userRepository.findAll(specification, sort);
-
-        List<UserSummaryResponseDTO> userSummaryResponseDTOS = new ArrayList<>();
-
-        for (User user : users) {
-            userSummaryResponseDTOS.add(mapToUserSummaryDTO(user));
+        if (limit != null && limit > 0 && limit < users.size()) {
+            users = users.subList(0, limit);
         }
 
-        return userSummaryResponseDTOS;
+        List<UserSummaryResponseDTO> userSummaryResponseDTOs = new ArrayList<>();
+
+        for (User user : users) {
+            userSummaryResponseDTOs.add(mapToUserSummaryDTO(user));
+        }
+
+        return userSummaryResponseDTOs;
     }
 
     public UserResponseDTO getUserById(Long id) {
-        return mapToUserResponseDTO(findUser(id));
+        return mapToUserResponseDTO(findUser(id, null));
     }
 
-    public void softDeleteUser(Long id) {
-        User user = findUser(id);
+    public void deactivateUser(Long id) {
+        User user = findUser(id, false);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
 
         userRepository.save(user);
     }
 
-    public void reactivateUser(ReactivateUserDTO reactivateUserDTO) {
-        User user = userRepository.findByEmail(reactivateUserDTO.getEmail())
-                .orElseThrow(() -> new RecordNotFoundException("User with email '" + reactivateUserDTO.getEmail() + "' not found"));
-
-        if (!user.getIsDeleted()) {
-            throw new ConflictException("User with email '" + reactivateUserDTO.getEmail() + "' still exists");
-        }
-
-        if (!"123456".equals(reactivateUserDTO.getVerificationCode())) {
-            throw new InvalidVerificationException();
-        }
-
+    public void reactivateUser(Long id) {
+        User user = findUser(id, true);
         user.setIsDeleted(false);
         user.setDeletedAt(null);
 
@@ -105,7 +97,7 @@ public class UserService {
 
 
     public List<RoleType> getUserRoles(Long userId) {
-        Set<Role> userRoles = findUser(userId).getRoles();
+        Set<Role> userRoles = findUser(userId, null).getRoles();
 
         List<RoleType> roles = new ArrayList<>();
         for (Role role : userRoles) {
@@ -116,7 +108,7 @@ public class UserService {
     }
 
     public void addRolesToUser(Long userId, List<RoleType> roles) {
-        User user = findUser(userId);
+        User user = findUser(userId, false);
         validateRolesForUserType(user, roles, true);
 
         for (RoleType role : roles) {
@@ -127,7 +119,7 @@ public class UserService {
     }
 
     public void removeRolesFromUser(Long userId, List<RoleType> roles) {
-        User user = findUser(userId);
+        User user = findUser(userId, null);
         validateRolesForUserType(user, roles, false);
 
         for (RoleType role : roles) {
@@ -138,14 +130,24 @@ public class UserService {
     }
 
 
-    private User findUser(Long userId) {
+    private User findUser(Long userId, Boolean isDeleted) {
+        if (isDeleted != null) {
+            if (isDeleted) {
+                return userRepository.findByIdAndIsDeletedTrue(userId)
+                        .orElseThrow(() -> new RecordNotFoundException("No deactivated user found with id" + userId));
+            } else {
+                return userRepository.findByIdAndIsDeletedFalse(userId)
+                        .orElseThrow(() -> new RecordNotFoundException("No user found with id" + userId));
+            }
+        }
+
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RecordNotFoundException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No user found with id: " + userId));
     }
 
     private Role findRoleByType(RoleType role) {
         return roleRepository.findByRoleType(role)
-                .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("Role " + role + " not found."));
     }
 
     private void validateRolesForUserType(User user, List<RoleType> roles, Boolean isNewRole) {

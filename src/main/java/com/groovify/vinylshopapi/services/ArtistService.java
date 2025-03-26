@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,33 +37,34 @@ public class ArtistService {
     public List<ArtistResponseDTO> getArtists(
             String country,
             String name,
+            LocalDate debutedAfter,
+            LocalDate debutedBefore,
             Integer minPopularity,
             Integer maxPopularity,
+            Boolean isGroup,
             String sortBy,
             String sortOrder,
             Integer limit
     ) {
-        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "countryOfOrigin"));
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "debutDate"));
         Specification<Artist> specification = ArtistSpecification.filterArtists(
-                country, name, minPopularity, maxPopularity
+                country, name, debutedAfter, debutedBefore, minPopularity, maxPopularity, isGroup
         );
         List<Artist> artists = artistRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < artists.size()) {
             artists = artists.subList(0, limit);
         }
-
         return artistMapper.toResponseDTOs(artists);
     }
 
     public ArtistResponseDTO getArtistById(Long id) {
-        Artist artist = findArtist(id);
-        return artistMapper.toResponseDTO(artist);
+        return artistMapper.toResponseDTO(findArtist(id));
     }
 
     public ArtistResponseDTO getArtistByName(String name) {
         Artist artist = artistRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with name " + name + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No artist found with name: " + name));
 
         return artistMapper.toResponseDTO(artist);
     }
@@ -71,8 +73,7 @@ public class ArtistService {
         Artist artist = artistMapper.toEntity(artistRequestDTO);
         validateUniqueArtistName(artist.getName(), artist.getId());
 
-        Artist savedArtist = artistRepository.save(artist);
-        return artistMapper.toResponseDTO(savedArtist);
+        return artistMapper.toResponseDTO(artistRepository.save(artist));
     }
 
     public ArtistResponseDTO updateArtist(Long id, ArtistRequestDTO artistRequestDTO) {
@@ -80,9 +81,7 @@ public class ArtistService {
         validateUniqueArtistName(artistRequestDTO.getName(), id);
 
         artistMapper.updateArtist(artistRequestDTO, artist);
-
-        Artist savedArtist = artistRepository.save(artist);
-        return artistMapper.toResponseDTO(savedArtist);
+        return artistMapper.toResponseDTO(artistRepository.save(artist));
     }
 
     public ArtistResponseDTO partialUpdateArtist(Long id, ArtistPatchDTO artistPatchDTO) {
@@ -93,32 +92,31 @@ public class ArtistService {
         }
 
         artistMapper.partialUpdateArtist(artistPatchDTO, artist);
-
-        Artist savedArtist = artistRepository.save(artist);
-        return artistMapper.toResponseDTO(savedArtist);
+        return artistMapper.toResponseDTO(artistRepository.save(artist));
     }
 
     public void deleteArtist(Long id) {
         Artist artist = findArtist(id);
 
         if (!artist.getVinylRecords().isEmpty()) {
-            throw new DeleteOperationException("Artist " + artist.getName() + " cannot be deleted while linked to vinyl records");
+            throw new DeleteOperationException("Artist " + artist.getName() + " cannot be deleted because it is still " +
+                    "linked to one or more vinyl records.");
         }
 
         artistRepository.deleteById(id);
+    }
+
+    private Artist findArtist(Long id) {
+        return artistRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("No artist found with id: " + id));
     }
 
     private void validateUniqueArtistName(String name, Long currentArtistId) {
         Optional<Artist> existingArtist = artistRepository.findByNameIgnoreCase(name);
 
         if (existingArtist.isPresent() && !existingArtist.get().getId().equals(currentArtistId)) {
-            throw new ConflictException("Artist with name " + name + " already exists");
+            throw new ConflictException("Artist name must be unique. There is already an artist with the name: " + name);
         }
-    }
-
-    private Artist findArtist(Long id) {
-        return artistRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + id + " not found"));
     }
 }
 

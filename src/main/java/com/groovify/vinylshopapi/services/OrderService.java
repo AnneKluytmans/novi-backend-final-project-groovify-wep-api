@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,27 +27,27 @@ import java.util.Set;
 
 @Service
 public class OrderService {
-    private final CustomerRepository customerRepository;
     private final AddressRepository addressRepository;
-    private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
+    private final CustomerRepository customerRepository;
     private final CustomerCartService customerCartService;
     private final InvoiceMapper invoiceMapper;
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
 
     public OrderService(
-            CustomerRepository customerRepository,
             AddressRepository addressRepository,
-            OrderRepository orderRepository,
-            OrderMapper orderMapper,
+            CustomerRepository customerRepository,
             CustomerCartService customerCartService,
-            InvoiceMapper invoiceMapper
+            InvoiceMapper invoiceMapper,
+            OrderRepository orderRepository,
+            OrderMapper orderMapper
     ) {
-        this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
-        this.orderRepository = orderRepository;
-        this.orderMapper = orderMapper;
+        this.customerRepository = customerRepository;
         this.customerCartService = customerCartService;
         this.invoiceMapper = invoiceMapper;
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
     }
 
     private static final Map<ConfirmationStatus, Set<ConfirmationStatus>> VALID_CONFIRMATION_TRANSITIONS = Map.of(
@@ -75,22 +76,28 @@ public class OrderService {
             String confirmationStatus,
             String paymentStatus,
             String shippingStatus,
-            String orderedBefore,
-            String orderedAfter,
+            List<String> excludedShippingStatuses,
+            LocalDate orderedBefore,
+            LocalDate orderedAfter,
             BigDecimal minTotalPrice,
             BigDecimal maxTotalPrice,
             Boolean isDeleted,
-            String deletedAfter,
-            String deletedBefore,
+            LocalDate deletedAfter,
+            LocalDate deletedBefore,
             String sortBy,
-            String sortOrder
+            String sortOrder,
+            Integer limit
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "subTotalPrice", "orderDate"));
         Specification<Order> specification = OrderSpecification.filterOrders(
-                confirmationStatus, paymentStatus, shippingStatus, orderedBefore, orderedAfter,
-                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore
+                confirmationStatus, paymentStatus, shippingStatus, excludedShippingStatuses, orderedBefore,
+                orderedAfter, minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore
         );
         List<Order> orders = orderRepository.findAll(specification, sort);
+
+        if (limit != null && limit > 0 && limit < orders.size()) {
+            orders = orders.subList(0, limit);
+        }
         return orderMapper.toOrderSummaryResponseDTOs(orders);
     }
 
@@ -109,15 +116,14 @@ public class OrderService {
 
         Order order = orderMapper.toEntity(orderRequestDTO);
         setOrderDefaults(order, customer, orderRequestDTO.getRecipientName(),
-                validateAddress(orderRequestDTO.getShippingAddressId(), customer),
-                validateAddress(orderRequestDTO.getBillingAddressId(), customer));
+                validateAddress(orderRequestDTO.getShippingAddressId(), customer.getId()),
+                validateAddress(orderRequestDTO.getBillingAddressId(), customer.getId()));
 
         order.setSubTotalPrice(processOrderItems(order, cart));
 
         customerCartService.clearCart(customer.getId());
 
-        Order savedOrder = orderRepository.save(order);
-        return orderMapper.toResponseDTO(savedOrder);
+        return orderMapper.toResponseDTO(orderRepository.save(order));
     }
 
     public OrderResponseDTO updatePendingOrder(Long orderId, OrderPatchDTO orderPatchDTO) {
@@ -131,19 +137,19 @@ public class OrderService {
         Address oldBillingAddress = order.getBillingAddress();
 
         if (orderPatchDTO.getShippingAddressId() != null) {
-            order.setShippingAddress(validateAddress(orderPatchDTO.getShippingAddressId(), order.getCustomer()));
+            order.setShippingAddress(validateAddress(orderPatchDTO.getShippingAddressId(), order.getCustomer().getId()));
         }
 
         if (orderPatchDTO.getBillingAddressId() != null) {
-            order.setBillingAddress(validateAddress(orderPatchDTO.getBillingAddressId(), order.getCustomer()));
+            order.setBillingAddress(validateAddress(orderPatchDTO.getBillingAddressId(), order.getCustomer().getId()));
         }
 
         orderMapper.partialUpdateOrder(orderPatchDTO, order);
 
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
         deleteIfStandAloneAddress(oldShippingAddress, oldBillingAddress);
 
-        return orderMapper.toResponseDTO(savedOrder);
+        return orderMapper.toResponseDTO(order);
     }
 
     public OrderResponseDTO updateOrderStatuses(Long orderId, OrderStatusUpdateDTO orderStatusUpdateDTO) {
@@ -152,8 +158,7 @@ public class OrderService {
         validateStatusUpdates(order, orderStatusUpdateDTO);
         applyStatusChanges(order, orderStatusUpdateDTO);
 
-        Order savedOrder = orderRepository.save(order);
-        return orderMapper.toResponseDTO(savedOrder);
+        return orderMapper.toResponseDTO(orderRepository.save(order));
     }
 
     public void cancelOrder(Long orderId) {
@@ -193,12 +198,8 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public InvoiceResponseDTO getInvoiceByOrder(Long orderId) {
-        Order order = findOrder(orderId, false);
-        if (order.getInvoice() == null) {
-            throw new RecordNotFoundException("No invoice found for order with id: " + orderId);
-        }
-        return invoiceMapper.toResponseDTO(order.getInvoice());
+    public InvoiceResponseDTO getOrderInvoice(Long orderId) {
+        return invoiceMapper.toResponseDTO(findInvoice(orderId));
     }
 
 
@@ -222,23 +223,25 @@ public class OrderService {
                 .orElseThrow(() -> new RecordNotFoundException("No order found with id: " + orderId));
     }
 
-    private Address validateAddress(Long addressId, Customer customer) {
-        Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new RecordNotFoundException("No address found with id: " + addressId));
-
-        if (address.getEmployee() != null || (address.getCustomer() != null && !address.getCustomer().equals(customer))) {
-            throw new IllegalArgumentException("Address with id: '" + addressId + "' doesn't belong to this customer");
+    private Invoice findInvoice(Long orderId) {
+        Order order = findOrder(orderId, false);
+        if (order.getInvoice() == null) {
+            throw new RecordNotFoundException("No invoice found for order with id: " + orderId);
         }
-        return address;
+        return order.getInvoice();
+    }
+
+    private Address validateAddress(Long addressId, Long customerId) {
+        return addressRepository.findByIdAndCustomerIdAndCustomerIsDeletedFalse(addressId, customerId)
+                .orElseThrow(() -> new RecordNotFoundException("No address found with id: " + addressId + " for customer with id: " + customerId));
     }
 
     private void validateNoExistingPendingOrder(Customer customer) {
-        boolean existingPendingOrder = customer.getOrders().stream()
-                .anyMatch(order -> order.getConfirmationStatus() == ConfirmationStatus.PENDING);
-
-        if (existingPendingOrder) {
-            throw new ConflictException("Customer already has an order with the status PENDING. " +
-                    "You'll have to cancel or confirm that order before placing a new order.");
+        for (Order order : customer.getOrders()) {
+            if (order.getConfirmationStatus() == ConfirmationStatus.PENDING) {
+                throw new ConflictException("Customer already has an order with the status PENDING. " +
+                        "You'll have to cancel or confirm that order before placing a new order.");
+            }
         }
     }
 

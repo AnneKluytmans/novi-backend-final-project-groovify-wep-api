@@ -1,14 +1,13 @@
 package com.groovify.vinylshopapi.controllers;
 
-import com.groovify.vinylshopapi.dtos.ReactivateUserDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
 import com.groovify.vinylshopapi.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,14 +27,15 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Boolean isDeleted,
-            @RequestParam(required = false) String deletedAfter,
-            @RequestParam(required = false) String deletedBefore,
+            @RequestParam(required = false) LocalDate deletedAfter,
+            @RequestParam(required = false) LocalDate deletedBefore,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) Integer limit
     ) {
             List<UserSummaryResponseDTO> users = userService.getUsers(
                     userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore,
-                    sortBy, sortOrder
+                    sortBy, sortOrder, limit
             );
             return ResponseEntity.ok(users);
     }
@@ -50,18 +50,18 @@ public class UserController {
 
 
     @DeleteMapping("/{id}/deactivate")
-    public ResponseEntity<Void> softDeleteUser(
+    public ResponseEntity<Void> deactivateUser(
             @PathVariable Long id
     ) {
-        userService.softDeleteUser(id);
+        userService.deactivateUser(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/reactivate")
+    @PostMapping("/{id}/reactivate")
     public ResponseEntity<Void> reactivateUser(
-            @Valid @RequestBody ReactivateUserDTO reactivateUserDTO
+            @PathVariable Long id
     ) {
-        userService.reactivateUser(reactivateUserDTO);
+        userService.reactivateUser(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -34,7 +34,7 @@ public class CustomerAddressController {
             @PathVariable("id") Long customerId,
             @PathVariable("addressId") Long addressId
     ) {
-        CustomerAddressResponseDTO address = customerAddressService.getCustomerAddressById(customerId, addressId);
+        CustomerAddressResponseDTO address = customerAddressService.getCustomerAddress(customerId, addressId);
         return ResponseEntity.ok(address);
     }
 

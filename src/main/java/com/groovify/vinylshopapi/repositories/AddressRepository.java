@@ -5,13 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long>, JpaSpecificationExecutor<Address> {
-    List<Address> findAllByCustomerId(Long customerId);
-    Optional<Address> findByEmployeeId(Long employeeId);
+    Optional<Address> findByEmployeeIdAndEmployeeIsDeletedFalse(Long employeeId);
+    Optional<Address> findByIdAndCustomerIdAndCustomerIsDeletedFalse(Long addressId, Long customerId);
 
     Boolean existsByEmployeeId(Long employeeId);
 }

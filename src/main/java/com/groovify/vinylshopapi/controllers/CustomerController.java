@@ -89,10 +89,10 @@ public class CustomerController {
 
 
     @GetMapping("/{id}/favorite-records")
-    public ResponseEntity<List<VinylRecordSummaryResponseDTO>> getFavoriteRecords(
+    public ResponseEntity<List<VinylRecordSummaryResponseDTO>> getCustomerFavoriteRecords(
             @PathVariable("id") Long customerId
     ) {
-        List<VinylRecordSummaryResponseDTO> favoriteRecords = customerService.getFavoriteRecords(customerId);
+        List<VinylRecordSummaryResponseDTO> favoriteRecords = customerService.getCustomerFavoriteRecords(customerId);
         return ResponseEntity.ok(favoriteRecords);
     }
 
@@ -116,19 +116,19 @@ public class CustomerController {
 
 
     @GetMapping("/{id}/orders")
-    public ResponseEntity<List<OrderSummaryResponseDTO>> getOrdersByCustomer(
+    public ResponseEntity<List<OrderSummaryResponseDTO>> getCustomerOrders(
             @PathVariable Long id
     ) {
-        List<OrderSummaryResponseDTO> orders = customerService.getOrdersByCustomer(id);
+        List<OrderSummaryResponseDTO> orders = customerService.getCustomerOrders(id);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}/orders/{orderId}")
-    public ResponseEntity<OrderResponseDTO> getOrderByCustomerAndId(
+    public ResponseEntity<OrderResponseDTO> getCustomerOrder(
             @PathVariable("id") Long customerId,
             @PathVariable("orderId") Long orderId
     ) {
-        OrderResponseDTO order = customerService.getOrderByCustomerAndId(customerId, orderId);
+        OrderResponseDTO order = customerService.getCustomerOrder(customerId, orderId);
         return ResponseEntity.ok(order);
     }
 }

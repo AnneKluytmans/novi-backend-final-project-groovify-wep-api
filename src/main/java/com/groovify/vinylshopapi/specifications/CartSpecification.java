@@ -5,25 +5,25 @@ import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CartSpecification {
     public static Specification<Cart> filterCarts(
-            String createdBefore,
-            String createdAfter,
-            String updatedBefore,
-            String updatedAfter,
+            LocalDate createdBefore,
+            LocalDate createdAfter,
+            LocalDate updatedBefore,
+            LocalDate updatedAfter,
             Long customerId,
             Boolean isEmpty
     ) {
         return (Root<Cart> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("createdAt"), createdBefore, false);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("createdAt"), createdAfter, true);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("updatedAt"), updatedBefore, false);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("updatedAt"), updatedAfter, true);
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("createdAt"), null, createdBefore, createdAfter);
+
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("updatedAt"), null, updatedBefore, updatedAfter);
 
             if (customerId != null) {
                 predicates.add(cb.equal(root.get("customer").get("id"), customerId));

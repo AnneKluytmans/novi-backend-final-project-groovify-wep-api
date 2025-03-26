@@ -1,7 +1,6 @@
 package com.groovify.vinylshopapi.dtos;
 
 import com.groovify.vinylshopapi.enums.PaymentMethod;
-import com.groovify.vinylshopapi.validation.ValidDate;
 import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.validation.constraints.*;
 import lombok.Data;

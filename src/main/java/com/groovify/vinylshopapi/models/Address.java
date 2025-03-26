@@ -2,9 +2,7 @@ package com.groovify.vinylshopapi.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "addresses")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

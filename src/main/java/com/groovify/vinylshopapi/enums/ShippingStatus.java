@@ -11,5 +11,5 @@ public enum ShippingStatus {
     RETURN_DECLINED,
     IN_RETURN,
     RETURNED,
-    NOT_APPLICABLE,
+    NOT_APPLICABLE
 }

@@ -6,13 +6,13 @@ import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CartMapper;
 import com.groovify.vinylshopapi.models.Cart;
 import com.groovify.vinylshopapi.repositories.CartRepository;
-import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.specifications.CartSpecification;
 import com.groovify.vinylshopapi.utils.SortHelper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,22 +20,20 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
-    private final CustomerRepository customerRepository;
 
     public CartService(
             CartRepository cartRepository,
-            CartMapper cartMapper,
-            CustomerRepository customerRepository) {
+            CartMapper cartMapper
+    ) {
         this.cartRepository = cartRepository;
         this.cartMapper = cartMapper;
-        this.customerRepository = customerRepository;
     }
 
-    public List<CartResponseDTO> getAllCarts(
-            String createdBefore,
-            String createdAfter,
-            String updatedBefore,
-            String updatedAfter,
+    public List<CartResponseDTO> getCarts(
+            LocalDate createdBefore,
+            LocalDate createdAfter,
+            LocalDate updatedBefore,
+            LocalDate updatedAfter,
             Long customerId,
             Boolean isEmpty,
             String sortBy,
@@ -46,8 +44,7 @@ public class CartService {
                 createdBefore, createdAfter, updatedBefore, updatedAfter,
                 customerId, isEmpty
         );
-        List<Cart> carts = cartRepository.findAll(specification, sort);
-        return cartMapper.toResponseDTOs(carts);
+        return cartMapper.toResponseDTOs(cartRepository.findAll(specification, sort));
     }
 
     public CartResponseDTO getCartById(Long cartId) {
@@ -62,12 +59,12 @@ public class CartService {
         }
 
         cart.getCustomer().setCart(null);
-        customerRepository.save(cart.getCustomer());
+        cartRepository.save(cart);
         cartRepository.delete(cart);
     }
 
     private Cart findCart(Long cartId) {
         return cartRepository.findById(cartId)
-                .orElseThrow(() -> new RecordNotFoundException("Cart with id " + cartId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No cart found with id: " + cartId));
     }
 }

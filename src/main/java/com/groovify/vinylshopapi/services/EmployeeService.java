@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -43,8 +44,8 @@ public class EmployeeService {
             String firstName,
             String lastName,
             String jobTitle,
-            Double minSalary,
-            Double maxSalary,
+            BigDecimal minSalary,
+            BigDecimal maxSalary,
             String country,
             String city,
             String sortBy,
@@ -54,9 +55,7 @@ public class EmployeeService {
         Specification<Employee> specification = EmployeeSpecification.filterEmployees(
                 firstName, lastName, jobTitle, minSalary, maxSalary, country, city
         );
-        List<Employee> employees = employeeRepository.findAll(specification, sort);
-
-        return employeeMapper.toUserSummaryResponseDTOs(employees);
+        return employeeMapper.toUserSummaryResponseDTOs(employeeRepository.findAll(specification, sort));
     }
 
     public EmployeeResponseDTO getEmployeeById(Long id) {
@@ -65,7 +64,7 @@ public class EmployeeService {
 
     public EmployeeResponseDTO getEmployeeByUsername(String username) {
         Employee employee = employeeRepository.findByUsernameIgnoreCaseAndIsDeletedFalse(username)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with username " + username + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No employee found with username: " + username));
 
         return employeeMapper.toResponseDTO(employee);
     }
@@ -82,8 +81,7 @@ public class EmployeeService {
             employee.getRoles().add(findRoleByRoleType(RoleType.ADMIN));
         }
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponseDTO(savedEmployee);
+        return employeeMapper.toResponseDTO(employeeRepository.save(employee));
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, UserUpdateDTO employeeUpdateDTO) {
@@ -93,24 +91,20 @@ public class EmployeeService {
         validationUtils.validateUniqueEmail(employeeUpdateDTO.getEmail(), id);
 
         employeeMapper.updateEmployee(employeeUpdateDTO, employee);
-
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponseDTO(savedEmployee);
+        return employeeMapper.toResponseDTO(employeeRepository.save(employee));
     }
 
     public EmployeeResponseDTO updateEmployeeByAdmin(Long id, EmployeeAdminUpdateDTO employeeUpdateDTO) {
         Employee employee = findEmployee(id);
-
         employeeMapper.updateEmployeeByAdmin(employeeUpdateDTO, employee);
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponseDTO(savedEmployee);
+        return employeeMapper.toResponseDTO(employeeRepository.save(employee));
     }
 
 
     private Employee findEmployee(Long id) {
         return employeeRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RecordNotFoundException("Employee with id " + id + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("No employee found with id: " + id));
     }
 
     private Role findRoleByRoleType(RoleType roleType) {

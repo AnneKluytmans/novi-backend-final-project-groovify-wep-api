@@ -3,9 +3,7 @@ package com.groovify.vinylshopapi.models;
 import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,8 +16,6 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

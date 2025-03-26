@@ -11,6 +11,4 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
     Optional<Customer> findByIdAndIsDeletedFalse(Long id);
     Optional<Customer> findByUsernameIgnoreCaseAndIsDeletedFalse(String username);
-
-    Boolean existsByIdAndIsDeletedFalse(Long id);
 }

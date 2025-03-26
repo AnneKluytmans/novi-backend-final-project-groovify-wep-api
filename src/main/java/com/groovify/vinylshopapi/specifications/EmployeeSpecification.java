@@ -6,6 +6,7 @@ import com.groovify.vinylshopapi.utils.SpecificationUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class EmployeeSpecification {
             String firstName,
             String lastName,
             String jobTitle,
-            Double minSalary,
-            Double maxSalary,
+            BigDecimal minSalary,
+            BigDecimal maxSalary,
             String country,
             String city
     ) {
@@ -29,13 +30,7 @@ public class EmployeeSpecification {
 
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("jobTitle"), jobTitle, false);
 
-            if (minSalary != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("salary"), minSalary));
-            }
-
-            if (maxSalary != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("salary"), maxSalary));
-            }
+            SpecificationUtils.addPricePredicates(predicates, cb, root.get("salary"), minSalary, maxSalary);
 
             SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("country"), country, false);
 

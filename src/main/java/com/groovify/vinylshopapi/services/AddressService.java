@@ -49,8 +49,7 @@ public class AddressService {
                 addressId, customerId, employeeId, userType, inactiveUsers, isShipping, isBilling,
                 isStandAlone, country, city, postalCode
         );
-        List<Address> addresses = addressRepository.findAll(specification, sort);
-        return addressMapper.toResponseDTOs(addresses);
+        return addressMapper.toResponseDTOs(addressRepository.findAll(specification, sort));
     }
 
     public List<AddressResponseDTO> getCustomerShippingAddresses(

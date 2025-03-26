@@ -3,6 +3,8 @@ package com.groovify.vinylshopapi.dtos;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class EmployeeAdminUpdateDTO {
     @NotBlank(message = "Job title is required")
@@ -11,7 +13,7 @@ public class EmployeeAdminUpdateDTO {
 
     @NotNull(message = "Salary is required")
     @Positive(message = "Salary must be a positive value")
-    private Double salary;
+    private BigDecimal salary;
 
     @NotNull(message = "Work hours is required")
     @Positive(message = "Work hours must be a positive value")

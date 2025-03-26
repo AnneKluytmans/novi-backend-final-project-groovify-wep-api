@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -44,6 +45,8 @@ public class VinylRecordService {
             String artist,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            LocalDate releasedAfter,
+            LocalDate releasedBefore,
             Boolean isLimitedEdition,
             Boolean isAvailable,
             String sortBy,
@@ -52,7 +55,8 @@ public class VinylRecordService {
     ) {
         Sort sort = getVinylRecordsSort(sortBy, sortOrder);
         Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(
-                title, genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable
+                title, genre, artist, minPrice, maxPrice, releasedAfter, releasedBefore,
+                isLimitedEdition, isAvailable
         );
         List<VinylRecord> vinylRecords = vinylRecordRepository.findAll(specification, sort);
 
@@ -64,47 +68,41 @@ public class VinylRecordService {
     }
 
     public VinylRecordResponseDTO getVinylRecordById(Long id) {
-        VinylRecord vinylRecord = findVinylRecord(id);
-        return vinylRecordMapper.toResponseDTO(vinylRecord);
+        return vinylRecordMapper.toResponseDTO(findVinylRecord(id));
     }
 
     public VinylRecordResponseDTO getVinylRecordByTitle(String title) {
         VinylRecord vinylRecord = vinylRecordRepository.findByTitleIgnoreCase(title)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with title " + title + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with title: " + title));
 
         return vinylRecordMapper.toResponseDTO(vinylRecord);
     }
 
     public VinylRecordResponseDTO createVinylRecord(VinylRecordRequestDTO vinylRecordRequestDTO) {
         VinylRecord vinylRecord = vinylRecordMapper.toEntity(vinylRecordRequestDTO);
-
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        return vinylRecordMapper.toResponseDTO(vinylRecordRepository.save(vinylRecord));
     }
 
     public VinylRecordResponseDTO updateVinylRecord(Long id, VinylRecordRequestDTO vinylRecordRequestDTO) {
         VinylRecord vinylRecord = findVinylRecord(id);
 
         vinylRecordMapper.updateVinylRecord(vinylRecordRequestDTO, vinylRecord);
-
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        return vinylRecordMapper.toResponseDTO(vinylRecordRepository.save(vinylRecord));
     }
 
     public VinylRecordResponseDTO partialUpdateVinylRecord(Long id, VinylRecordPatchDTO vinylRecordPatchDTO) {
         VinylRecord vinylRecord = findVinylRecord(id);
 
         vinylRecordMapper.partialUpdateVinylRecord(vinylRecordPatchDTO, vinylRecord);
-
-        VinylRecord savedRecord = vinylRecordRepository.save(vinylRecord);
-        return vinylRecordMapper.toResponseDTO(savedRecord);
+        return vinylRecordMapper.toResponseDTO(vinylRecordRepository.save(vinylRecord));
     }
 
     public void deleteVinylRecord(Long id) {
         VinylRecord vinylRecord = findVinylRecord(id);
 
         if (!vinylRecord.getOrderItems().isEmpty()) {
-            throw new DeleteOperationException("This vinyl record cannot be deleted because it is linked to one or more orders");
+            throw new DeleteOperationException("Vinyl record " + vinylRecord.getTitle() + " cannot be deleted because " +
+                    "it is linked to one or more orders");
         }
 
         for (Customer customer : vinylRecord.getCustomers()) {
@@ -119,7 +117,7 @@ public class VinylRecordService {
         VinylRecord vinylRecord = findVinylRecord(vinylRecordId);
 
         Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(() -> new RecordNotFoundException("Artist with id " + artistId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No artist found with id: " + artistId));
 
         vinylRecord.setArtist(artist);
         vinylRecordRepository.save(vinylRecord);
@@ -146,6 +144,6 @@ public class VinylRecordService {
 
     private VinylRecord findVinylRecord(Long vinylRecordId) {
         return vinylRecordRepository.findById(vinylRecordId)
-                .orElseThrow(() -> new RecordNotFoundException("Vinyl record with id " + vinylRecordId + " not found"));
+                .orElseThrow(() -> new RecordNotFoundException("No vinyl record found with id: " + vinylRecordId));
     }
 }

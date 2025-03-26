@@ -2,7 +2,6 @@ package com.groovify.vinylshopapi.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 @Table(name = "invoices")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
