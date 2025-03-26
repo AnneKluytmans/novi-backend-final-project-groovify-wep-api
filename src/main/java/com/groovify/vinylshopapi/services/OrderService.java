@@ -85,7 +85,8 @@ public class OrderService {
             LocalDate deletedAfter,
             LocalDate deletedBefore,
             String sortBy,
-            String sortOrder
+            String sortOrder,
+            Integer limit
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "subTotalPrice", "orderDate"));
         Specification<Order> specification = OrderSpecification.filterOrders(
@@ -93,6 +94,10 @@ public class OrderService {
                 orderedAfter, minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore
         );
         List<Order> orders = orderRepository.findAll(specification, sort);
+
+        if (limit != null && limit > 0 && limit < orders.size()) {
+            orders = orders.subList(0, limit);
+        }
         return orderMapper.toOrderSummaryResponseDTOs(orders);
     }
 

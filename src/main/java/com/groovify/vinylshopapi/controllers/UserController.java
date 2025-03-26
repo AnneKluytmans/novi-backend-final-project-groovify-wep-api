@@ -30,11 +30,12 @@ public class UserController {
             @RequestParam(required = false) LocalDate deletedAfter,
             @RequestParam(required = false) LocalDate deletedBefore,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) Integer limit
     ) {
             List<UserSummaryResponseDTO> users = userService.getUsers(
                     userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore,
-                    sortBy, sortOrder
+                    sortBy, sortOrder, limit
             );
             return ResponseEntity.ok(users);
     }

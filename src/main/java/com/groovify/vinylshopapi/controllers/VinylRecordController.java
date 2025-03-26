@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -31,15 +32,17 @@ public class VinylRecordController {
             @RequestParam(required = false) String artist,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) LocalDate releasedAfter,
+            @RequestParam(required = false) LocalDate releasedBefore,
             @RequestParam(required = false) Boolean isLimitedEdition,
             @RequestParam(required = false) Boolean isAvailable,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder,
-            @RequestParam(required = false) Integer limit)
-    {
+            @RequestParam(required = false) Integer limit
+    ) {
         List<VinylRecordResponseDTO> vinylRecords = vinylRecordService.getVinylRecords(
-                title, genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable,
-                sortBy, sortOrder, limit
+                title, genre, artist, minPrice, maxPrice, releasedAfter, releasedBefore,
+                isLimitedEdition, isAvailable, sortBy, sortOrder, limit
         );
         return ResponseEntity.ok(vinylRecords);
     }

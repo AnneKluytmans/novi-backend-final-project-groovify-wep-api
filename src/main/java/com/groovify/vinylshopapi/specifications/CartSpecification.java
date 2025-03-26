@@ -21,10 +21,9 @@ public class CartSpecification {
         return (Root<Cart> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("createdAt"), createdBefore, false);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("createdAt"), createdAfter, true);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("updatedAt"), updatedBefore, false);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("updatedAt"), updatedAfter, true);
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("createdAt"), null, createdBefore, createdAfter);
+
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("updatedAt"), null, updatedBefore, updatedAfter);
 
             if (customerId != null) {
                 predicates.add(cb.equal(root.get("customer").get("id"), customerId));

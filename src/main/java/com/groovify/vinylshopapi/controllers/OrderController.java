@@ -37,11 +37,12 @@ public class OrderController {
             @RequestParam(required = false) LocalDate deletedAfter,
             @RequestParam(required = false) LocalDate deletedBefore,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) Integer limit
     ) {
         List<OrderSummaryResponseDTO> orders = orderService.getOrders(
                 confirmationStatus, paymentStatus, shippingStatus, excludedShippingStatuses, orderedBefore, orderedAfter,
-                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore, sortBy, sortOrder
+                minTotalPrice, maxTotalPrice, isDeleted, deletedAfter, deletedBefore, sortBy, sortOrder, limit
         );
         return ResponseEntity.ok(orders);
     }

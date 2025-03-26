@@ -54,13 +54,17 @@ public class UserService {
             LocalDate deletedAfter,
             LocalDate deletedBefore,
             String sortBy,
-            String sortOrder
+            String sortOrder,
+            Integer limit
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "lastName", "email"));
         Specification<User> specification = UserSpecification.filterUsers(
                 userType, firstName, lastName, isDeleted, deletedAfter, deletedBefore
         );
         List<User> users = userRepository.findAll(specification, sort);
+        if (limit != null && limit > 0 && limit < users.size()) {
+            users = users.subList(0, limit);
+        }
 
         List<UserSummaryResponseDTO> userSummaryResponseDTOs = new ArrayList<>();
 

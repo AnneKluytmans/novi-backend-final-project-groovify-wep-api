@@ -28,23 +28,18 @@ public class OrderSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("confirmationStatus"), confirmationStatus, false);
+
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("paymentStatus"), paymentStatus, false);
+
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("shippingStatus"), shippingStatus, false);
 
             if (excludedShippingStatuses != null && !excludedShippingStatuses.isEmpty()) {
                 predicates.add(root.get("shippingStatus").in(excludedShippingStatuses).not());
             }
 
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("orderDate"), orderedBefore, false);
-            SpecificationUtils.addDatePredicate(predicates, cb, root.get("orderDate"), orderedAfter, true);
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("orderDate"), null, orderedBefore, orderedAfter);
 
-            if (minTotalPrice != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("subTotalPrice"), minTotalPrice));
-            }
-
-            if (maxTotalPrice != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("subTotalPrice"), maxTotalPrice));
-            }
+            SpecificationUtils.addPricePredicates(predicates, cb, root.get("subTotalPrice"), minTotalPrice, maxTotalPrice);
 
             SpecificationUtils.addDeletePredicates(predicates, cb, root.get("isDeleted"), isDeleted,
                     root.get("deletedAt"), deletedBefore, deletedAfter);

@@ -55,9 +55,7 @@ public class EmployeeService {
         Specification<Employee> specification = EmployeeSpecification.filterEmployees(
                 firstName, lastName, jobTitle, minSalary, maxSalary, country, city
         );
-        List<Employee> employees = employeeRepository.findAll(specification, sort);
-
-        return employeeMapper.toUserSummaryResponseDTOs(employees);
+        return employeeMapper.toUserSummaryResponseDTOs(employeeRepository.findAll(specification, sort));
     }
 
     public EmployeeResponseDTO getEmployeeById(Long id) {

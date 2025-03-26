@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class VinylRecordSpecification {
             String artist,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            LocalDate releasedAfter,
+            LocalDate releasedBefore,
             Boolean isLimitedEdition,
             Boolean isAvailable
     ) {
@@ -34,17 +37,11 @@ public class VinylRecordSpecification {
                 SpecificationUtils.addStringPredicate(predicates, cb, artistJoin.get("name"), artist, false);
             }
 
-            if (minPrice != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
-            }
+            SpecificationUtils.addPricePredicates(predicates, cb, root.get("price"), minPrice, maxPrice);
 
-            if (maxPrice != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
-            }
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("releaseDate"), null, releasedBefore, releasedAfter);
 
-            if (isLimitedEdition != null) {
-                predicates.add(cb.equal(root.get("isLimitedEdition"), isLimitedEdition));
-            }
+            SpecificationUtils.addBooleanPredicate(predicates, cb, root.get("isLimitedEdition"), isLimitedEdition);
 
             if (isAvailable != null) {
                 Join<VinylRecord, VinylRecordStock> stockJoin = root.join("stock");

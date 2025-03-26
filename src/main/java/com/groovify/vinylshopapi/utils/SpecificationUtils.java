@@ -2,6 +2,7 @@ package com.groovify.vinylshopapi.utils;
 
 import jakarta.persistence.criteria.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,19 +21,50 @@ public class SpecificationUtils {
         }
     }
 
-    public static void addDatePredicate(
+    public static void addBooleanPredicate(
+            List<Predicate> predicates,
+            CriteriaBuilder cb,
+            Path<Boolean> field,
+            Boolean value
+    ) {
+        if (value != null) {
+            predicates.add(cb.equal(field, value));
+        }
+    }
+
+    public static void addPricePredicates(
+            List<Predicate> predicates,
+            CriteriaBuilder cb,
+            Path<BigDecimal> field,
+            BigDecimal minPrice,
+            BigDecimal maxPrice
+    ) {
+        if (minPrice != null) {
+            predicates.add(cb.greaterThanOrEqualTo(field, minPrice));
+        }
+        if (maxPrice != null) {
+            predicates.add(cb.lessThanOrEqualTo(field, maxPrice));
+        }
+    }
+
+    public static void addDatePredicates(
             List<Predicate> predicates,
             CriteriaBuilder cb,
             Path<LocalDateTime> field,
             LocalDate dateValue,
-            Boolean isAfter
+            LocalDate dateBeforeValue,
+            LocalDate dateAfterValue
     ) {
         if (dateValue != null) {
-            if (isAfter) {
-                predicates.add(cb.greaterThanOrEqualTo(field.as(LocalDate.class), dateValue));
-            } else {
-                predicates.add(cb.lessThanOrEqualTo(field.as(LocalDate.class), dateValue));
-            }
+            predicates.add(cb.equal(field.as(LocalDate.class), dateValue));
+        }
+
+        if (dateBeforeValue != null) {
+            predicates.add(cb.lessThanOrEqualTo(field.as(LocalDate.class), dateBeforeValue));
+        }
+
+        if (dateAfterValue != null) {
+            predicates.add(cb.greaterThanOrEqualTo(field.as(LocalDate.class), dateAfterValue));
         }
     }
 
@@ -46,11 +78,7 @@ public class SpecificationUtils {
             LocalDate deletedBefore,
             LocalDate deletedAfter
     ) {
-       if (isDeleted != null) {
-           predicates.add(cb.equal(isDeletedField, isDeleted));
-       }
-
-       addDatePredicate(predicates, cb, deletedAtField, deletedBefore, false);
-       addDatePredicate(predicates, cb, deletedAtField, deletedAfter, true);
+        addBooleanPredicate(predicates, cb, isDeletedField, isDeleted);
+        addDatePredicates(predicates, cb, deletedAtField, null, deletedBefore, deletedAfter);
     }
 }

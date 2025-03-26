@@ -29,6 +29,8 @@ public class CustomerSpecification {
 
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("lastName"), lastName, false);
 
+            SpecificationUtils.addBooleanPredicate(predicates, cb, root.get("newsletterSubscribed"), newsletterSubscribed);
+
             SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("country"), country, false);
 
             SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("city"), city, false);
@@ -36,10 +38,6 @@ public class CustomerSpecification {
             SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("postalCode"), postalCode, true);
 
             SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("houseNumber"), houseNumber, true);
-
-            if (newsletterSubscribed != null) {
-                predicates.add(cb.equal(root.get("isNewsletterSubscribed"), newsletterSubscribed));
-            }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

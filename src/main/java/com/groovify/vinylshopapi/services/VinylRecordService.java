@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -44,6 +45,8 @@ public class VinylRecordService {
             String artist,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            LocalDate releasedAfter,
+            LocalDate releasedBefore,
             Boolean isLimitedEdition,
             Boolean isAvailable,
             String sortBy,
@@ -52,7 +55,8 @@ public class VinylRecordService {
     ) {
         Sort sort = getVinylRecordsSort(sortBy, sortOrder);
         Specification<VinylRecord> specification = VinylRecordSpecification.filterVinylRecords(
-                title, genre, artist, minPrice, maxPrice, isLimitedEdition, isAvailable
+                title, genre, artist, minPrice, maxPrice, releasedAfter, releasedBefore,
+                isLimitedEdition, isAvailable
         );
         List<VinylRecord> vinylRecords = vinylRecordRepository.findAll(specification, sort);
 

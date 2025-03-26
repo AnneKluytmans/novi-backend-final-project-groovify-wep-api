@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,22 +37,24 @@ public class ArtistService {
     public List<ArtistResponseDTO> getArtists(
             String country,
             String name,
+            LocalDate debutDateAfter,
+            LocalDate debutDateBefore,
             Integer minPopularity,
             Integer maxPopularity,
+            Boolean isGroup,
             String sortBy,
             String sortOrder,
             Integer limit
     ) {
-        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "countryOfOrigin"));
+        Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "debutDate"));
         Specification<Artist> specification = ArtistSpecification.filterArtists(
-                country, name, minPopularity, maxPopularity
+                country, name, debutDateAfter, debutDateBefore, minPopularity, maxPopularity, isGroup
         );
         List<Artist> artists = artistRepository.findAll(specification, sort);
 
         if (limit != null && limit > 0 && limit < artists.size()) {
             artists = artists.subList(0, limit);
         }
-
         return artistMapper.toResponseDTOs(artists);
     }
 

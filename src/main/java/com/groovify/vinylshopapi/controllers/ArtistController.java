@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,14 +29,18 @@ public class ArtistController {
     public ResponseEntity<List<ArtistResponseDTO>> getArtists(
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false) LocalDate debutDateAfter,
+            @RequestParam(required = false) LocalDate debutDateBefore,
             @RequestParam(required = false) Integer minPopularity,
             @RequestParam(required = false) Integer maxPopularity,
+            @RequestParam(required = false) Boolean isGroup,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder,
-            @RequestParam(required = false) Integer limit)
-    {
+            @RequestParam(required = false) Integer limit
+    ) {
         List<ArtistResponseDTO> artists = artistService.getArtists(
-                country, name, minPopularity, maxPopularity, sortBy, sortOrder, limit
+                country, name, debutDateAfter, debutDateBefore, minPopularity, maxPopularity,
+                isGroup, sortBy, sortOrder, limit
         );
         return ResponseEntity.ok(artists);
     }

@@ -44,8 +44,7 @@ public class CartService {
                 createdBefore, createdAfter, updatedBefore, updatedAfter,
                 customerId, isEmpty
         );
-        List<Cart> carts = cartRepository.findAll(specification, sort);
-        return cartMapper.toResponseDTOs(carts);
+        return cartMapper.toResponseDTOs(cartRepository.findAll(specification, sort));
     }
 
     public CartResponseDTO getCartById(Long cartId) {

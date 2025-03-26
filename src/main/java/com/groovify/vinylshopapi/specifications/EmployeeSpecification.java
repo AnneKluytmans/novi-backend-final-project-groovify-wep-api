@@ -30,13 +30,7 @@ public class EmployeeSpecification {
 
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("jobTitle"), jobTitle, false);
 
-            if (minSalary != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("salary"), minSalary));
-            }
-
-            if (maxSalary != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("salary"), maxSalary));
-            }
+            SpecificationUtils.addPricePredicates(predicates, cb, root.get("salary"), minSalary, maxSalary);
 
             SpecificationUtils.addStringPredicate(predicates, cb, addressJoin.get("country"), country, false);
 

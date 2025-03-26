@@ -27,9 +27,9 @@ public class VinylRecordCoverController {
     @PostMapping()
     public ResponseEntity<VinylRecordCoverSummaryResponseDTO> uploadCover(
             @PathVariable("id") Long vinylRecordId,
-            @RequestParam("file") MultipartFile file)
-            throws IOException {
-
+            @RequestParam("file") MultipartFile file
+    ) throws IOException
+    {
         String downloadUrl = ServletUriComponentsBuilder.fromCurrentRequest()
                 .toUriString();
         VinylRecordCoverSummaryResponseDTO newCover = vinylRecordCoverService.uploadCover(vinylRecordId, file, downloadUrl);

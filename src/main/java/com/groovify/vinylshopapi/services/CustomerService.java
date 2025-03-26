@@ -73,9 +73,7 @@ public class CustomerService {
         Specification<Customer> specification = CustomerSpecification.filterCustomers(
                 firstName, lastName, newsletterSubscribed, country, city, postalCode, houseNumber
         );
-        List<Customer> customers = customerRepository.findAll(specification, sort);
-
-        return customerMapper.toUserSummaryResponseDTOs(customers);
+        return customerMapper.toUserSummaryResponseDTOs(customerRepository.findAll(specification, sort));
     }
 
     public CustomerResponseDTO getCustomerById(Long id) {
