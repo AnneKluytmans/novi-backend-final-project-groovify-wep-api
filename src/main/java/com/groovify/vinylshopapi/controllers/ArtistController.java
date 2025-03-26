@@ -29,8 +29,8 @@ public class ArtistController {
     public ResponseEntity<List<ArtistResponseDTO>> getArtists(
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) LocalDate debutDateAfter,
-            @RequestParam(required = false) LocalDate debutDateBefore,
+            @RequestParam(required = false) LocalDate debutedAfter,
+            @RequestParam(required = false) LocalDate debutedBefore,
             @RequestParam(required = false) Integer minPopularity,
             @RequestParam(required = false) Integer maxPopularity,
             @RequestParam(required = false) Boolean isGroup,
@@ -39,7 +39,7 @@ public class ArtistController {
             @RequestParam(required = false) Integer limit
     ) {
         List<ArtistResponseDTO> artists = artistService.getArtists(
-                country, name, debutDateAfter, debutDateBefore, minPopularity, maxPopularity,
+                country, name, debutedAfter, debutedBefore, minPopularity, maxPopularity,
                 isGroup, sortBy, sortOrder, limit
         );
         return ResponseEntity.ok(artists);

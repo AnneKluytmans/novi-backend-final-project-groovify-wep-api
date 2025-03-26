@@ -17,8 +17,8 @@ public class ArtistSpecification {
     public static Specification<Artist> filterArtists(
             String country,
             String name,
-            LocalDate debutDateAfter,
-            LocalDate debutDateBefore,
+            LocalDate debutedAfter,
+            LocalDate debutedBefore,
             Integer minPopularity,
             Integer maxPopularity,
             Boolean isGroup
@@ -30,7 +30,7 @@ public class ArtistSpecification {
 
             SpecificationUtils.addStringPredicate(predicates, cb, root.get("name"), name, false);
 
-            SpecificationUtils.addDatePredicates(predicates, cb, root.get("debutDate"), null, debutDateBefore, debutDateAfter);
+            SpecificationUtils.addDatePredicates(predicates, cb, root.get("debutDate"), null, debutedBefore, debutedAfter);
 
             if (minPopularity != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("popularity"), minPopularity));

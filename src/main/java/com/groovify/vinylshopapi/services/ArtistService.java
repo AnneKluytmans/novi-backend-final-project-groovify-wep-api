@@ -37,8 +37,8 @@ public class ArtistService {
     public List<ArtistResponseDTO> getArtists(
             String country,
             String name,
-            LocalDate debutDateAfter,
-            LocalDate debutDateBefore,
+            LocalDate debutedAfter,
+            LocalDate debutedBefore,
             Integer minPopularity,
             Integer maxPopularity,
             Boolean isGroup,
@@ -48,7 +48,7 @@ public class ArtistService {
     ) {
         Sort sort = SortHelper.getSort(sortBy, sortOrder, List.of("id", "popularity", "name", "debutDate"));
         Specification<Artist> specification = ArtistSpecification.filterArtists(
-                country, name, debutDateAfter, debutDateBefore, minPopularity, maxPopularity, isGroup
+                country, name, debutedAfter, debutedBefore, minPopularity, maxPopularity, isGroup
         );
         List<Artist> artists = artistRepository.findAll(specification, sort);
 
