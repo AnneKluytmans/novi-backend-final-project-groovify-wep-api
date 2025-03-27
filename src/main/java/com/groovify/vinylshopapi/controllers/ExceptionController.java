@@ -2,6 +2,7 @@ package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.exceptions.*;
 import org.springframework.http.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
@@ -43,6 +44,13 @@ public class ExceptionController {
     public ResponseEntity<Object> handleRecordNotFoundException(RecordNotFoundException ex) {
         return buildErrorResponse(
                 HttpStatus.NOT_FOUND, "Not Found", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND, "Username not found", ex.getMessage(), null
         );
     }
 
