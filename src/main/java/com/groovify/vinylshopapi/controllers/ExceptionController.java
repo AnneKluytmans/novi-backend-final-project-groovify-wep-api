@@ -1,12 +1,14 @@
 package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.exceptions.*;
+import jakarta.servlet.ServletException;
 import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.io.IOException;
+import java.rmi.ServerException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,6 +102,13 @@ public class ExceptionController {
     public ResponseEntity<Object> handleIOException(IOException ex) {
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST, "File Processing Error", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = ServletException.class)
+    public ResponseEntity<Object> handleServletException(ServletException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Servlet Error", ex.getMessage(), null
         );
     }
 
