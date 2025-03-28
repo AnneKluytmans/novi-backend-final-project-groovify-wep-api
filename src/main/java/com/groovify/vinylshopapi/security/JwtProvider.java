@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,22 +39,16 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public Long getUserIdFromToken(String token) {
-        return extractClaim(token, claims -> claims.get("userId", Long.class));
-    }
-
     public Boolean validateToken(String token, UserDetails userDetails) {
-        String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        return claimsResolver.apply(extractAllClaims(token));
     }
 
     private Claims extractAllClaims(String token) {

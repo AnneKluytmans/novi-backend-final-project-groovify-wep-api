@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
