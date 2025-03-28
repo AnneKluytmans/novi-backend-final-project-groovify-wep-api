@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -12,5 +12,5 @@ import java.util.List;
 public class UserDetailsResponseDTO {
     private Long userId;
     private String username;
-    private List<String> roles;
+    private Set<String> roles;
 }
