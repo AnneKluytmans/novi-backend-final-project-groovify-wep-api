@@ -111,6 +111,20 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler(value = InvalidPasswordException.class)
+    public ResponseEntity<Object> handleInvalidPasswordException(InvalidPasswordException ex) {
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED, "Invalid Password", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = PasswordConfirmationException.class)
+    public ResponseEntity<Object> handlePasswordConfirmationException(PasswordConfirmationException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Password Confirmation", ex.getMessage(), null
+        );
+    }
+
     @ExceptionHandler(value = IOException.class)
     public ResponseEntity<Object> handleIOException(IOException ex) {
         return buildErrorResponse(
