@@ -97,6 +97,20 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler(value = InvalidTokenException.class)
+    public ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException ex) {
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED, "Invalid Token", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = MissingTokenException.class)
+    public ResponseEntity<Object> handleMissingTokenException(MissingTokenException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Missing Token", ex.getMessage(), null
+        );
+    }
+
     @ExceptionHandler(value = IOException.class)
     public ResponseEntity<Object> handleIOException(IOException ex) {
         return buildErrorResponse(

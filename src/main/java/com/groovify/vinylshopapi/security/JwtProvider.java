@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.security;
 
+import com.groovify.vinylshopapi.exceptions.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,8 +46,19 @@ public class JwtProvider {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
     public Boolean validateToken(String token, UserDetails userDetails) {
         return (extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String refreshToken(String token, UserDetails userDetails) {
+        if (!validateToken(token, userDetails)) {
+            throw new InvalidTokenException("Token is invalid");
+        }
+        return generateToken(userDetails, extractUserId(token));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

@@ -1,5 +1,7 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.exceptions.InvalidTokenException;
+import com.groovify.vinylshopapi.exceptions.MissingTokenException;
 import com.groovify.vinylshopapi.payload.AuthRequestDTO;
 import com.groovify.vinylshopapi.payload.AuthResponseDTO;
 import com.groovify.vinylshopapi.security.CustomUserDetailsService;
@@ -7,6 +9,7 @@ import com.groovify.vinylshopapi.security.JwtProvider;
 import com.groovify.vinylshopapi.security.SecurityUser;
 import com.groovify.vinylshopapi.security.UserDetailsResponseDTO;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,10 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
@@ -78,5 +78,44 @@ public class AuthController {
         final String token = jwtProvider.generateToken(userDetails, user.getUserId());
 
         return ResponseEntity.ok(new AuthResponseDTO(token));
+    }
+
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<AuthResponseDTO> validateToken(
+            @RequestHeader("Authorization") String authorizationHeader,
+            Authentication authentication
+    ) {
+        String token = extractTokenFromHeader(authorizationHeader);
+        if (token == null) {
+            throw new MissingTokenException("Authorization header is missing a bearer token");
+        }
+
+        if (!jwtProvider.validateToken(token, (UserDetails) authentication.getPrincipal())) {
+            throw new InvalidTokenException("Token is invalid");
+        }
+
+        return ResponseEntity.ok(new AuthResponseDTO(token));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponseDTO> refreshToken(
+            @RequestHeader("Authorization") String authorizationHeader,
+            Authentication authentication
+    ) {
+        String token = extractTokenFromHeader(authorizationHeader);
+        if (token == null) {
+            throw new MissingTokenException("Authorization header is missing a bearer token");
+        }
+
+        String refreshedToken = jwtProvider.refreshToken(token, (UserDetails) authentication.getPrincipal());
+        return ResponseEntity.ok(new AuthResponseDTO(refreshedToken));
+    }
+
+    private String extractTokenFromHeader(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 }
