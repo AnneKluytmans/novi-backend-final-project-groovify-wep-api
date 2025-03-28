@@ -1,7 +1,9 @@
 package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.exceptions.*;
+import jakarta.servlet.ServletException;
 import org.springframework.http.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
@@ -43,6 +45,13 @@ public class ExceptionController {
     public ResponseEntity<Object> handleRecordNotFoundException(RecordNotFoundException ex) {
         return buildErrorResponse(
                 HttpStatus.NOT_FOUND, "Not Found", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND, "Username not found", ex.getMessage(), null
         );
     }
 
@@ -88,10 +97,45 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler(value = InvalidTokenException.class)
+    public ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException ex) {
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED, "Invalid Token", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = MissingTokenException.class)
+    public ResponseEntity<Object> handleMissingTokenException(MissingTokenException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Missing Token", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = InvalidPasswordException.class)
+    public ResponseEntity<Object> handleInvalidPasswordException(InvalidPasswordException ex) {
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED, "Invalid Password", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = PasswordConfirmationException.class)
+    public ResponseEntity<Object> handlePasswordConfirmationException(PasswordConfirmationException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Password Confirmation", ex.getMessage(), null
+        );
+    }
+
     @ExceptionHandler(value = IOException.class)
     public ResponseEntity<Object> handleIOException(IOException ex) {
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST, "File Processing Error", ex.getMessage(), null
+        );
+    }
+
+    @ExceptionHandler(value = ServletException.class)
+    public ResponseEntity<Object> handleServletException(ServletException ex) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, "Servlet Error", ex.getMessage(), null
         );
     }
 

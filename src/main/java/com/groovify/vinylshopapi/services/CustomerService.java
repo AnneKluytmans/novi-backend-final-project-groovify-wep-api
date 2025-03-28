@@ -21,6 +21,7 @@ import com.groovify.vinylshopapi.validation.ValidationUtils;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CustomerService {
     private final VinylRecordRepository vinylRecordRepository;
     private final VinylRecordMapper vinylRecordMapper;
     private final ValidationUtils validationUtils;
+    private final PasswordEncoder passwordEncoder;
 
     public CustomerService(
             CustomerRepository customerRepository,
@@ -46,7 +48,8 @@ public class CustomerService {
             RoleRepository roleRepository,
             VinylRecordRepository vinylRecordRepository,
             VinylRecordMapper vinylRecordMapper,
-            ValidationUtils validationUtils
+            ValidationUtils validationUtils,
+            PasswordEncoder passwordEncoder
     ) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
@@ -56,6 +59,7 @@ public class CustomerService {
         this.vinylRecordRepository = vinylRecordRepository;
         this.vinylRecordMapper = vinylRecordMapper;
         this.validationUtils = validationUtils;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserSummaryResponseDTO> getCustomers(
@@ -92,6 +96,8 @@ public class CustomerService {
 
         validationUtils.validateUniqueUsername(customerRegisterDTO.getUsername(), customer.getId());
         validationUtils.validateUniqueEmail(customerRegisterDTO.getEmail(), customer.getId());
+
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
 
         Role userRole = roleRepository.findByRoleType(RoleType.USER)
                 .orElseThrow(() -> new RecordNotFoundException("Role '" + RoleType.USER + "' not found."));

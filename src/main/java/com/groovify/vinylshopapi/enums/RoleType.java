@@ -3,5 +3,9 @@ package com.groovify.vinylshopapi.enums;
 public enum RoleType {
     USER,
     EMPLOYEE,
-    ADMIN
+    ADMIN;
+
+    public String getAuthority() {
+        return "ROLE_" + this.name();
+    }
 }
