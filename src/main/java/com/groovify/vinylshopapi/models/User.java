@@ -50,7 +50,7 @@ public abstract class User {
     @Pattern(regexp = "^\\+?([0-9]{1,4})?\\s?(\\(?\\d{1,4}\\)?\\s?)?\\d{6,10}$", message = "Invalid phone number format")
     private String phone;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

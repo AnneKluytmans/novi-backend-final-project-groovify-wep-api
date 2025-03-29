@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.security;
 
-import com.groovify.vinylshopapi.models.User;
 import com.groovify.vinylshopapi.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -9,7 +9,6 @@ import com.groovify.vinylshopapi.security.JwtProvider;
 import com.groovify.vinylshopapi.security.SecurityUser;
 import com.groovify.vinylshopapi.security.UserDetailsResponseDTO;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,7 +57,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Valid AuthRequestDTO authRequestDTO,
+            @Valid @RequestBody AuthRequestDTO authRequestDTO,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
