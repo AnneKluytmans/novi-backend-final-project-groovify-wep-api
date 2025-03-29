@@ -178,8 +178,8 @@ public class UserService {
                 if (user instanceof Employee && role == RoleType.EMPLOYEE) {
                     throw new IllegalArgumentException("The role EMPLOYEE is mandatory for employees and cannot be removed.");
                 }
-                if (user instanceof Customer && role == RoleType.USER) {
-                    throw new IllegalArgumentException("The role USER is mandatory for customers and cannot be removed.");
+                if (role == RoleType.USER) {
+                    throw new IllegalArgumentException("The role USER is mandatory for all users and cannot be removed.");
                 }
             }
         }

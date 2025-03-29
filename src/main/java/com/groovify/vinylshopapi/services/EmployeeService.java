@@ -81,6 +81,7 @@ public class EmployeeService {
 
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
 
+        employee.getRoles().add(findRoleByRoleType(RoleType.USER));
         employee.getRoles().add(findRoleByRoleType(RoleType.EMPLOYEE));
 
         if (employeeRegisterDTO.getIsAdmin()) {
