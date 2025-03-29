@@ -1,6 +1,7 @@
 package com.groovify.vinylshopapi.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Hidden
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint, AccessDeniedHandler {
 

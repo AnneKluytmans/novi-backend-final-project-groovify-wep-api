@@ -1,6 +1,7 @@
 package com.groovify.vinylshopapi.controllers;
 
 import com.groovify.vinylshopapi.exceptions.*;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.ServletException;
 import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Hidden
 @ControllerAdvice
 public class ExceptionController {
 
