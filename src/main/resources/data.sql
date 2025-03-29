@@ -118,12 +118,17 @@ VALUES
 -- Employee roles
 INSERT INTO user_roles (user_id, role_id)
 VALUES
-    (11, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (11, (SELECT id FROM roles WHERE role_type = 'USER')),
     (11, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (11, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (12, (SELECT id FROM roles WHERE role_type = 'USER')),
     (12, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
     (12, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (13, (SELECT id FROM roles WHERE role_type = 'USER')),
     (13, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (14, (SELECT id FROM roles WHERE role_type = 'USER')),
     (14, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (15, (SELECT id FROM roles WHERE role_type = 'USER')),
     (15, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE'));
 
 
