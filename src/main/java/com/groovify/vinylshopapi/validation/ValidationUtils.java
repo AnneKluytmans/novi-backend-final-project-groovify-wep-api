@@ -29,7 +29,7 @@ public class ValidationUtils {
 
         if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
             if (existingUser.get().getIsDeleted()) {
-                throw new DeactivatedException("This username is linked to a deleted account. Do you want to reactivate it?");
+                throw new DeactivatedException("This username is linked to a deleted account.");
             } else {
                 throw new ConflictException("Username '" + username + "' is already taken by another user. Please choose another username.");
             }
@@ -41,7 +41,7 @@ public class ValidationUtils {
 
         if (existingUser.isPresent() && !existingUser.get().getId().equals(currentUserId)) {
             if (existingUser.get().getIsDeleted()) {
-                throw new DeactivatedException("This email is linked to a deleted account. Do you want to reactivate it?", email);
+                throw new DeactivatedException("This email is linked to a deleted account.", email);
             } else {
                 throw new ConflictException("Email: '" + email + "' is already in use by another user. Please choose another email.");
             }

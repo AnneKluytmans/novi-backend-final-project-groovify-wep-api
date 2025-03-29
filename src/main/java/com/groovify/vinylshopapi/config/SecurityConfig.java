@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.config;
 
+import com.groovify.vinylshopapi.security.CustomAuthenticationEntryPoint;
 import com.groovify.vinylshopapi.security.CustomUserDetailsService;
 import com.groovify.vinylshopapi.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -23,13 +24,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(
             CustomUserDetailsService customUserDetailsService,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
         this.customUserDetailsService = customUserDetailsService;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -44,6 +48,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAuthenticationEntryPoint)
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
