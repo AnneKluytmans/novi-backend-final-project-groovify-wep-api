@@ -11,11 +11,14 @@ import com.groovify.vinylshopapi.models.*;
 import com.groovify.vinylshopapi.repositories.AddressRepository;
 import com.groovify.vinylshopapi.repositories.CustomerRepository;
 import com.groovify.vinylshopapi.repositories.OrderRepository;
+import com.groovify.vinylshopapi.security.SecurityUser;
 import com.groovify.vinylshopapi.specifications.OrderSpecification;
 import com.groovify.vinylshopapi.utils.SortHelper;
 import com.groovify.vinylshopapi.validation.ValidationUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -106,6 +109,9 @@ public class OrderService {
     }
 
     public OrderResponseDTO placeOrder(OrderRequestDTO orderRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        checkAuthorization(authentication, orderRequestDTO.getCustomerId());
+
         Customer customer = findCustomer(orderRequestDTO.getCustomerId());
         validateNoExistingPendingOrder(customer);
 
@@ -229,6 +235,13 @@ public class OrderService {
             throw new RecordNotFoundException("No invoice found for order with id: " + orderId);
         }
         return order.getInvoice();
+    }
+
+    private void checkAuthorization(Authentication authentication, Long customerId) {
+        SecurityUser user = (SecurityUser) authentication.getPrincipal();
+        if (!customerId.equals(user.getUserId())) {
+            throw new ForbiddenException("You do not have the permission to access this resource.");
+        }
     }
 
     private Address validateAddress(Long addressId, Long customerId) {

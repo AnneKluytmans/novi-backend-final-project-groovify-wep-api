@@ -25,7 +25,6 @@ public class Order {
     @NotNull(message = "Order date is required")
     private LocalDateTime orderDate;
 
-    @Future
     private LocalDateTime expectedDeliveryDate;
 
     @NotBlank(message = "Recipient name is required")
