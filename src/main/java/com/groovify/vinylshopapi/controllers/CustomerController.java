@@ -88,33 +88,6 @@ public class CustomerController {
     }
 
 
-    @GetMapping("/{id}/favorite-records")
-    public ResponseEntity<List<VinylRecordSummaryResponseDTO>> getCustomerFavoriteRecords(
-            @PathVariable("id") Long customerId
-    ) {
-        List<VinylRecordSummaryResponseDTO> favoriteRecords = customerService.getCustomerFavoriteRecords(customerId);
-        return ResponseEntity.ok(favoriteRecords);
-    }
-
-    @PostMapping("/{id}/favorite-records/{vinylId}")
-    public ResponseEntity<Void> addFavoriteRecordToCustomer(
-            @PathVariable("id") Long customerId,
-            @PathVariable("vinylId") Long vinylRecordId
-    ) {
-        customerService.addFavoriteRecordToCustomer(customerId, vinylRecordId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{id}/favorite-records/{vinylId}")
-    public ResponseEntity<Void> removeFavoriteRecordFromCustomer(
-            @PathVariable("id") Long customerId,
-            @PathVariable("vinylId") Long vinylRecordId
-    ) {
-        customerService.removeFavoriteRecordFromCustomer(customerId, vinylRecordId);
-        return ResponseEntity.noContent().build();
-    }
-
-
     @GetMapping("/{id}/orders")
     public ResponseEntity<List<OrderSummaryResponseDTO>> getCustomerOrders(
             @PathVariable Long id
