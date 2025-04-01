@@ -12,6 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class DashboardResponseDTO {
     private Map<VinylRecordSummaryResponseDTO, Integer> bestSellersThisMonth;
+    private Map<VinylRecordSummaryResponseDTO, Integer> bestSellersThisYear;
     private BigDecimal totalRevenueLastMonth;
     private BigDecimal totalRevenueThisMonth;
     private BigDecimal totalRevenueLastYear;

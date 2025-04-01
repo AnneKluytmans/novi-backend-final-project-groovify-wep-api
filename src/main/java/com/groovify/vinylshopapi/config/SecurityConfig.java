@@ -158,6 +158,7 @@ public class SecurityConfig {
 
                         // Dashboard endpoints
                         .requestMatchers(HttpMethod.GET, "/api/dashboard").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard/bestsellers").hasRole("USER")
 
                         .anyRequest().denyAll()
                 )

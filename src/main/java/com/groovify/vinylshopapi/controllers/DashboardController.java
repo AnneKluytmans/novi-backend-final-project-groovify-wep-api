@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.controllers;
 
+import com.groovify.vinylshopapi.dtos.BestsellersResponseDTO;
 import com.groovify.vinylshopapi.dtos.DashboardResponseDTO;
 import com.groovify.vinylshopapi.services.DashboardService;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,13 @@ public class DashboardController {
     ) {
         DashboardResponseDTO dashboard = dashboardService.getDashboard(topN);
         return ResponseEntity.ok(dashboard);
+    }
+
+    @GetMapping("/bestsellers")
+    public ResponseEntity<BestsellersResponseDTO> getBestsellers(
+            @RequestParam(defaultValue = "3") Integer topN
+    ) {
+        BestsellersResponseDTO bestSellers = dashboardService.getBestsellers(topN);
+        return ResponseEntity.ok(bestSellers);
     }
 }
