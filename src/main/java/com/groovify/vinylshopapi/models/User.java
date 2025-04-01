@@ -31,7 +31,7 @@ public abstract class User {
     @Email(message = "Invalid email format")
     private String email;
 
-    @NotBlank(message = "Password is required")
+    @NotNull(message = "Password is required")
     @Size(min = 8, max = 200, message = "Password must be between 8 and 200 characters long")
     private String password;
 
@@ -50,7 +50,7 @@ public abstract class User {
     @Pattern(regexp = "^\\+?([0-9]{1,4})?\\s?(\\(?\\d{1,4}\\)?\\s?)?\\d{6,10}$", message = "Invalid phone number format")
     private String phone;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -80,25 +80,25 @@ VALUES
 -- Customers
 INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_deleted, newsletter_subscribed)
 VALUES
-    ('vinylfan_01', 'max.stoop@example.com', 'password123', 'Max', 'Stoop', '1987-03-14', '0612345678', 'CUSTOMER', false, true),
-    ('groovehunter_02', 'eva.vandongen@example.com', 'password123', 'Eva', 'van Dongen', '1992-07-22', '0623456789', 'CUSTOMER', false, false),
-    ('turntableking_03', 'niels.verhoeven@example.com', 'password123', 'Niels', 'Verhoeven', '1990-11-30', '0634567890', 'CUSTOMER', false, true),
-    ('recordlover_04', 'sophie.maes@example.com', 'password123', 'Sophie', 'Maes', '1978-05-18', '0645678901', 'CUSTOMER', false, true),
-    ('spinningvinyl_05', 'jasper.vanrooij@example.com', 'password123', 'Jasper', 'van Rooij', '1985-09-10', '0656789012', 'CUSTOMER', false, true),
-    ('discophile_06', 'lisa.vanacker@example.com', 'password123', 'Lisa', 'Van Acker', '1995-01-25', '0667890123', 'CUSTOMER', false, false),
-    ('soundsystemfan_07', 'thomas.dekker@example.com', 'password123', 'Thomas', 'Dekker', '1983-04-12', '0678901234', 'CUSTOMER', false, true),
-    ('thevinylman_08', 'anne.vanbeek@example.com', 'password123', 'Anne', 'van Beek', '1999-12-05', '0689012345', 'CUSTOMER', false, false),
-    ('oldschoolvinyl_09', 'stefan.vanderlinden@example.com', 'password123', 'Stefan', 'van der Linden', '1991-06-28', '0690123456', 'CUSTOMER', false, true),
-    ('newagevinyl_10', 'mila.janssen@example.com', 'password123', 'Mila', 'Janssen', '1974-02-15', '0611234567', 'CUSTOMER', false, true);
+    ('vinylfan_01', 'max.stoop@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Max', 'Stoop', '1987-03-14', '0612345678', 'CUSTOMER', false, true),
+    ('groovehunter_02', 'eva.vandongen@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Eva', 'van Dongen', '1992-07-22', '0623456789', 'CUSTOMER', false, false),
+    ('turntableking_03', 'niels.verhoeven@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Niels', 'Verhoeven', '1990-11-30', '0634567890', 'CUSTOMER', false, true),
+    ('recordlover_04', 'sophie.maes@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Sophie', 'Maes', '1978-05-18', '0645678901', 'CUSTOMER', false, true),
+    ('spinningvinyl_05', 'jasper.vanrooij@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Jasper', 'van Rooij', '1985-09-10', '0656789012', 'CUSTOMER', false, true),
+    ('discophile_06', 'lisa.vanacker@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Lisa', 'Van Acker', '1995-01-25', '0667890123', 'CUSTOMER', false, false),
+    ('soundsystemfan_07', 'thomas.dekker@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Thomas', 'Dekker', '1983-04-12', '0678901234', 'CUSTOMER', false, true),
+    ('thevinylman_08', 'anne.vanbeek@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Anne', 'van Beek', '1999-12-05', '0689012345', 'CUSTOMER', false, false),
+    ('oldschoolvinyl_09', 'stefan.vanderlinden@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Stefan', 'van der Linden', '1991-06-28', '0690123456', 'CUSTOMER', false, true),
+    ('newagevinyl_10', 'mila.janssen@example.com', '$2a$10$jq3a65A2weHaOIv/2vxIdu6zp.XaFOTAs7v1kqNVq7xaT6gLYZOBG', 'Mila', 'Janssen', '1974-02-15', '0611234567', 'CUSTOMER', false, true);
 
 -- Employees
 INSERT INTO users (username, email, password, first_name, last_name, date_of_birth, phone, user_type, is_deleted, job_title, salary, work_hours)
 VALUES
-    ('admin_lars', 'lars.vanmeulen@vinylshop.com', 'admin', 'Lars', 'van Meulen', '1983-02-14', '0623344556', 'EMPLOYEE', false, 'Store Manager', 6500.00, 40),
-    ('admin_emma', 'emma.verstraeten@vinylshop.com', 'admin', 'Emma', 'Verstraeten', '1992-11-12', '0677889900', 'EMPLOYEE', false, 'Store Manager', 6000.00, 40),
-    ('employee_bram', 'bram.vanhof@vinylshop.com', 'employee', 'Bram', 'van Hof', '1990-05-09', '0611223344', 'EMPLOYEE', false, 'Sales Associate', 3600.00, 32),
-    ('employee_eline', 'eline.peeters@vinylshop.com', 'employee', 'Eline', 'Peeters', '1992-07-20', '0688997766', 'EMPLOYEE', false, 'Sales Associate', 2900.00, 24),
-    ('employee_dean', 'daan.koning@vinylshop.com', 'employee', 'Daan', 'Koning', '1988-03-22', '0622233344', 'EMPLOYEE', false, 'Warehouse Coordinator', 5500.00, 32);
+    ('admin_lars', 'lars.vanmeulen@vinylshop.com', '$2a$10$Y1fp2IloggWibbS04Q4fRO1RyTDo2EWdjbi.xSkbnth1l0Ksp1z4e', 'Lars', 'van Meulen', '1983-02-14', '0623344556', 'EMPLOYEE', false, 'Store Manager', 6500.00, 40),
+    ('admin_emma', 'emma.verstraeten@vinylshop.com', '$2a$10$Y1fp2IloggWibbS04Q4fRO1RyTDo2EWdjbi.xSkbnth1l0Ksp1z4e', 'Emma', 'Verstraeten', '1992-11-12', '0677889900', 'EMPLOYEE', false, 'Store Manager', 6000.00, 40),
+    ('employee_bram', 'bram.vanhof@vinylshop.com', '$2a$10$ZVPLU04qTxu1T5DRHcCFDu4CFbXcRqaThbDwU7PH4qAZapWq6XUta', 'Bram', 'van Hof', '1990-05-09', '0611223344', 'EMPLOYEE', false, 'Sales Associate', 3600.00, 32),
+    ('employee_eline', 'eline.peeters@vinylshop.com', '$2a$10$ZVPLU04qTxu1T5DRHcCFDu4CFbXcRqaThbDwU7PH4qAZapWq6XUta', 'Eline', 'Peeters', '1992-07-20', '0688997766', 'EMPLOYEE', false, 'Sales Associate', 2900.00, 24),
+    ('employee_dean', 'daan.koning@vinylshop.com', '$2a$10$ZVPLU04qTxu1T5DRHcCFDu4CFbXcRqaThbDwU7PH4qAZapWq6XUta', 'Daan', 'Koning', '1988-03-22', '0622233344', 'EMPLOYEE', false, 'Warehouse Coordinator', 5500.00, 32);
 
 
 -- Customer roles
@@ -118,12 +118,17 @@ VALUES
 -- Employee roles
 INSERT INTO user_roles (user_id, role_id)
 VALUES
-    (11, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (11, (SELECT id FROM roles WHERE role_type = 'USER')),
     (11, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (11, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (12, (SELECT id FROM roles WHERE role_type = 'USER')),
     (12, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
     (12, (SELECT id FROM roles WHERE role_type = 'ADMIN')),
+    (13, (SELECT id FROM roles WHERE role_type = 'USER')),
     (13, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (14, (SELECT id FROM roles WHERE role_type = 'USER')),
     (14, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE')),
+    (15, (SELECT id FROM roles WHERE role_type = 'USER')),
     (15, (SELECT id FROM roles WHERE role_type = 'EMPLOYEE'));
 
 

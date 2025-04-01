@@ -14,6 +14,7 @@ import com.groovify.vinylshopapi.validation.ValidationUtils;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,17 +27,20 @@ public class EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final RoleRepository roleRepository;
     private final ValidationUtils validationUtils;
+    private final PasswordEncoder passwordEncoder;
 
     public EmployeeService(
             EmployeeRepository employeeRepository,
             EmployeeMapper employeeMapper,
             RoleRepository roleRepository,
-            ValidationUtils validationUtils
+            ValidationUtils validationUtils,
+            PasswordEncoder passwordEncoder
     ) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
         this.roleRepository = roleRepository;
         this.validationUtils = validationUtils;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -75,6 +79,9 @@ public class EmployeeService {
         validationUtils.validateUniqueUsername(employeeRegisterDTO.getUsername(), employee.getId());
         validationUtils.validateUniqueEmail(employeeRegisterDTO.getEmail(), employee.getId());
 
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+
+        employee.getRoles().add(findRoleByRoleType(RoleType.USER));
         employee.getRoles().add(findRoleByRoleType(RoleType.EMPLOYEE));
 
         if (employeeRegisterDTO.getIsAdmin()) {

@@ -1,8 +1,11 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.ChangePasswordDTO;
 import com.groovify.vinylshopapi.dtos.UserResponseDTO;
 import com.groovify.vinylshopapi.dtos.UserSummaryResponseDTO;
 import com.groovify.vinylshopapi.enums.RoleType;
+import com.groovify.vinylshopapi.exceptions.InvalidPasswordException;
+import com.groovify.vinylshopapi.exceptions.PasswordConfirmationException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.CustomerMapper;
 import com.groovify.vinylshopapi.mappers.EmployeeMapper;
@@ -17,6 +20,7 @@ import com.groovify.vinylshopapi.specifications.UserSpecification;
 import com.groovify.vinylshopapi.utils.SortHelper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,17 +36,20 @@ public class UserService {
     private final EmployeeMapper employeeMapper;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             CustomerMapper customerMapper,
             EmployeeMapper employeeMapper,
             RoleRepository roleRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.customerMapper = customerMapper;
         this.employeeMapper = employeeMapper;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -95,6 +102,18 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void changePassword(Long id, ChangePasswordDTO changePasswordDTO) {
+        User user = findUser(id, false);
+
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Incorrect old password. You must confirm your current password to change it.");
+        }
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            throw new PasswordConfirmationException("Password change failed. New password and confirm password do not match");
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+        userRepository.save(user);
+    }
 
     public List<RoleType> getUserRoles(Long userId) {
         Set<Role> userRoles = findUser(userId, null).getRoles();
@@ -159,8 +178,8 @@ public class UserService {
                 if (user instanceof Employee && role == RoleType.EMPLOYEE) {
                     throw new IllegalArgumentException("The role EMPLOYEE is mandatory for employees and cannot be removed.");
                 }
-                if (user instanceof Customer && role == RoleType.USER) {
-                    throw new IllegalArgumentException("The role USER is mandatory for customers and cannot be removed.");
+                if (role == RoleType.USER) {
+                    throw new IllegalArgumentException("The role USER is mandatory for all users and cannot be removed.");
                 }
             }
         }
