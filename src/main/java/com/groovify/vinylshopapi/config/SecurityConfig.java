@@ -136,9 +136,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/addresses/{id}").hasRole("USER")
 
                         // Cart endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/carts").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/carts/{id}").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/carts/{id}").hasRole("ADMIN")
+                        .requestMatchers("/api/carts", "/api/carts/{id}").hasRole("ADMIN")
 
                         // Order endpoints
                         .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
