@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.dtos;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ public class EmployeeAdminUpdateDTO {
     private String jobTitle;
 
     @NotNull(message = "Salary is required")
-    @Positive(message = "Salary must be a positive value")
+    @DecimalMin(value = "0.00", message = "Salary must be positive")
     private BigDecimal salary;
 
     @NotNull(message = "Work hours is required")
