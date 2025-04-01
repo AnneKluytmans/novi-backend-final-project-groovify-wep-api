@@ -2,7 +2,7 @@ package com.groovify.vinylshopapi.exceptions;
 
 public class InsufficientStockException extends RuntimeException {
     public InsufficientStockException() {
-        super("Insufficient stock");
+        super("There is not enough stock available to fulfill your request.");
     }
 
     public InsufficientStockException(String message) {

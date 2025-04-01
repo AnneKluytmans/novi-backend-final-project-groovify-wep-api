@@ -8,6 +8,10 @@ import lombok.Getter;
 public class DeactivatedException extends RuntimeException {
     private String email;
 
+    public DeactivatedException() {
+        super("This account has been deactivated.");
+    }
+
     public DeactivatedException(String message) {
         super(message);
     }

@@ -1,6 +1,5 @@
 package com.groovify.vinylshopapi.dtos;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
