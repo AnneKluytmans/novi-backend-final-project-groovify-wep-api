@@ -139,7 +139,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/carts", "/api/carts/{id}").hasRole("ADMIN")
 
                         // Order endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/orders/{id}").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/orders/{id}/invoice")
                             .access((authentication, context) ->
@@ -148,16 +148,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}")
                             .access((authentication, context) ->
                                     canAccessOrder(authentication.get(), context, null))
-                        .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}/status")
-                            .access((authentication, context) ->
-                                    canAccessOrder(authentication.get(), context, "EMPLOYEE"))
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}/status").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.DELETE, "/api/orders/{id}")
                             .access((authentication, context) ->
                                     canAccessOrder(authentication.get(), context, null))
                         .requestMatchers("/api/orders/{id}/deactivate", "/api/orders/{id}/reactivate").hasRole("ADMIN")
 
                         // Dashboard endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/dashboard").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/dashboard/bestsellers").hasRole("USER")
 
                         .anyRequest().denyAll()
