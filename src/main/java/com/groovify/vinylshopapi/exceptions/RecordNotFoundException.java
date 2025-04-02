@@ -2,7 +2,7 @@ package com.groovify.vinylshopapi.exceptions;
 
 public class RecordNotFoundException extends RuntimeException {
     public RecordNotFoundException() {
-        super("Record not found");
+        super("The requested record was not found.");
     }
 
     public RecordNotFoundException(String message) {

@@ -2,7 +2,7 @@ package com.groovify.vinylshopapi.exceptions;
 
 public class BadRequestException extends RuntimeException {
     public BadRequestException() {
-        super("Bad request");
+        super("Invalid request. Please check your input and try again.");
     }
 
     public BadRequestException(String message) {

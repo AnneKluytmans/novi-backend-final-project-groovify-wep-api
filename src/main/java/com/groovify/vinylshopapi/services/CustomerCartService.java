@@ -128,7 +128,8 @@ public class CustomerCartService {
                 return cartItem;
             }
         }
-        throw new RecordNotFoundException("No cart item found with id: " + cartItemId + " for cart with id: " + cart.getId());
+        throw new RecordNotFoundException("No cart item found with id: " + cartItemId + " in the cart of customer with id: "
+                + cart.getCustomer().getId());
     }
 
     private CartItem findExistingCartItem(Cart cart, VinylRecord vinylRecord) {

@@ -1,5 +1,6 @@
 package com.groovify.vinylshopapi.services;
 
+import com.groovify.vinylshopapi.dtos.BestsellersResponseDTO;
 import com.groovify.vinylshopapi.dtos.DashboardResponseDTO;
 import com.groovify.vinylshopapi.dtos.VinylRecordSummaryResponseDTO;
 import com.groovify.vinylshopapi.mappers.VinylRecordMapper;
@@ -34,25 +35,14 @@ public class DashboardService {
     public DashboardResponseDTO getDashboard(
             Integer topN
     ) {
-        LocalDate startOfLastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
-        LocalDate endOfLastMonth = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
-
-        LocalDate startOfThisMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDate endOfThisMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
-
-        LocalDate startOfLastYear = LocalDate.now().minusYears(1).withDayOfYear(1);
-        LocalDate endOfLastYear = LocalDate.now().minusYears(1).with(TemporalAdjusters.lastDayOfYear());
-
-        LocalDate startOfThisYear = LocalDate.now().withDayOfYear(1);
-        LocalDate endOfThisYear = LocalDate.now().with(TemporalAdjusters.lastDayOfYear());
-
-        List<Order> ordersLastMonth = findOrders(startOfLastMonth, endOfLastMonth);
-        List<Order> ordersThisMonth = findOrders(startOfThisMonth, endOfThisMonth);
-        List<Order> ordersLastYear = findOrders(startOfLastYear, endOfLastYear);
-        List<Order> ordersThisYear = findOrders(startOfThisYear, endOfThisYear);
+        List<Order> ordersLastMonth = findOrders(getStartOfLastMonth(), getEndOfLastMonth());
+        List<Order> ordersThisMonth = findOrders(getStartOfThisMonth(), getEndOfThisMonth());
+        List<Order> ordersLastYear = findOrders(getStartOfLastYear(), getEndOfLastYear());
+        List<Order> ordersThisYear = findOrders(getStartOfThisYear(), getEndOfThisYear());
 
         return new DashboardResponseDTO(
                 findBestSellers(ordersThisMonth, topN),
+                findBestSellers(ordersThisYear, topN),
                 calculateTotalRevenue(ordersLastMonth),
                 calculateTotalRevenue(ordersThisMonth),
                 calculateTotalRevenue(ordersLastYear),
@@ -61,6 +51,18 @@ public class DashboardService {
                 calculateTotalAmountSold(ordersThisMonth),
                 calculateTotalAmountSold(ordersLastYear),
                 calculateTotalAmountSold(ordersThisYear)
+        );
+    }
+
+    public BestsellersResponseDTO getBestsellers(
+            Integer topN
+    ) {
+        List<Order> ordersThisMonth = findOrders(getStartOfThisMonth(), getEndOfThisMonth());
+        List<Order> ordersThisYear = findOrders(getStartOfThisYear(), getEndOfThisYear());
+
+        return new BestsellersResponseDTO(
+                findBestSellers(ordersThisMonth, topN),
+                findBestSellers(ordersThisYear, topN)
         );
     }
 
@@ -118,5 +120,38 @@ public class DashboardService {
         }
 
         return bestSellers;
+    }
+
+
+    private LocalDate getStartOfLastMonth() {
+        return LocalDate.now().minusMonths(1).withDayOfMonth(1);
+    }
+
+    private LocalDate getEndOfLastMonth() {
+        return LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    private LocalDate getStartOfThisMonth() {
+        return LocalDate.now().withDayOfMonth(1);
+    }
+
+    private LocalDate getEndOfThisMonth() {
+        return LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    private LocalDate getStartOfLastYear() {
+        return LocalDate.now().minusYears(1).withDayOfYear(1);
+    }
+
+    private LocalDate getEndOfLastYear() {
+        return LocalDate.now().minusYears(1).with(TemporalAdjusters.lastDayOfYear());
+    }
+
+    private LocalDate getStartOfThisYear() {
+        return LocalDate.now().withDayOfYear(1);
+    }
+
+    private LocalDate getEndOfThisYear() {
+        return LocalDate.now().with(TemporalAdjusters.lastDayOfYear());
     }
 }

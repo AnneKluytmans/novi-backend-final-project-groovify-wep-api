@@ -17,7 +17,7 @@ import java.util.List;
 public class OpenApiConfig {
 
     private static final String devUrl = "http://localhost:8080";
-    private static final String prodUrl = "http://production.host";
+    private static final String prodUrl = "https://production.host";
 
     @Bean
     public OpenAPI myOpenAPI() {

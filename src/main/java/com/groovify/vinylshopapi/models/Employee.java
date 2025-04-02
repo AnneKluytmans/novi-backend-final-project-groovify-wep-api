@@ -17,8 +17,9 @@ public class Employee extends User {
     @Size(max = 50, message = "Job title cannot be longer than 50 characters")
     private String jobTitle;
 
+    @Column(precision = 10, scale = 2)
     @NotNull(message = "Salary is required")
-    @Positive(message = "Salary must be a positive value")
+    @DecimalMin(value = "0.00", message = "Salary must be positive")
     private BigDecimal salary;
 
     @NotNull(message = "Work hours are required")
