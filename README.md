@@ -53,13 +53,13 @@ Before running the Spring Boot Web API, ensure you have the following installed:
 ## Installation Steps
 Follow these steps to set up and run the Spring Boot Web API.
 
-1. Clone the [Groovify repository](https://github.com/AnneKluytmans/novi-backend-final-project-groovify-wep-api)
+1. Clone the [Groovify repository](https://github.com/AnneKluytmans/novi-backend-final-project-groovify-web-api)
     ```
-    git@github.com:AnneKluytmans/novi-backend-final-project-groovify-wep-api.git
+    git@github.com:AnneKluytmans/novi-backend-final-project-groovify-web-api.git
     ```
     or
     ```
-    git clone https://github.com/AnneKluytmans/novi-backend-final-project-groovify-wep-api.git
+    git clone https://github.com/AnneKluytmans/novi-backend-final-project-groovify-web-api.git
     ```
 2. Set Up Environment Variables
    Create a `.env` file in the root directory of the project and add the following:
