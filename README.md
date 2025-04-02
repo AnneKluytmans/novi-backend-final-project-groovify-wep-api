@@ -6,6 +6,8 @@ You can find the github repository [here](https://github.com/AnneKluytmans/novi-
 
 - [About The Project](#about-the-project)
 - [Built With](#built-with)
+- [Prerequisites](#prerequisites)
+- [Installation Steps](#installation-steps)
 - [Author](#author)
 
   <br>
@@ -21,13 +23,13 @@ collections, place orders and view their order details, while empowering employe
 process orders with ease.
 
 ### Features
-- **Product Management**: Customers can browse and filter the vinyl collection by artist, genre, price, and more.
-  Employees can efficiently add, update, and remove vinyl records, manage stock levels, and upload/download album covers, 
+- **Product Management**: Customers can explore the vinyl records collection, filtering by artist, genre, price, and more.
+  Employees can efficiently manage stock levels, add, update, and remove vinyl records, and upload/download album covers 
 - ensuring an accurate and up-to-date catalog.
 - **Order Management**: Customers can easily place, update, and cancel orders. They can also view their order details along with 
 - corresponding invoices. Employees can update order statuses and retrieve order and invoice details to ensure a smooth order process.
-- **User Management**: Both customers and employees can create accounts, manage their personal details, and update their information as needed.
-  Employees have the ability to retrieve customer information when necessary.
+- **User Management**: Both customers and employees can create and manage accounts and update their personal details as needed.
+  Employees have access to customer information when necessary for support or order processing.
 - **Authentication and Authorization**: Role-based access control ensures that users can only perform actions within their permissions, 
 - protecting sensitive data and maintaining system security.
 
