@@ -19,8 +19,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,6 +42,26 @@ class ArtistControllerIntegrationTest {
 
     private Artist aretha;
 
+    private final String validArtistUpdateJson = """
+            {
+                "name": "Aretha Franklin Updated",
+                "isGroup": false,
+                "debutDate": "1960-05-05",
+                "countryOfOrigin": "USA",
+                "popularity": 90
+            }
+        """;
+
+    private final String invalidArtistUpdateJson = """
+            {
+                "name": "",
+                "isGroup": null,
+                "debutDate": null,
+                "countryOfOrigin": "",
+                "popularity": null
+            }
+        """;
+
     @BeforeEach
     void setUp() {
         orderRepository.deleteAll();
@@ -59,11 +79,13 @@ class ArtistControllerIntegrationTest {
         aretha = artistRepository.findAll().getFirst();
     }
 
+    // Tests for get Artist by id
     @Test
     @WithMockUser()
-    void givenExistingArtist_whenGetArtistById_thenReturnArtistResponseDTO() throws Exception {
+    void givenExistingArtist_whenGetArtistById_thenReturnArtis() throws Exception {
         mockMvc.perform(get("/api/artists/{id}", aretha.getId())
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(aretha.getId()))
                 .andExpect(jsonPath("$.name").value(aretha.getName()))
                 .andExpect(jsonPath("$.isGroup").value(aretha.getIsGroup()))
@@ -88,4 +110,62 @@ class ArtistControllerIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value(containsString("You have to be logged in to access this resource.")));
     }
+
+
+    // Tests for update Artist
+    @Test
+    @WithMockUser(roles = {"EMPLOYEE"})
+    void givenExistingArtist_whenUpdateArtist_thenReturnUpdatedArtist() throws Exception {
+        mockMvc.perform(put("/api/artists/{id}", aretha.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validArtistUpdateJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(aretha.getId()))
+                .andExpect(jsonPath("$.name").value("Aretha Franklin Updated"))
+                .andExpect(jsonPath("$.isGroup").value(false))
+                .andExpect(jsonPath("$.debutDate").value("1960-05-05"))
+                .andExpect(jsonPath("$.countryOfOrigin").value("USA"))
+                .andExpect(jsonPath("$.popularity").value(90));
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void givenNonExistingArtist_whenUpdateArtist_thenThrowRecordNotFoundException() throws Exception {
+        mockMvc.perform(put("/api/artists/{id}", 999)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validArtistUpdateJson))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(containsString("No artist found with id: " + 999)));
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void givenInvalidRequestBody_whenUpdateArtist_thenThrowBadRequestException() throws Exception {
+        mockMvc.perform(put("/api/artists/{id}", aretha.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidArtistUpdateJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+
+    @Test
+    @WithMockUser()
+    void givenOnlyRoleUser_whenUpdateArtist_thenThrowForbiddenException() throws Exception {
+        mockMvc.perform(put("/api/artists/{id}", aretha.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validArtistUpdateJson))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(containsString("You do not have the permission to access this resource.")));
+    }
+
+    @Test
+    void givenNonAuthenticatedUser_whenUpdateArtist_thenThrowUnauthorizedException() throws Exception {
+        mockMvc.perform(put("/api/artists/{id}", aretha.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(validArtistUpdateJson))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value(containsString("You have to be logged in to access this resource.")));
+    }
+
 }
