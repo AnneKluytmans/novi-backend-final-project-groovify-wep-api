@@ -4,6 +4,7 @@ import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "artists")
 @Data
+@NoArgsConstructor
 public class Artist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,4 +44,11 @@ public class Artist {
     @OneToMany(mappedBy = "artist")
     private List<VinylRecord> vinylRecords = new ArrayList<>();
 
+    public Artist(String name, Boolean isGroup, LocalDate debutDate, String countryOfOrigin, Integer popularity) {
+        this.name = name;
+        this.isGroup = isGroup;
+        this.debutDate = debutDate;
+        this.countryOfOrigin = countryOfOrigin;
+        this.popularity = popularity;
+    }
 }
