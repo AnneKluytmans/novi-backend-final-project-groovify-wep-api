@@ -39,7 +39,6 @@ public class VinylRecordStockServiceTest {
 
     private List<VinylRecord> vinylRecords;
     private VinylRecord vinylRecordWithoutStock;
-    private List<VinylRecordStock> vinylRecordsStock;
     private VinylRecordStockRequestDTO requestDTO;
 
     @BeforeEach
@@ -59,7 +58,7 @@ public class VinylRecordStockServiceTest {
                 5000L, true, "9876543210987"
         );
 
-        vinylRecordsStock = List.of(
+        List<VinylRecordStock> vinylRecordsStock = List.of(
                 new VinylRecordStock(15, 5, vinylRecords.get(0)),
                 new VinylRecordStock(20, 8, vinylRecords.get(1)),
                 new VinylRecordStock(30, 10, vinylRecords.get(2))
@@ -73,8 +72,8 @@ public class VinylRecordStockServiceTest {
     }
 
     @Test
-    void givenExistingStock_whenGetStock_thenReturnStock() throws Exception {
-        VinylRecord record = vinylRecords.get(0);
+    void givenExistingStock_whenGetStock_thenReturnStock() {
+        VinylRecord record = vinylRecords.getFirst();
         VinylRecordStock stock = record.getStock();
 
         when(vinylRecordRepository.findById(record.getId())).thenReturn(Optional.of(record));
@@ -89,25 +88,32 @@ public class VinylRecordStockServiceTest {
         assertEquals(stock.getId(), result.getId());
         assertEquals(stock.getAmountInStock(), result.getAmountInStock());
         assertEquals(stock.getAmountSold(), result.getAmountSold());
+
+        verify(vinylRecordRepository).findById(record.getId());
+        verify(vinylRecordStockRepository).findByVinylRecord(record);
+        verify(vinylRecordStockMapper).toResponseDTO(stock);
     }
 
     @Test
-    void givenNotExistingVinylRecord_whenGetStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingVinylRecord_whenGetStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.getStock(999L));
+        verify(vinylRecordRepository).findById(999L);
     }
 
     @Test
-    void givenNotExistingStock_whenGetStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingStock_whenGetStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(vinylRecordWithoutStock.getId())).thenReturn(Optional.of(vinylRecordWithoutStock));
         when(vinylRecordStockRepository.findByVinylRecord(vinylRecordWithoutStock)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.getStock(vinylRecordWithoutStock.getId()));
+        verify(vinylRecordRepository).findById(vinylRecordWithoutStock.getId());
+        verify(vinylRecordStockRepository).findByVinylRecord(vinylRecordWithoutStock);
     }
 
     @Test
-    void givenNotExistingStock_whenCreateStock_thenReturnCreatedStock() throws Exception {
+    void givenNotExistingStock_whenCreateStock_thenReturnCreatedStock() {
         VinylRecordStock newStock = new VinylRecordStock(25, 0, vinylRecordWithoutStock);
 
         when(vinylRecordRepository.findById(vinylRecordWithoutStock.getId())).thenReturn(Optional.of(vinylRecordWithoutStock));
@@ -123,27 +129,34 @@ public class VinylRecordStockServiceTest {
         assertEquals(newStock.getId(), result.getId());
         assertEquals(newStock.getAmountInStock(), result.getAmountInStock());
         assertEquals(newStock.getAmountSold(), result.getAmountSold());
+
+        verify(vinylRecordRepository).findById(vinylRecordWithoutStock.getId());
+        verify(vinylRecordStockMapper).toEntity(requestDTO);
+        verify(vinylRecordStockRepository).save(newStock);
+        verify(vinylRecordStockMapper).toResponseDTO(newStock);
     }
 
     @Test
-    void givenExistingStock_whenCreateStock_thenThrowConflictException() throws Exception {
-        VinylRecord record = vinylRecords.get(0);
+    void givenExistingStock_whenCreateStock_thenThrowConflictException() {
+        VinylRecord record = vinylRecords.getFirst();
 
         when(vinylRecordRepository.findById(record.getId())).thenReturn(Optional.of(record));
 
         assertThrows(ConflictException.class, () -> vinylRecordStockService.createStock(record.getId(), requestDTO));
+        verify(vinylRecordRepository).findById(record.getId());
     }
 
     @Test
-    void givenNotExistingVinylRecord_whenCreateStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingVinylRecord_whenCreateStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.createStock(999L, requestDTO));
+        verify(vinylRecordRepository).findById(999L);
     }
 
     @Test
-    void givenExistingStock_whenUpdateStock_thenReturnUpdatedStock() throws Exception {
-        VinylRecord record = vinylRecords.get(0);
+    void givenExistingStock_whenUpdateStock_thenReturnUpdatedStock() {
+        VinylRecord record = vinylRecords.getFirst();
         VinylRecordStock stock = record.getStock();
 
         when(vinylRecordRepository.findById(record.getId())).thenReturn(Optional.of(record));
@@ -166,26 +179,35 @@ public class VinylRecordStockServiceTest {
         assertEquals(stock.getId(), result.getId());
         assertEquals(requestDTO.getAmountInStock(), result.getAmountInStock());
         assertEquals(requestDTO.getAmountSold(), result.getAmountSold());
+
+        verify(vinylRecordRepository).findById(record.getId());
+        verify(vinylRecordStockRepository).findByVinylRecord(record);
+        verify(vinylRecordStockMapper).updateVinylRecordStock(requestDTO, stock);
+        verify(vinylRecordStockRepository).save(stock);
+        verify(vinylRecordStockMapper).toResponseDTO(stock);
     }
 
     @Test
-    void givenNotExistingVinylRecord_whenUpdateStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingVinylRecord_whenUpdateStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.updateStock(999L, requestDTO));
+        verify(vinylRecordRepository).findById(999L);
     }
 
     @Test
-    void givenNotExistingStock_whenUpdateStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingStock_whenUpdateStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(vinylRecordWithoutStock.getId())).thenReturn(Optional.of(vinylRecordWithoutStock));
         when(vinylRecordStockRepository.findByVinylRecord(vinylRecordWithoutStock)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.updateStock(vinylRecordWithoutStock.getId(), requestDTO));
+        verify(vinylRecordRepository).findById(vinylRecordWithoutStock.getId());
+        verify(vinylRecordStockRepository).findByVinylRecord(vinylRecordWithoutStock);
     }
 
     @Test
-    void givenExistingStock_whenDeleteStock_thenDeleteStock() throws Exception {
-        VinylRecord record = vinylRecords.get(0);
+    void givenExistingStock_whenDeleteStock_thenDeleteStockSuccessfully() {
+        VinylRecord record = vinylRecords.getFirst();
         VinylRecordStock stock = record.getStock();
 
         when(vinylRecordRepository.findById(record.getId())).thenReturn(Optional.of(record));
@@ -200,17 +222,19 @@ public class VinylRecordStockServiceTest {
     }
 
     @Test
-    void givenNotExistingVinylRecord_whenDeleteStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingVinylRecord_whenDeleteStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.deleteStock(999L));
+        verify(vinylRecordRepository).findById(999L);
     }
 
     @Test
-    void givenNotExistingStock_whenDeleteStock_thenThrowRecordNotFoundException() throws Exception {
+    void givenNotExistingStock_whenDeleteStock_thenThrowRecordNotFoundException() {
         when(vinylRecordRepository.findById(vinylRecordWithoutStock.getId())).thenReturn(Optional.of(vinylRecordWithoutStock));
         when(vinylRecordStockRepository.findByVinylRecord(vinylRecordWithoutStock)).thenReturn(Optional.empty());
 
         assertThrows(RecordNotFoundException.class, () -> vinylRecordStockService.deleteStock(vinylRecordWithoutStock.getId()));
+        verify(vinylRecordStockRepository).findByVinylRecord(vinylRecordWithoutStock);
     }
 }

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @DiscriminatorValue("CUSTOMER")
 @EqualsAndHashCode(callSuper = true)
 @Data
+@NoArgsConstructor
 public class Customer extends User {
     @NotNull(message = "Subscribe status is required")
     private Boolean newsletterSubscribed = true;
@@ -32,4 +35,10 @@ public class Customer extends User {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
+
+    public Customer(String username, String email, String password, String firstName, String lastName,
+                    LocalDate dateOfBirth, String phone, Boolean newsletterSubscribed) {
+        super(username, email, password, firstName, lastName, dateOfBirth, phone);
+        this.newsletterSubscribed = newsletterSubscribed;
+    }
 }
