@@ -4,6 +4,7 @@ import com.groovify.vinylshopapi.validation.ValidDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type")
 @Data
+@NoArgsConstructor
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,4 +63,15 @@ public abstract class User {
     private Boolean isDeleted = false;
 
     private LocalDateTime deletedAt = null;
+
+    public User(String username, String email, String password, String firstName, String lastName,
+                LocalDate dateOfBirth, String phone) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.phone = phone;
+    }
 }

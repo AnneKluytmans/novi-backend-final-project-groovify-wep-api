@@ -2,9 +2,13 @@ package com.groovify.vinylshopapi.dtos;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class VinylRecordStockRequestDTO {
     @NotNull(message = "Amount in stock is required")
     @Min(value = 0)

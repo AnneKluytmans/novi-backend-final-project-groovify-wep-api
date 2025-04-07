@@ -281,7 +281,7 @@ VALUES
 
     ('2025-03-28 18:00:00', '2025-04-04 16:00:00', 'Niels Verhoeven', 113.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'RETURNED', 6, 6, 3, FALSE),
 
-    ('2025-02-26 18:00:00', '2025-02-29 12:00:00', 'Sophie Maes', 74.97, 4.99, 'First time ordering — So excited!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
+    ('2025-02-26 18:00:00', '2025-03-01 12:00:00', 'Sophie Maes', 74.97, 4.99, 'First time ordering — So excited!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
     ('2025-03-13 14:00:00', '2025-03-16 11:30:00', 'Sophie Maes', 84.97, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
     ('2025-04-20 14:00:00', '2025-04-25 10:00:00', 'Sophie Maes', 96.96, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'AWAITING_PAYMENT', 'PROCESSING', 10, 10, 4, FALSE),
 
