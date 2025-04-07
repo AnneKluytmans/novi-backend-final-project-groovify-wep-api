@@ -7,6 +7,7 @@ import com.groovify.vinylshopapi.validation.ValidEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "vinyl_records")
 @Data
+@NoArgsConstructor
 public class VinylRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,4 +78,17 @@ public class VinylRecord {
 
     @OneToMany(mappedBy = "vinylRecord")
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    public VinylRecord(String title, String description, Genre genre, String label, BigDecimal price,
+                       LocalDate releaseDate, Long playTimeSeconds, Boolean isLimitedEdition, String ean) {
+        this.title = title;
+        this.description = description;
+        this.genre = genre;
+        this.label = label;
+        this.price = price;
+        this.releaseDate = releaseDate;
+        this.playTimeSeconds = playTimeSeconds;
+        this.isLimitedEdition = isLimitedEdition;
+        this.ean = ean;
+    }
 }
