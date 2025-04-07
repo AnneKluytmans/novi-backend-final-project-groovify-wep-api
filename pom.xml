@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.groovify</groupId>
     <artifactId>vinylshop-api</artifactId>
-    <version>0.0.0</version>
+    <version>1.0.0</version>
     <name>GroovifyVinylshopWebApi</name>
     <description>Groovify Vinylshop API - Supporting inventory and order management for vinyl stores</description>
     <url/>
