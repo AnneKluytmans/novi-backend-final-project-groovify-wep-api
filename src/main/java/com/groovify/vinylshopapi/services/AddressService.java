@@ -3,6 +3,7 @@ package com.groovify.vinylshopapi.services;
 import com.groovify.vinylshopapi.dtos.AddressRequestDTO;
 import com.groovify.vinylshopapi.dtos.AddressResponseDTO;
 import com.groovify.vinylshopapi.exceptions.DeleteOperationException;
+import com.groovify.vinylshopapi.exceptions.ForbiddenException;
 import com.groovify.vinylshopapi.exceptions.RecordNotFoundException;
 import com.groovify.vinylshopapi.mappers.AddressMapper;
 import com.groovify.vinylshopapi.models.Address;
@@ -66,6 +67,16 @@ public class AddressService {
         );
         List<Address> addresses = addressRepository.findAll(specification, sort);
         return addressMapper.toResponseDTOs(addresses);
+    }
+
+    public AddressResponseDTO getAddressById(Long id) {
+        Address address = findAddress(id);
+
+        if (address.getCustomer() != null || address.getEmployee() != null) {
+            throw new ForbiddenException("Address with id: " + id + " belongs to a customer or employee");
+        }
+
+        return addressMapper.toResponseDTO(address);
     }
 
     public AddressResponseDTO createStandAloneAddress(AddressRequestDTO addressRequestDTO) {

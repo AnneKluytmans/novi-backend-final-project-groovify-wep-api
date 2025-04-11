@@ -60,6 +60,14 @@ public class AddressController {
         return ResponseEntity.ok(addresses);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AddressResponseDTO> getStandAloneAddress(
+            @PathVariable Long id
+    ) {
+        AddressResponseDTO address = addressService.getAddressById(id);
+        return ResponseEntity.ok(address);
+    }
+
     @PostMapping()
     public ResponseEntity<?> createStandAloneAddress(
             @Valid @RequestBody AddressRequestDTO addressRequestDTO,

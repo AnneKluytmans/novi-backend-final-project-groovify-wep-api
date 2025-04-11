@@ -226,16 +226,16 @@ VALUES
 -- Carts
 INSERT INTO carts (customer_id, created_at, updated_at)
 VALUES
-    (1, '2025-02-12 17:10:00', '2025-04-19 19:20:00'),
-    (2, '2025-02-18 16:20:00', '2025-04-22 17:40:00'),
-    (3, '2025-02-20 15:30:00', '2025-03-28 18:00:00'),
-    (4, '2025-02-24 14:00:00', '2025-04-19 14:30:00'),
-    (5, '2025-03-12 12:45:00', '2025-04-22 14:25:00'),
-    (6, '2025-03-14 11:00:00', '2025-04-21 15:30:00'),
-    (7, '2025-04-05 19:50:00', '2025-04-20 21:45:00'),
-    (8, '2025-04-11 09:30:00', '2025-04-23 10:30:00'),
-    (9, '2025-04-19 18:40:00', '2025-04-22 20:30:00'),
-    (10, '2025-04-22 13:15:00', '2025-04-22 16:45:00');
+    (1, '2025-02-01 17:10:00', '2025-04-11 19:20:00'),
+    (2, '2025-02-07 16:20:00', '2025-04-11 17:40:00'),
+    (3, '2025-02-09 15:30:00', '2025-03-17 18:00:00'),
+    (4, '2025-02-13 14:00:00', '2025-04-08 14:30:00'),
+    (5, '2025-03-01 12:45:00', '2025-04-11 14:25:00'),
+    (6, '2025-03-03 11:00:00', '2025-04-10 15:30:00'),
+    (7, '2025-03-25 19:50:00', '2025-04-09 21:45:00'),
+    (8, '2025-03-31 09:30:00', '2025-04-12 10:30:00'),
+    (9, '2025-04-08 18:40:00', '2025-04-11 20:30:00'),
+    (10, '2025-04-11 13:15:00', '2025-04-11 16:45:00');
 
 -- Cart Items
 INSERT INTO cart_items (cart_id, vinyl_record_id, quantity)
@@ -272,31 +272,31 @@ VALUES
 -- Orders
 INSERT INTO orders (order_date, expected_delivery_date, recipient_name, sub_total_price, shipping_cost, note, payment_method, confirmation_status, payment_status, shipping_status, shipping_address_id, billing_address_id, customer_id, is_deleted)
 VALUES
-    ('2025-02-20 19:00:00', '2025-02-23 14:00:00', 'Max Stoop', 152.96, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 1, 1, 1, FALSE),
-    ('2025-03-08 10:00:00', '2025-03-12 11:00:00', 'Max Stoop', 67.97, 4.99, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 2, 2, 1, FALSE),
+    ('2025-02-09 19:00:00', '2025-02-12 14:00:00', 'Max Stoop', 152.96, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 1, 1, 1, FALSE),
+    ('2025-02-28 10:00:00', '2025-03-01 11:00:00', 'Max Stoop', 67.97, 4.99, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 2, 2, 1, FALSE),
 
-    ('2025-02-23 13:20:00', '2025-02-26 15:00:00', 'Eva van Dongen', 115.96, 0.00, 'Urgent delivery', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 4, 5, 2, FALSE),
-    ('2025-03-18 12:00:00', '2025-03-21 10:30:00', 'Eva van Dongen', 72.97, 2.99, NULL, 'GIFT_CARD', 'CONFIRMED', 'PAID', 'DELIVERED', 33, 33, 2, FALSE),
-    ('2025-04-22 17:40:00', '2025-04-26 14:30:00', 'Eva van Dongen', 24.99, 2.99, NULL, 'IDEAL', 'PENDING', 'NOT_APPLICABLE', 'NOT_APPLICABLE', 33, 33, 2, FALSE),
+    ('2025-02-12 13:20:00', '2025-02-15 15:00:00', 'Eva van Dongen', 115.96, 0.00, 'Urgent delivery', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 4, 5, 2, FALSE),
+    ('2025-03-07 12:00:00', '2025-03-10 10:30:00', 'Eva van Dongen', 72.97, 2.99, NULL, 'GIFT_CARD', 'CONFIRMED', 'PAID', 'DELIVERED', 33, 33, 2, FALSE),
+    ('2025-04-11 17:40:00', '2025-04-15 14:30:00', 'Eva van Dongen', 24.99, 2.99, NULL, 'IDEAL', 'PENDING', 'NOT_APPLICABLE', 'NOT_APPLICABLE', 33, 33, 2, FALSE),
 
-    ('2025-03-28 18:00:00', '2025-04-04 16:00:00', 'Niels Verhoeven', 113.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'RETURNED', 6, 6, 3, FALSE),
+    ('2025-03-17 18:00:00', '2025-03-20 16:00:00', 'Niels Verhoeven', 113.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'RETURNED', 6, 6, 3, FALSE),
 
-    ('2025-02-26 18:00:00', '2025-03-01 12:00:00', 'Sophie Maes', 74.97, 4.99, 'First time ordering — So excited!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
-    ('2025-03-13 14:00:00', '2025-03-16 11:30:00', 'Sophie Maes', 84.97, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
-    ('2025-04-20 14:00:00', '2025-04-25 10:00:00', 'Sophie Maes', 96.96, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'AWAITING_PAYMENT', 'PROCESSING', 10, 10, 4, FALSE),
+    ('2025-02-15 18:00:00', '2025-02-19 12:00:00', 'Sophie Maes', 74.97, 4.99, 'First time ordering — So excited!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
+    ('2025-03-02 14:00:00', '2025-03-05 11:30:00', 'Sophie Maes', 84.97, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 8, 9, 4, FALSE),
+    ('2025-04-09 14:00:00', '2025-04-14 10:00:00', 'Sophie Maes', 96.96, 0.00, NULL, 'AFTER_PAY', 'CONFIRMED', 'AWAITING_PAYMENT', 'PROCESSING', 10, 10, 4, FALSE),
 
-    ('2025-03-15 10:35:00', '2025-03-19 14:00:00', 'Jasper van Rooij', 154.96, 0.00, NULL, 'CREDIT_CARD', 'CONFIRMED', 'PAID', 'DELIVERED', 12, 13, 5, FALSE),
+    ('2025-03-04 10:35:00', '2025-03-08 14:00:00', 'Jasper van Rooij', 154.96, 0.00, NULL, 'CREDIT_CARD', 'CONFIRMED', 'PAID', 'DELIVERED', 12, 13, 5, FALSE),
 
-    ('2025-03-17 21:00:00', '2025-03-21 16:00:00', 'Lisa van Acker', 92.97, 0.00, 'No invoice needed.', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 16, 17, 6, FALSE),
-    ('2025-04-12 19:10:00', '2025-04-15 15:30:00', 'Lisa van Acker', 74.97, 4.99, NULL, 'APPLE_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 18, 17, 6, FALSE),
+    ('2025-03-06 21:00:00', '2025-03-10 16:00:00', 'Lisa van Acker', 92.97, 0.00, 'No invoice needed.', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 16, 17, 6, FALSE),
+    ('2025-04-01 19:10:00', '2025-04-04 15:30:00', 'Lisa van Acker', 74.97, 4.99, NULL, 'APPLE_PAY', 'CONFIRMED', 'PAID', 'DELIVERED', 18, 17, 6, FALSE),
 
-    ('2025-04-06 09:10:00', '2025-04-10 12:00:00', 'Arne Smit', 59.98, 4.99, 'Gift wrap, please!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 34, 20, 7, FALSE),
-    ('2025-04-20 21:45:00', '2025-04-24 10:30:00', 'Thomas Dekker', 107.96, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'SHIPPED', 21, 20, 7, FALSE),
+    ('2025-03-26 09:10:00', '2025-03-31 12:00:00', 'Arne Smit', 59.98, 4.99, 'Gift wrap, please!', 'IDEAL', 'CONFIRMED', 'PAID', 'DELIVERED', 34, 20, 7, FALSE),
+    ('2025-04-09 21:45:00', '2025-04-13 10:30:00', 'Thomas Dekker', 107.96, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'SHIPPED', 21, 20, 7, FALSE),
 
-    ('2025-04-12 09:30:00', '2025-04-15 13:00:00', 'Anne van Beek', 62.98, 4.99, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'LOST', 22, 23, 8, FALSE),
-    ('2025-04-21 09:30:00', '2025-04-26 11:00:00', 'Anne van Beek', 121.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'PROCESSING', 24, 23, 8, FALSE),
+    ('2025-04-01 09:30:00', '2025-04-05 13:00:00', 'Anne van Beek', 62.98, 4.99, NULL, 'IDEAL', 'CONFIRMED', 'REFUNDED', 'LOST', 22, 23, 8, FALSE),
+    ('2025-04-11 09:30:00', '2025-04-15 11:00:00', 'Anne van Beek', 121.97, 0.00, NULL, 'IDEAL', 'CONFIRMED', 'PAID', 'PROCESSING', 24, 23, 8, FALSE),
 
-    ('2025-04-22 20:30:00', '2025-04-26 15:00:00', 'Stefan van der Linden', 87.97, 0.00, NULL, 'IDEAL', 'PENDING', 'NOT_APPLICABLE', 'NOT_APPLICABLE', 25, 25, 9, FALSE);
+    ('2025-04-11 20:30:00', '2025-04-15 15:00:00', 'Stefan van der Linden', 87.97, 0.00, NULL, 'IDEAL', 'PENDING', 'NOT_APPLICABLE', 'NOT_APPLICABLE', 25, 25, 9, FALSE);
 
 -- Order Items
 INSERT INTO order_items (order_id, vinyl_record_id, quantity, price_at_purchase)
@@ -364,24 +364,24 @@ VALUES
 -- Invoices
 INSERT INTO invoices (invoice_date, order_id)
 VALUES
-    ('2025-02-20 19:03:00', 1),
-    ('2025-03-08 10:05:00', 2),
+    ('2025-02-09 19:03:00', 1),
+    ('2025-02-28 10:05:00', 2),
 
-    ('2025-02-23 13:24:00', 3),
-    ('2025-03-18 12:02:00', 4),
+    ('2025-02-12 13:24:00', 3),
+    ('2025-03-07 12:02:00', 4),
 
-    ('2025-03-28 18:04:00', 6),
+    ('2025-03-17 18:04:00', 6),
 
-    ('2025-02-26 18:05:00', 7),
-    ('2025-03-18 11:30:00', 8),
+    ('2025-02-15 18:05:00', 7),
+    ('2025-03-07 11:30:00', 8),
 
-    ('2025-03-15 10:40:00', 10),
+    ('2025-03-04 10:40:00', 10),
 
-    ('2025-03-17 21:06:00', 11),
-    ('2025-04-12 19:14:00', 12),
+    ('2025-03-06 21:06:00', 11),
+    ('2025-04-01 19:14:00', 12),
 
-    ('2025-04-06 09:15:00', 13),
-    ('2025-04-20 21:49:00', 14),
+    ('2025-03-26 09:15:00', 13),
+    ('2025-04-09 21:49:00', 14),
 
-    ('2025-04-12 9:32:00', 15),
-    ('2025-04-21 9:35:00', 16);
+    ('2025-04-01 9:32:00', 15),
+    ('2025-04-11 9:35:00', 16);

@@ -245,8 +245,14 @@ public class OrderService {
     }
 
     private Address validateAddress(Long addressId, Long customerId) {
-        return addressRepository.findByIdAndCustomerIdAndCustomerIsDeletedFalse(addressId, customerId)
-                .orElseThrow(() -> new RecordNotFoundException("No address found with id: " + addressId + " for customer with id: " + customerId));
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RecordNotFoundException("No address found with id: " + addressId));
+
+        if (address.getCustomer() != null && !customerId.equals(address.getCustomer().getId()) || address.getEmployee() != null) {
+            throw new ForbiddenException("Address with id: " + addressId + " doesn't belong to customer with id: " + customerId);
+        }
+
+        return address;
     }
 
     private void validateNoExistingPendingOrder(Customer customer) {
